@@ -1,0 +1,149 @@
+---
+import LargeButton from '~/components/ui/LargeButton.astro';
+import { closingCta } from '~/data/home';
+
+/**
+ * Section / CTA (Figma 54:4245) — "Closing conversion band. Kicker, Heading
+ * and an optional Body are text properties; Show body and Show secondary
+ * reveal the supporting line and the outline button. The action row wraps and
+ * the content column fills to a 790 max-width so it reflows at narrow
+ * breakpoints."
+ *
+ * The homepage instance uses showBody=false and showSecondary=false, so only
+ * the kicker, heading and primary action render.
+ *
+ * NOTE: Figma backs this band with a raster gradient that could not be
+ * exported here (see README "Design assets"). It is reproduced with layered
+ * CSS gradients — a blue glow rising from the bottom centre with a dot
+ * texture over it — which also means it scales cleanly and ships no image.
+ */
+---
+
+<section class="cta-section">
+  <div class="container">
+    <div class="cta">
+      <div class="cta__backdrop" aria-hidden="true"></div>
+
+      <div class="cta__content">
+        <p class="cta__kicker">{closingCta.kicker}</p>
+        <h2 class="cta__heading">{closingCta.heading}</h2>
+      </div>
+
+      <div class="cta__actions">
+        <LargeButton
+          label={closingCta.action.label}
+          href={closingCta.action.href}
+          tone="white"
+        />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta-section {
+    padding-block: var(--space-5xl);
+  }
+
+  .cta {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xl);
+    padding: var(--space-4xl) var(--space-2xl);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .cta__backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-color: #eff5ff;
+  }
+
+  /* The glow: a wide ellipse of brand blue rising from the bottom centre,
+     with two lighter wings fanning out towards the top corners. */
+  .cta__backdrop::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(
+        46% 74% at 50% 110%,
+        #0a68ef 0%,
+        #2b88f7 30%,
+        rgb(116 176 250 / 0.5) 60%,
+        rgb(190 219 253 / 0) 80%
+      ),
+      conic-gradient(
+        from 208deg at 50% 132%,
+        rgb(233 243 255 / 0) 0deg,
+        rgb(139 190 251 / 0.62) 18deg,
+        rgb(206 229 254 / 0.1) 52deg,
+        rgb(139 190 251 / 0.62) 86deg,
+        rgb(233 243 255 / 0) 104deg
+      );
+  }
+
+  /* The dot texture, faded in only where the glow is. */
+  .cta__backdrop::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(
+      circle at center,
+      rgb(255 255 255 / 0.55) 1.1px,
+      transparent 1.2px
+    );
+    background-size: 14px 14px;
+    mask-image: radial-gradient(
+      52% 72% at 50% 104%,
+      #000 10%,
+      rgb(0 0 0 / 0.35) 55%,
+      transparent 82%
+    );
+  }
+
+  .cta__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+    width: 100%;
+    max-width: 790px;
+    text-align: center;
+    color: var(--color-text-primary);
+  }
+
+  .cta__kicker {
+    /* Label/Kicker */
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body-md);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.3;
+  }
+
+  .cta__heading {
+    /* Display/CTA */
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-display-3);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.2;
+    text-transform: uppercase;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  .cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs) var(--space-md);
+    width: 100%;
+  }
+</style>

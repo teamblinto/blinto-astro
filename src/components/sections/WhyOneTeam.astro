@@ -1,0 +1,112 @@
+---
+import SectionHeader from '~/components/ui/SectionHeader.astro';
+import { whyCells } from '~/data/home';
+
+/**
+ * Section / Why One Team (Figma 149:241).
+ *
+ * A 3-up grid alternating photo cards and belief cards. Belief cards push
+ * their body copy to the bottom of the cell, which is what gives the row its
+ * staggered reading rhythm in the design.
+ */
+---
+
+<section class="why">
+  <div class="container why__inner">
+    <SectionHeader eyebrow="Why One Team" subheading="A working app isn't the same as a successful one. Here's what we think successful Shopify apps need.">
+      Because Building the App Is Only One Part of Making It Successful
+    </SectionHeader>
+
+    <ul class="card-grid">
+      {whyCells.map((cell) =>
+        cell.kind === 'image' ? (
+          <li class="why__cell">
+            <img
+              class="why__image"
+              src={cell.src}
+              alt={cell.alt}
+              width={427}
+              height={320}
+              loading="lazy"
+              decoding="async"
+            />
+          </li>
+        ) : (
+          <li class="why__cell">
+            <article class:list={['why__belief', `why__belief--${cell.tone}`]}>
+              <h3 class="why__heading">{cell.heading}</h3>
+              <p class="why__body">{cell.body}</p>
+            </article>
+          </li>
+        )
+      )}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .why {
+    padding-top: var(--space-4xl);
+  }
+
+  .why__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xl);
+  }
+
+  .why__cell {
+    /* Figma pins every cell in this grid to 320px tall. */
+    min-height: 320px;
+    display: flex;
+  }
+
+  .why__image {
+    width: 100%;
+    height: 100%;
+    min-height: 320px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    background-color: var(--color-border-faint);
+  }
+
+  .why__belief {
+    display: flex;
+    flex-direction: column;
+    /* Heading top, body bottom. */
+    justify-content: space-between;
+    gap: var(--space-2xl);
+    width: 100%;
+    padding: var(--space-lg);
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+  }
+
+  .why__belief--blue {
+    background-color: var(--color-bg-accent-blue);
+  }
+
+  .why__belief--yellow {
+    background-color: var(--color-bg-accent-yellow);
+  }
+
+  .why__belief--green {
+    background-color: var(--color-bg-accent-green);
+  }
+
+  .why__heading {
+    /* Heading/Card */
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-heading-1);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.25;
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  .why__body {
+    /* Body/Default */
+    font-size: var(--font-size-body-xs);
+    line-height: 1.3;
+  }
+</style>

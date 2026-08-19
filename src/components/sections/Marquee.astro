@@ -1,0 +1,83 @@
+---
+import { marqueeItems } from '~/data/home';
+
+/**
+ * Marquee (Figma 135:135) — "Full-bleed scrolling statement band. Text is
+ * centred and deliberately overflows a clipping frame, so it bleeds at every
+ * breakpoint. Top and bottom hairlines only."
+ *
+ * Figma pins a static overflowing line; here it actually scrolls, which is
+ * what "scrolling statement band" describes. The track is duplicated so the
+ * loop is seamless, and the animation is dropped entirely for anyone who asks
+ * for reduced motion — the copy then reads as the centred static line.
+ */
+const items = [...marqueeItems, ...marqueeItems];
+---
+
+<div class="marquee">
+  <div class="marquee__track">
+    {items.map((item, index) => (
+      <span class="marquee__item" aria-hidden={index >= marqueeItems.length}>
+        <span class="marquee__bullet">•</span>
+        {item}
+      </span>
+    ))}
+  </div>
+</div>
+
+<style>
+  .marquee {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 112px;
+    padding-block: var(--space-xl);
+    border-top: 1px solid var(--color-border-subtle);
+    border-bottom: 1px solid var(--color-border-subtle);
+    overflow: hidden;
+  }
+
+  .marquee__track {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: var(--space-2xl);
+    width: max-content;
+    animation: marquee-scroll 32s linear infinite;
+  }
+
+  .marquee__item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2xl);
+    /* Display/Marquee */
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-display-4);
+    font-weight: var(--font-weight-regular);
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--color-text-primary);
+    white-space: nowrap;
+  }
+
+  .marquee__bullet {
+    color: var(--color-icon-brand);
+  }
+
+  /* The track holds two copies, so shifting by half its width loops cleanly. */
+  @keyframes marquee-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee__track {
+      animation: none;
+      justify-content: center;
+    }
+  }
+</style>

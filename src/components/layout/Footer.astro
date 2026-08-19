@@ -1,0 +1,317 @@
+---
+import Logo from '~/components/ui/Logo.astro';
+import Icon from '~/components/ui/Icon.astro';
+import {
+  offices,
+  footerTagline,
+  footerColumns,
+  socialLinks,
+  legal,
+} from '~/data/site';
+
+/**
+ * Footer (Figma 61:4383) — "Site footer. Every row wraps: locations go 2-up
+ * then 1-up, the logo/links row stacks, and the legal line splits. Widths are
+ * capped with maxWidth so the 1440 layout stays identical to the approved
+ * design. Show watermark hides the oversized decorative wordmark at narrow
+ * breakpoints."
+ */
+---
+
+<footer class="footer">
+  <div class="footer__inner">
+    <ul class="footer__offices">
+      {offices.map((office) => (
+        <li class="footer__office">
+          <Icon name={office.icon} size={84} />
+          <div class="footer__office-text">
+            <p class="footer__office-name">{office.name}</p>
+            <address class="footer__office-address">{office.address}</address>
+          </div>
+        </li>
+      ))}
+    </ul>
+
+    <hr class="footer__divider" />
+
+    <div class="footer__content">
+      <div class="footer__brand">
+        <Logo tone="inverse" height={48} href="/" />
+        <p class="footer__tagline">{footerTagline}</p>
+      </div>
+
+      <div class="footer__links">
+        {footerColumns.map((column) => (
+          <div class="footer__column">
+            <h2 class="footer__column-title">{column.title}</h2>
+            <ul class="footer__column-list">
+              {column.links.map((link) => (
+                <li>
+                  <a class="footer__link" href={link.href}>{link.label}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+
+        <div class="footer__column">
+          <h2 class="footer__column-title">Connect</h2>
+          <ul class="footer__socials">
+            {socialLinks.map((social) => (
+              <li>
+                <a
+                  class="footer__social"
+                  href={social.href}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  <Icon name={social.icon} size={20} label={social.label} />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <hr class="footer__divider" />
+      <div class="footer__legal">
+        <p>{legal.copyright}</p>
+        <p>{legal.credit}</p>
+      </div>
+    </div>
+
+    <p class="footer__watermark" aria-hidden="true">blinto</p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background-color: var(--color-bg-inverse);
+    color: var(--color-text-inverse);
+    border-radius: 20px 20px 0 0;
+    overflow: hidden;
+  }
+
+  .footer__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 48px;
+    width: 100%;
+    max-width: var(--layout-frame-width);
+    margin-inline: auto;
+    padding: var(--space-4xl) var(--space-3xl) var(--space-2xl);
+  }
+
+  /* ------------------------------------------------------------ offices -- */
+
+  .footer__offices {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-md) var(--space-lg);
+    width: 100%;
+    /* Figma pulls the office row in by 236px on each side at 1440. */
+    padding-inline: var(--layout-footer-inset);
+  }
+
+  .footer__office {
+    display: flex;
+    flex: 1 0 0;
+    align-items: center;
+    gap: var(--space-sm);
+    min-width: 280px;
+    max-width: 412px;
+    padding: var(--space-md);
+    border: 1px solid var(--color-border-inverse-subtle);
+    border-radius: var(--radius-md);
+  }
+
+  .footer__office-text {
+    display: flex;
+    flex: 1 0 0;
+    flex-direction: column;
+    gap: var(--space-2xs);
+    min-width: 0;
+  }
+
+  .footer__office-name {
+    /* Heading/Row */
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-heading-2);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.25;
+    text-transform: uppercase;
+  }
+
+  .footer__office-address {
+    /* Body/Address */
+    font-size: var(--font-size-body-sm);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.4;
+    font-style: normal;
+    color: var(--color-text-inverse-muted);
+  }
+
+  /* ------------------------------------------------------------ content -- */
+
+  .footer__divider {
+    width: 100%;
+    height: 0;
+    margin: 0;
+    border: 0;
+    border-top: 1px solid var(--color-border-inverse-subtle);
+  }
+
+  .footer__content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-2xl);
+    width: 100%;
+  }
+
+  .footer__brand {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-lg);
+  }
+
+  .footer__tagline {
+    width: 315px;
+    max-width: 100%;
+    /* Body/Muted */
+    font-size: var(--font-size-body-xs);
+    line-height: 1.5;
+  }
+
+  .footer__links {
+    display: flex;
+    flex: 1 0 0;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-2xl);
+    min-width: min(380px, 100%);
+    max-width: 873px;
+  }
+
+  .footer__column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .footer__column-title {
+    /* Label/Overline */
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-label);
+    font-weight: var(--font-weight-semibold);
+    line-height: 1.5;
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  .footer__column-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .footer__link {
+    /* Nav/Item */
+    font-size: var(--font-size-body-sm);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.2;
+    color: var(--color-text-inverse-muted);
+    transition: color 0.2s ease;
+  }
+
+  .footer__link:hover {
+    color: var(--color-text-inverse);
+  }
+
+  /* Figma lays the five icons out as 3 + 2; a 3-column grid reproduces that
+     while still reflowing if the set grows. */
+  .footer__socials {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    justify-content: start;
+    gap: var(--space-xs);
+  }
+
+  .footer__social {
+    display: grid;
+    place-items: center;
+    padding: var(--space-2xs);
+    border: 1px solid var(--color-border-inverse-subtle);
+    color: var(--color-text-inverse-muted);
+    transition:
+      color 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .footer__social:hover {
+    color: var(--color-text-inverse);
+    border-color: var(--color-border-inverse);
+  }
+
+  /* ------------------------------------------------------------- bottom -- */
+
+  .footer__bottom {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    width: 100%;
+  }
+
+  .footer__legal {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2xs) var(--space-lg);
+    width: 100%;
+    font-size: var(--font-size-body-xs);
+    line-height: 1.5;
+    opacity: 0.6;
+  }
+
+  /* ---------------------------------------------------------- watermark -- */
+
+  /**
+   * The oversized decorative wordmark. Figma ships it as a 1320x425 vector;
+   * it is reproduced as clipped live text so it scales with the column and
+   * costs nothing to download. Hidden at narrow widths, matching the
+   * design's "Show watermark" toggle.
+   */
+  .footer__watermark {
+    width: 100%;
+    font-family: var(--font-family-body);
+    font-size: clamp(150px, 36.7vw, 528px);
+    font-weight: var(--font-weight-medium);
+    line-height: 0.78;
+    letter-spacing: -0.02em;
+    text-align: center;
+    color: color-mix(in srgb, var(--color-text-inverse) 4%, transparent);
+    user-select: none;
+  }
+
+  @media (width <= 1024px) {
+    .footer__offices {
+      padding-inline: 0;
+    }
+  }
+
+  @media (width <= 768px) {
+    .footer__inner {
+      padding-inline: var(--layout-page-margin);
+    }
+
+    .footer__watermark {
+      display: none;
+    }
+  }
+</style>

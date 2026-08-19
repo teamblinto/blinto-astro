@@ -1,0 +1,55 @@
+---
+/**
+ * Eyebrow (Figma 126:6) — "Small pill label that opens every section.
+ * Padding 8/16, radius full, 1px ink outline."
+ */
+interface Props {
+  label: string;
+  /** `inverse` is for the dark CTA / footer surfaces. */
+  tone?: 'default' | 'inverse';
+}
+
+const { label, tone = 'default' } = Astro.props;
+---
+
+<span class:list={['eyebrow', `eyebrow--${tone}`]}>
+  <span class="eyebrow__dot"></span>
+  {label}
+</span>
+
+<style>
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    padding: var(--space-2xs) var(--space-sm);
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-border-subtle);
+    background-color: var(--color-bg-page);
+    color: var(--color-text-brand);
+    /* Label/Eyebrow */
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-label);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+
+  .eyebrow__dot {
+    width: 12px;
+    height: 12px;
+    border-radius: var(--radius-full);
+    background-color: var(--color-icon-brand);
+    flex-shrink: 0;
+  }
+
+  .eyebrow--inverse {
+    background-color: transparent;
+    border-color: var(--color-border-inverse-subtle);
+    color: var(--color-text-inverse);
+  }
+
+  .eyebrow--inverse .eyebrow__dot {
+    background-color: var(--color-bg-action);
+  }
+</style>

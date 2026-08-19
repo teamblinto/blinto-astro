@@ -1,0 +1,43 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/Hero.astro';
+import Marquee from '~/components/sections/Marquee.astro';
+import WhereYouAre from '~/components/sections/WhereYouAre.astro';
+import WhatWeDo from '~/components/sections/WhatWeDo.astro';
+import WhyOneTeam from '~/components/sections/WhyOneTeam.astro';
+import Faq from '~/components/sections/Faq.astro';
+import Cta from '~/components/sections/Cta.astro';
+import { faqs } from '~/data/home';
+
+const title = 'Blinto — Shopify Expert Agency for App Founders and Product Teams';
+const description =
+  'Blinto helps Shopify app founders and product teams move from idea to launch, growth, and long term support, all through one Shopify expert agency.';
+
+/** Surfaces the FAQ copy to search engines as structured data. */
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((faq) => ({
+    '@type': 'Question',
+    name: faq.question,
+    acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+  })),
+};
+---
+
+<BaseLayout {title} {description}>
+  <script
+    slot="head"
+    type="application/ld+json"
+    is:inline
+    set:html={JSON.stringify(faqSchema)}
+  />
+
+  <Hero />
+  <Marquee />
+  <WhereYouAre />
+  <WhatWeDo />
+  <WhyOneTeam />
+  <Faq />
+  <Cta />
+</BaseLayout>

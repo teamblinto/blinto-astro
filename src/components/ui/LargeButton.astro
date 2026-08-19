@@ -1,0 +1,110 @@
+---
+import Icon from './Icon.astro';
+
+/**
+ * Large Button (Figma 54:1440) — "Primary pill CTA with a circular arrow
+ * affordance. Hugs its label with a 278 min-width, so short labels match the
+ * approved hero button exactly and long labels grow. Tone=Black on light
+ * surfaces, Tone=White on dark or imagery, Tone=Outline as the secondary
+ * action."
+ */
+interface Props {
+  label: string;
+  href?: string;
+  tone?: 'black' | 'white' | 'outline';
+  class?: string;
+}
+
+const { label, href = '#contact', tone = 'black', class: className } = Astro.props;
+---
+
+<a href={href} class:list={['large-button', `large-button--${tone}`, className]}>
+  <span class="large-button__label">{label}</span>
+  <span class="large-button__arrow">
+    <Icon name="arrow-right" size={20} />
+  </span>
+</a>
+
+<style>
+  .large-button {
+    /* Figma: min-width 278, padding-left 20, padding-right/y 8, radius full */
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    min-width: 278px;
+    padding: var(--space-2xs) var(--space-2xs) var(--space-2xs) var(--space-md);
+    border-radius: var(--radius-full);
+    border: 1px solid transparent;
+    /* Label/Button */
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-label);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.3;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
+      border-color 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .large-button__label {
+    white-space: nowrap;
+  }
+
+  /* The 44px circular arrow affordance from the design. */
+  .large-button__arrow {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-full);
+    background-color: var(--color-bg-action);
+    color: var(--color-text-inverse);
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+  }
+
+  .large-button--black {
+    background-color: var(--color-bg-inverse);
+    color: var(--color-text-inverse);
+  }
+
+  .large-button--white {
+    background-color: var(--color-bg-page);
+    color: var(--color-text-primary);
+  }
+
+  .large-button--outline {
+    background-color: transparent;
+    border-color: var(--color-border-default);
+    color: var(--color-text-primary);
+  }
+
+  .large-button:hover .large-button__arrow {
+    transform: translateX(4px);
+  }
+
+  .large-button:hover {
+    transform: translateY(-2px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .large-button,
+    .large-button__arrow {
+      transition: none;
+    }
+
+    .large-button:hover,
+    .large-button:hover .large-button__arrow {
+      transform: none;
+    }
+  }
+
+  @media (width <= 480px) {
+    .large-button {
+      min-width: 0;
+      width: 100%;
+    }
+  }
+</style>

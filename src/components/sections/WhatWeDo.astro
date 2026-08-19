@@ -1,0 +1,43 @@
+---
+import SectionHeader from '~/components/ui/SectionHeader.astro';
+import FeatureCard from '~/components/ui/FeatureCard.astro';
+import { serviceCards } from '~/data/home';
+
+/** Section / What We Do (Figma 148:223). */
+---
+
+<section class="services">
+  <div class="container services__inner">
+    <SectionHeader eyebrow="What We Do About It" subheading="An app needs different things at different stages. Blinto brings the right skills in at the right time.">
+      Wherever Your App Is Today, Our Shopify Services Help Move It Forward
+    </SectionHeader>
+
+    <ul class="card-grid card-grid--aligned">
+      {serviceCards.map((card) => (
+        <li>
+          <FeatureCard
+            icon={card.icon}
+            tone={card.tone}
+            heading={card.heading}
+            body={card.body}
+            features={card.features}
+            cta={card.cta}
+            align
+          />
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .services {
+    padding-top: var(--space-4xl);
+  }
+
+  .services__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xl);
+  }
+</style>

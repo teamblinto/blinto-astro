@@ -1,0 +1,70 @@
+---
+/**
+ * Blinto logo — quatrefoil mark + wordmark.
+ *
+ * NOTE: the official logo SVG could not be exported from Figma in this
+ * environment (see README "Design assets"). The mark below is a geometric
+ * reconstruction from the design render and the wordmark is set in the body
+ * face. Drop the official `blinto-logo.svg` in and replace this file's body
+ * to swap it — every usage goes through this one component.
+ */
+interface Props {
+  /** `brand` paints the mark in Blinto blue, `inverse` in white for the footer. */
+  tone?: 'brand' | 'inverse';
+  /** Rendered height in px. Figma pins 48 in both the nav and the footer. */
+  height?: number;
+  href?: string | null;
+}
+
+const { tone = 'brand', height = 48, href = '/' } = Astro.props;
+
+const Tag = href ? 'a' : 'div';
+---
+
+<Tag
+  class:list={['logo', `logo--${tone}`]}
+  style={`--logo-height: ${height}px`}
+  {...href ? { href, 'aria-label': 'Blinto — home' } : {}}
+>
+  <svg class="logo__mark" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
+    <g fill="none" stroke="currentColor" stroke-width="3.4">
+      <circle cx="13" cy="13" r="9.3" />
+      <circle cx="27" cy="13" r="9.3" />
+      <circle cx="13" cy="27" r="9.3" />
+      <circle cx="27" cy="27" r="9.3" />
+    </g>
+  </svg>
+  <span class="logo__wordmark">blinto</span>
+</Tag>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.22em;
+    height: var(--logo-height);
+    font-size: calc(var(--logo-height) * 0.72);
+  }
+
+  .logo--brand {
+    color: var(--color-text-brand);
+  }
+
+  .logo--inverse {
+    color: var(--color-text-inverse);
+  }
+
+  .logo__mark {
+    height: calc(var(--logo-height) * 0.83);
+    width: calc(var(--logo-height) * 0.83);
+    flex-shrink: 0;
+  }
+
+  .logo__wordmark {
+    font-family: var(--font-family-body);
+    font-weight: var(--font-weight-medium);
+    font-size: 1em;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+</style>

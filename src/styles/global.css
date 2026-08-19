@@ -1,0 +1,181 @@
+/* Self-hosted webfonts — no runtime request to a third-party font CDN. */
+@import '@fontsource-variable/dm-sans';
+@import '@fontsource/staatliches/400.css';
+
+@import './tokens.css';
+
+/* ------------------------------------------------------------------ reset */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background-color: var(--color-bg-page);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-body-xs);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+img,
+picture,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul,
+ol {
+  list-style: none;
+  padding: 0;
+}
+
+/* --------------------------------------------------------------- a11y kit */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* A single, consistent focus treatment across every interactive element. */
+:where(a, button, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-text-brand);
+  outline-offset: 3px;
+  border-radius: var(--radius-md);
+}
+
+.skip-link {
+  position: absolute;
+  top: var(--space-2xs);
+  left: var(--space-2xs);
+  z-index: 100;
+  padding: var(--space-2xs) var(--space-sm);
+  background-color: var(--color-bg-inverse);
+  color: var(--color-text-inverse);
+  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-medium);
+  transform: translateY(-200%);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+/* ---------------------------------------------------------------- layout */
+
+/**
+ * The page shell. Figma pins a 1440 frame with a 60px margin; above that
+ * width the content column stays at 1320 and centres.
+ */
+.container {
+  width: 100%;
+  max-width: calc(var(--layout-content-width) + var(--layout-page-margin) * 2);
+  margin-inline: auto;
+  padding-inline: var(--layout-page-margin);
+}
+
+.section {
+  padding-block: var(--space-4xl);
+}
+
+/**
+ * Card grid.
+ *
+ * Figma models every card row as a wrapping flex line of `flex: 1 0 0` cards
+ * with a `--layout-card-min` (330px) minimum. `auto-fit` + `minmax` expresses
+ * the same intent declaratively: three across at 1440, two, then one, with
+ * cells that stay equal height so the cards' pinned CTAs line up.
+ */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(var(--layout-card-min), 100%), 1fr)
+  );
+  gap: var(--layout-grid-gap);
+  width: 100%;
+}
+
+.card-grid > * {
+  display: flex;
+  min-width: 0;
+}
+
+.card-grid > * > * {
+  width: 100%;
+}
+
+/**
+ * Row-aligned card grid.
+ *
+ * Figma aligns the divider and tick list across a row of service cards even
+ * though their body copy runs to different lengths. `subgrid` shares the
+ * grid's row tracks with each card so the five bands — icon, copy, divider,
+ * features, CTA — line up horizontally. Cards that wrap onto a new line get
+ * their own band of tracks, and browsers without subgrid fall back to the
+ * plain per-card sizing above.
+ *
+ * Use only where every card has all five bands.
+ */
+@supports (grid-template-rows: subgrid) {
+  .card-grid--aligned {
+    grid-template-rows: auto auto auto auto auto;
+  }
+
+  /* The card itself opts in via its own `align` prop — a rule here could not
+     out-specify the component's own layout declaration. */
+  .card-grid--aligned > * {
+    display: grid;
+    grid-row: span 5;
+    grid-template-rows: subgrid;
+  }
+}

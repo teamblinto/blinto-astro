@@ -1,0 +1,185 @@
+---
+import Icon, { type IconName } from './Icon.astro';
+import PillButton from './PillButton.astro';
+
+/**
+ * Card / Feature (Figma 129:96) — "The workhorse card. Features=false gives
+ * the short stage card; Features=true adds the divider and tick list.
+ * Show button=false drops the CTA for informational grids. Tone drives the
+ * pastel fill and the tick colour."
+ */
+export type CardTone = 'blue' | 'yellow' | 'green';
+
+interface Props {
+  icon: IconName;
+  tone: CardTone;
+  heading: string;
+  body: string;
+  /** Feature Row (126:24) labels. Omitting them gives the short stage card. */
+  features?: string[];
+  cta?: { label: string; href?: string };
+  /** Heading level for the card title, to keep the outline sane. */
+  as?: 'h3' | 'h4';
+  /**
+   * Opt into row alignment inside a `.card-grid--aligned`, so the divider,
+   * tick list and CTA line up across every card in the row.
+   */
+  align?: boolean;
+}
+
+const {
+  icon,
+  tone,
+  heading,
+  body,
+  features = [],
+  cta,
+  as: Heading = 'h3',
+  align = false,
+}: Props = Astro.props;
+---
+
+<article
+  class:list={[
+    'feature-card',
+    `feature-card--${tone}`,
+    align && 'feature-card--aligned',
+  ]}
+>
+  <Icon name={icon} size={48} />
+
+  <div class="feature-card__content">
+    <Heading class="feature-card__heading">{heading}</Heading>
+    <p class="feature-card__body">{body}</p>
+  </div>
+
+  {features.length > 0 && (
+    <>
+      <div class="feature-card__divider" role="presentation"></div>
+      <ul class="feature-card__features">
+        {features.map((label) => (
+          <li class="feature-card__feature">
+            <span class="feature-card__tick">
+              <Icon name="check" size={16} />
+            </span>
+            <span>{label}</span>
+          </li>
+        ))}
+      </ul>
+    </>
+  )}
+
+  {cta && (
+    <div class="feature-card__cta">
+      <PillButton label={cta.label} href={cta.href} tone="outline" />
+    </div>
+  )}
+</article>
+
+<style>
+  .feature-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-xl);
+    padding: var(--space-lg);
+    border-radius: var(--radius-md);
+    height: 100%;
+    color: var(--color-text-primary);
+  }
+
+  /* Tone drives the pastel fill and the tick colour. */
+  .feature-card--blue {
+    background-color: var(--color-bg-accent-blue);
+    --card-tick-color: var(--color-icon-brand);
+  }
+
+  .feature-card--yellow {
+    background-color: var(--color-bg-accent-yellow);
+    --card-tick-color: var(--color-icon-accent);
+  }
+
+  .feature-card--green {
+    background-color: var(--color-bg-accent-green);
+    --card-tick-color: var(--color-icon-success);
+  }
+
+  .feature-card__content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    width: 100%;
+  }
+
+  .feature-card__heading {
+    /* Heading/Card */
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-heading-1);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.25;
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  .feature-card__body {
+    /* Body/Default */
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body-xs);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.3;
+  }
+
+  .feature-card__divider {
+    width: 100%;
+    height: 1px;
+    background-color: var(--color-border-subtle);
+  }
+
+  .feature-card__features {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    width: 100%;
+  }
+
+  /* Feature Row (126:24): tick + label, 8px gap, top-aligned. */
+  .feature-card__feature {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2xs);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body-xs);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.3;
+  }
+
+  .feature-card__tick {
+    display: flex;
+    color: var(--card-tick-color);
+    /* Nudge the 16px tick onto the cap height of the 16px/1.3 label. */
+    margin-top: 0.15em;
+  }
+
+  /* The CTA is pinned to the bottom so buttons align across a row of cards
+     whose copy runs to different lengths. */
+  .feature-card__cta {
+    margin-top: auto;
+  }
+
+  /**
+   * Row-aligned variant: share the parent grid's row tracks so the divider,
+   * tick list and CTA line up across the row, as they do in the design.
+   * Declared after `.feature-card` so it wins on source order.
+   */
+  @supports (grid-template-rows: subgrid) {
+    .feature-card--aligned {
+      display: grid;
+      grid-row: span 5;
+      grid-template-rows: subgrid;
+    }
+
+    .feature-card--aligned .feature-card__cta {
+      margin-top: 0;
+    }
+  }
+</style>

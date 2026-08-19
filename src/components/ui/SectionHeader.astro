@@ -1,0 +1,157 @@
+---
+import Eyebrow from './Eyebrow.astro';
+
+/**
+ * Section Header (Figma 134:82).
+ *
+ * Layout=split   — eyebrow + bottom-aligned heading/subheading pair, wraps to
+ *                  stacked below `--layout-heading-min` (480px).
+ * Layout=centered — homepage hero on Display/Hero.
+ * Layout=stacked  — narrow column beside the FAQ list.
+ *
+ * The heading is a slot so callers can mark up part of it (the hero tints
+ * "Shopify" and drops the Shopify bag inline).
+ */
+interface Props {
+  eyebrow: string;
+  subheading?: string;
+  layout?: 'split' | 'centered' | 'stacked';
+  /** Heading level — pick per document outline, not per size. */
+  as?: 'h1' | 'h2' | 'h3';
+}
+
+const {
+  eyebrow,
+  subheading,
+  layout = 'split',
+  as: Heading = 'h2',
+}: Props = Astro.props;
+---
+
+<div class:list={['section-header', `section-header--${layout}`]}>
+  <Eyebrow label={eyebrow} />
+
+  <div class="section-header__columns">
+    <Heading class="section-header__heading">
+      <slot />
+    </Heading>
+    {subheading && (
+      <div class="section-header__aside">
+        <p class="section-header__subheading">{subheading}</p>
+      </div>
+    )}
+  </div>
+</div>
+
+<style>
+  .section-header {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .section-header__heading {
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-regular);
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--color-text-primary);
+    margin: 0;
+    /* Figma wraps these headings greedily — `balance` re-breaks them. */
+    text-wrap: normal;
+  }
+
+  .section-header__subheading {
+    /* Body/Subheading */
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body-md);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+    color: var(--color-text-primary);
+  }
+
+  /* ------------------------------------------------------------ split ---- */
+
+  .section-header--split {
+    align-items: flex-start;
+    gap: var(--space-sm);
+  }
+
+  .section-header--split .section-header__columns {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--space-lg) var(--layout-grid-gap);
+    width: 100%;
+  }
+
+  .section-header--split .section-header__heading {
+    flex: 1 0 0;
+    min-width: min(var(--layout-heading-min), 100%);
+    /* Display/Section */
+    font-size: var(--font-size-display-2);
+  }
+
+  .section-header--split .section-header__aside {
+    width: var(--layout-aside-width);
+    max-width: 100%;
+    flex-shrink: 0;
+  }
+
+  /* --------------------------------------------------------- centered ---- */
+
+  .section-header--centered {
+    align-items: center;
+    gap: var(--space-xs);
+    text-align: center;
+  }
+
+  .section-header--centered .section-header__columns {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
+    width: 100%;
+  }
+
+  .section-header--centered .section-header__heading {
+    /* Display/Hero */
+    font-size: var(--font-size-display-1);
+    max-width: 1096px;
+  }
+
+  .section-header--centered .section-header__aside {
+    max-width: 874px;
+  }
+
+  .section-header--centered .section-header__subheading {
+    /* Body/Lead */
+    font-size: var(--font-size-body-lg);
+  }
+
+  /* ---------------------------------------------------------- stacked ---- */
+
+  .section-header--stacked {
+    align-items: flex-start;
+    gap: var(--space-sm);
+  }
+
+  .section-header--stacked .section-header__columns {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-sm);
+  }
+
+  .section-header--stacked .section-header__heading {
+    font-size: var(--font-size-display-2);
+  }
+
+  /* On narrow viewports the split aside can no longer sit beside the
+     heading, so the whole header reads as one stacked column. */
+  @media (width <= 900px) {
+    .section-header--split .section-header__aside {
+      width: 100%;
+    }
+  }
+</style>

@@ -1,0 +1,162 @@
+---
+import SectionHeader from '~/components/ui/SectionHeader.astro';
+import LargeButton from '~/components/ui/LargeButton.astro';
+import Icon from '~/components/ui/Icon.astro';
+import { heroImages } from '~/data/home';
+import { primaryCta } from '~/data/site';
+
+/** Section / Hero (Figma 145:29). */
+---
+
+<section class="hero">
+  <div class="hero__content container">
+    <SectionHeader layout="centered" as="h1" eyebrow="Shopify Expert Agency" subheading="We help Shopify app founders and product teams move from idea to launch, growth, and long term support, all through one Shopify expert agency.">
+      Build, Grow, and Maintain Your{' '}
+      <span class="hero__shopify">
+        <span class="hero__bag">
+          <Icon name="shopify-bag" size="0.8em" />
+        </span>
+        <span class="hero__shopify-word">Shopify</span>
+      </span>{' '}
+      App
+    </SectionHeader>
+
+    <LargeButton label={primaryCta.label} href={primaryCta.href} tone="black" />
+  </div>
+
+  {/*
+    Hero Image Strip (135:137): five FILL-width columns whose top padding sets
+    the arc offset (0/80/160/80/0) and whose image carries a fixed height.
+    Slots keep a 180 min-width so the band bleeds and clips rather than
+    crushing on narrow frames.
+  */}
+  <div class="hero__strip">
+    <ul class="hero__slots">
+      {heroImages.map((image) => (
+        <li class="hero__slot" style={`--slot-offset: ${image.offset}px`}>
+          <img
+            class="hero__image"
+            src={image.src}
+            alt={image.alt}
+            width={264}
+            height={image.height}
+            style={`--image-height: ${image.height}px`}
+            loading="eager"
+            decoding="async"
+          />
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-block: var(--space-3xl);
+  }
+
+  .hero__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2xl);
+  }
+
+  /* "Shopify" is tinted and preceded by the decorative bag, inline with the
+     display type so it re-flows with the headline instead of being pinned. */
+  .hero__shopify {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.06em;
+    white-space: nowrap;
+  }
+
+  .hero__shopify-word {
+    color: var(--color-text-shopify);
+  }
+
+  /* Figma pins the bag at 70x80 against the 100px display face, so it is
+     expressed in em to track the fluid headline. */
+  .hero__bag {
+    display: flex;
+    color: var(--color-text-shopify);
+    transform: translateY(-0.05em);
+  }
+
+  /* --------------------------------------------------------------- strip -- */
+
+  .hero__strip {
+    width: 100%;
+    height: 460px;
+    overflow: hidden;
+  }
+
+  .hero__slots {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: var(--space-lg);
+    /* Figma's strip is 1420 inside the 1440 frame — 10px of bleed each side. */
+    width: calc(100% - 20px);
+    max-width: 1420px;
+    height: 100%;
+    margin-inline: auto;
+  }
+
+  .hero__slot {
+    display: flex;
+    flex: 1 0 0;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 180px;
+    height: 100%;
+    padding-top: var(--slot-offset);
+    overflow: hidden;
+  }
+
+  .hero__image {
+    width: 100%;
+    /* Each slot's image keeps its own designed height. */
+    height: var(--image-height);
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    background-color: var(--color-border-faint);
+  }
+
+  /**
+   * Below ~1100px five 180px slots plus gaps no longer fit, so the strip
+   * scrolls horizontally rather than crushing the photos. The arc offsets are
+   * flattened to keep the band a predictable height on small screens.
+   */
+  @media (width <= 1100px) {
+    .hero__strip {
+      height: auto;
+      padding-bottom: var(--space-2xs);
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x proximity;
+    }
+
+    .hero__slots {
+      justify-content: flex-start;
+      width: max-content;
+      max-width: none;
+      padding-inline: var(--layout-page-margin);
+    }
+
+    .hero__slot {
+      flex: 0 0 auto;
+      width: 240px;
+      height: auto;
+      padding-top: 0;
+      scroll-snap-align: center;
+    }
+
+    .hero__image {
+      height: 320px;
+    }
+  }
+</style>
