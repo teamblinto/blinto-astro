@@ -1,8 +1,9 @@
 ---
+import { Image } from 'astro:assets';
 import SectionHeader from '~/components/ui/SectionHeader.astro';
 import LargeButton from '~/components/ui/LargeButton.astro';
 import Icon from '~/components/ui/Icon.astro';
-import { heroImages } from '~/data/home';
+import { heroImages, HERO_SLOT_WIDTH } from '~/data/home';
 import { primaryCta } from '~/data/site';
 
 /** Section / Hero (Figma 145:29). */
@@ -34,12 +35,13 @@ import { primaryCta } from '~/data/site';
     <ul class="hero__slots">
       {heroImages.map((image) => (
         <li class="hero__slot" style={`--slot-offset: ${image.offset}px`}>
-          <img
+          <Image
             class="hero__image"
             src={image.src}
             alt={image.alt}
-            width={264}
+            width={HERO_SLOT_WIDTH}
             height={image.height}
+            densities={[1, 2]}
             style={`--image-height: ${image.height}px`}
             loading="eager"
             decoding="async"

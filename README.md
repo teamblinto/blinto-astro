@@ -78,11 +78,11 @@ clear 3:1 if that is wanted.
 
 ## Design assets
 
-Every **vector** asset is the real thing, exported from the Figma file itself.
-`www.figma.com` is blocked by this environment's egress policy, so the usual
-asset URLs are unreachable — instead the artwork was pulled through the Figma
-Plugin API (`exportAsync({ format: 'SVG_STRING' })`), which returns SVG as
-text rather than over HTTP. That covers:
+Every asset on the page is the real artwork from the Figma file — no
+placeholders, no reconstructions.
+
+**Vectors** were pulled through the Figma Plugin API
+(`exportAsync({ format: 'SVG_STRING' })`), which returns SVG as text:
 
 | Asset | Figma node | Lives in |
 | --- | --- | --- |
@@ -97,26 +97,26 @@ text rather than over HTTP. That covers:
 Inline icons have their `#222222` / `white` strokes rewritten to
 `currentColor`; each keeps its own Figma `viewBox` so geometry is exact.
 
-### Still outstanding: the 7 photographs
+**Photography** was exported at 2x the designed slot size and lives in
+`src/assets/images/` — deliberately *not* `public/`, so Astro's build pipeline
+optimises it. The `<Image>` component with `densities={[1, 2]}` emits WebP with
+a 1x/2x srcset, which takes the seven photos from 2.3 MB of source JPEG down to
+about 500 KB of shipped WebP.
 
-The hero strip's five photos and the two *Why One Team* photos are **generated
-placeholders**, not the real photography. Raster images cannot come through the
-text channel: the smallest is 81 KB as JPEG, and a `use_figma` response is
-capped at 20 KB, so even a half-resolution export exceeds one response and
-would have to be hand-reassembled from base64 fragments — not something to
-trust in a production asset.
+| File | Figma node | Source | Used by |
+| --- | --- | --- | --- |
+| `hero-wireframes.jpg` | 135:139 | 530x760 | Hero slot 1 |
+| `hero-laptop.jpg` | 135:141 | 530x760 | Hero slot 2 |
+| `hero-mobile-storefront.jpg` | 135:143 | 530x600 | Hero slot 3 |
+| `hero-shopify-app.jpg` | 135:145 | 530x760 | Hero slot 4 |
+| `hero-code.jpg` | 135:147 | 530x760 | Hero slot 5 |
+| `why-pair-programming.jpg` | 149:252 | 854x640 | Why One Team |
+| `why-team-workshop.jpg` | 149:265 | 854x640 | Why One Team |
 
-Two ways to finish them:
+Alt text lives beside each import in `src/data/home.ts`.
 
-1. **Allowlist `www.figma.com`** for this environment's egress policy, then
-   re-run the export — this is the clean fix and also restores normal
-   `download_assets` behaviour.
-2. **Drop the files in by hand.** Overwrite the seven `.jpg` files in
-   `public/images/` using the node IDs and sizes in
-   `public/images/README.md`. No code change is needed.
-
-The CTA band's background is deliberately *not* an image: Figma backs it with a
-315 KB raster gradient, and it is reproduced with layered CSS gradients in
+The CTA band's background is the one deliberate exception: Figma backs it with
+a 315 KB raster gradient, and it is reproduced with layered CSS gradients in
 `src/components/sections/Cta.astro`, which scales cleanly and ships no bytes.
 
 ## Deviations from the design
@@ -125,8 +125,12 @@ The CTA band's background is deliberately *not* an image: Figma backs it with a
   (388/367/367px). They are rendered equal-height here so the CTAs align, which
   is what the *What We Do* grid does in the design itself.
 - **The marquee actually scrolls.** Figma pins a static overflowing line; the
-  component description calls it a "scrolling statement band", so it animates,
-  and falls back to the static centred line under `prefers-reduced-motion`.
+  component description calls it a "scrolling statement band", so it loops
+  continuously. Two identical groups animate from 0 to -50%, and each group
+  carries its trailing gap as `padding-inline-end` so the shift lands exactly
+  on a repeat boundary — a track-level `gap` would leave it half a gap short
+  and the loop would visibly jump. Hover pauses it, and it falls back to the
+  static centred line under `prefers-reduced-motion`.
 - **The mobile nav drawer is new.** The Figma notes record it as "still an open
   design decision"; it is built from the design's own tokens.
 - **The LinkedIn icon was normalised.** Its Figma node (61:4365) carries
