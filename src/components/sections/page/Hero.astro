@@ -16,15 +16,22 @@ import type { CardImage } from '~/data/types';
 interface Props {
   eyebrow: string;
   heading: string;
-  subheading: string;
+  /** Omitted by /seo/, whose original hero is a headline and a button. */
+  subheading?: string;
   actions: CtaAction[];
-  banner: CardImage;
+  /**
+   * Omit for the pages migrated from WordPress: their original hero art lives
+   * on wp-content and dies with that site, and there is no on-brand
+   * replacement yet. The header then stands on its own.
+   */
+  banner?: CardImage;
 }
 
 const { eyebrow, heading, subheading, actions, banner }: Props = Astro.props;
 
 /** See ImageCard: never ask for a 2x that the export cannot actually supply. */
-const bannerDensities = banner.src.width >= banner.width * 2 ? [1, 2] : [1];
+const bannerDensities =
+  banner && banner.src.width >= banner.width * 2 ? [1, 2] : [1];
 ---
 
 <section class="service-hero">
@@ -44,17 +51,19 @@ const bannerDensities = banner.src.width >= banner.width * 2 ? [1, 2] : [1];
     </div>
   </div>
 
-  <Image
-    class="service-hero__banner"
-    src={banner.src}
-    alt={banner.alt}
-    width={banner.width}
-    height={banner.height}
-    densities={bannerDensities}
-    loading="eager"
-    fetchpriority="high"
-    decoding="async"
-  />
+  {banner && (
+    <Image
+      class="service-hero__banner"
+      src={banner.src}
+      alt={banner.alt}
+      width={banner.width}
+      height={banner.height}
+      densities={bannerDensities}
+      loading="eager"
+      fetchpriority="high"
+      decoding="async"
+    />
+  )}
 </section>
 
 <style>

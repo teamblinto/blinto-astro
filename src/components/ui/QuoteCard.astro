@@ -1,0 +1,96 @@
+---
+import type { CardTone } from './FeatureCard.astro';
+
+/**
+ * Client quote card.
+ *
+ * The Figma library has no testimonial component, so this is built from the
+ * design's own parts rather than invented: it is Card / Belief's shape — quote
+ * pinned top on the display face, attribution pinned bottom over a 320
+ * min-height — so a row of quotes sits in the same rhythm as every other card
+ * grid on the site.
+ *
+ * Marked up as a real <blockquote> with <cite>, so the attribution is
+ * associated with the quote rather than being loose text beneath it.
+ */
+interface Props {
+  quote: string;
+  name: string;
+  role: string;
+  tone: CardTone;
+  minHeight?: number;
+}
+
+const { quote, name, role, tone, minHeight = 320 }: Props = Astro.props;
+---
+
+<figure
+  class:list={['quote-card', `quote-card--${tone}`]}
+  style={`--quote-card-min-height: ${minHeight}px`}
+>
+  <blockquote class="quote-card__quote">{quote}</blockquote>
+
+  <figcaption class="quote-card__attribution">
+    <cite class="quote-card__name">{name}</cite>
+    <span class="quote-card__role">{role}</span>
+  </figcaption>
+</figure>
+
+<style>
+  .quote-card {
+    display: flex;
+    flex-direction: column;
+    /* Quote top, attribution bottom — Card / Belief's rhythm. */
+    justify-content: space-between;
+    gap: var(--space-xl);
+    width: 100%;
+    min-height: var(--quote-card-min-height);
+    margin: 0;
+    padding: var(--space-lg);
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+  }
+
+  .quote-card--blue {
+    background-color: var(--color-bg-accent-blue);
+  }
+
+  .quote-card--yellow {
+    background-color: var(--color-bg-accent-yellow);
+  }
+
+  .quote-card--green {
+    background-color: var(--color-bg-accent-green);
+  }
+
+  .quote-card__quote {
+    /* Heading/Row */
+    margin: 0;
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-heading-2);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.25;
+    text-transform: uppercase;
+  }
+
+  .quote-card__attribution {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xs);
+  }
+
+  .quote-card__name {
+    /* Body/Subheading, not italic — <cite>'s default slant fights the face. */
+    font-size: var(--font-size-body-md);
+    font-weight: var(--font-weight-medium);
+    font-style: normal;
+    line-height: 1.5;
+  }
+
+  .quote-card__role {
+    /* Body/Default */
+    font-size: var(--font-size-body-xs);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.3;
+  }
+</style>

@@ -224,6 +224,13 @@ export const faqs = [
 ];
 
 /** Section / CTA (150:296) */
+/** Section / FAQ (Figma 149:266) header copy. */
+export const faqSection = {
+  eyebrow: 'FAQs',
+  heading: 'Questions App Teams Ask Before Choosing a Shopify Expert Agency',
+  subheading: "Here's what most teams want to know before they reach out.",
+};
+
 export const closingCta = {
   kicker: 'Next Step',
   heading: "Your Shopify App's Next Stage Can Start With One Conversation",

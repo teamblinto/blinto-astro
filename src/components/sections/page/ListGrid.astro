@@ -1,0 +1,82 @@
+---
+import SectionHeader from '~/components/ui/SectionHeader.astro';
+import ListCard from '~/components/ui/ListCard.astro';
+import LargeButton from '~/components/ui/LargeButton.astro';
+import type { CtaAction } from '~/components/sections/Cta.astro';
+import type { ListPanel, SectionCopy } from '~/data/types';
+
+/**
+ * A section header over a row of Card / List panels and nothing else.
+ *
+ * `ListWithImage` pairs one list with a photo; this is the same card without
+ * the photo, several across. The pages migrated from WordPress need it for
+ * their "Our Core Services" bands, where each panel is a service with a short
+ * intro and its own bullets, and there is no on-brand photography to pair.
+ */
+interface Props {
+  copy: SectionCopy;
+  panels: ListPanel[];
+  /** Column floor. Default is `--layout-card-min` (330). */
+  cardMin?: number;
+  actions?: CtaAction[];
+  id?: string;
+}
+
+const { copy, panels, cardMin, actions = [], id }: Props = Astro.props;
+---
+
+<section class="list-grid" {id}>
+  <div class="container list-grid__inner">
+    <SectionHeader eyebrow={copy.eyebrow} subheading={copy.subheading}>
+      {copy.heading}
+    </SectionHeader>
+
+    <ul
+      class="card-row"
+      style={cardMin ? `--layout-card-min: ${cardMin}px` : undefined}
+    >
+      {panels.map((panel) => (
+        <li>
+          <ListCard
+            tone={panel.tone}
+            heading={panel.heading}
+            subheading={panel.subheading}
+            items={panel.items}
+          />
+        </li>
+      ))}
+    </ul>
+
+    {actions.length > 0 && (
+      <div class="list-grid__actions">
+        {actions.map((action) => (
+          <LargeButton
+            label={action.label}
+            href={action.href}
+            tone={action.tone ?? 'black'}
+          />
+        ))}
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .list-grid {
+    padding-top: var(--space-4xl);
+  }
+
+  .list-grid__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xl);
+  }
+
+  .list-grid__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs) var(--layout-grid-gap);
+  }
+</style>

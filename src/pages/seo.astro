@@ -1,0 +1,76 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/page/Hero.astro';
+import ListGrid from '~/components/sections/page/ListGrid.astro';
+import BeliefGrid from '~/components/sections/page/BeliefGrid.astro';
+import QuoteGrid from '~/components/sections/page/QuoteGrid.astro';
+import Faq from '~/components/sections/Faq.astro';
+import Cta from '~/components/sections/Cta.astro';
+import * as page from '~/data/services/seo';
+
+/**
+ * SEO Services, migrated from https://blinto.co/seo/.
+ *
+ * Lives at its WordPress path for now; step 3 of the migration moves it under
+ * /services/. The original's "Get Your Free SEO Audit" form is not reproduced
+ * here — the site is a static build with no form endpoint yet, so the band
+ * closes with the audit-call CTA instead and the form lands with the contact
+ * page decision.
+ */
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: page.faqs.map((faq) => ({
+    '@type': 'Question',
+    name: faq.question,
+    acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+  })),
+};
+---
+
+<BaseLayout title={page.meta.title} description={page.meta.description}>
+  <script
+    slot="head"
+    type="application/ld+json"
+    is:inline
+    set:html={JSON.stringify(faqSchema)}
+  />
+
+  <Hero
+    eyebrow={page.hero.eyebrow}
+    heading={page.hero.heading}
+    subheading={page.hero.subheading}
+    actions={page.hero.actions}
+  />
+
+  <ListGrid
+    copy={page.solutionsSection}
+    panels={page.solutions}
+    cardMin={260}
+  />
+
+  <BeliefGrid
+    copy={page.resultsSection}
+    cells={page.resultsCells}
+    cardMin={260}
+    cellMinHeight={260}
+  />
+
+  <QuoteGrid copy={page.quotesSection} quotes={page.quotes} cardMin={500} />
+
+  <Faq
+    eyebrow={page.faqSection.eyebrow}
+    heading={page.faqSection.heading}
+    items={page.faqs}
+    compact
+  />
+
+  <Cta
+    kicker={page.closingCta.kicker}
+    heading={page.closingCta.heading}
+    body={page.closingCta.body}
+    actions={page.closingCta.actions}
+    backdrop={page.closingCta.backdrop}
+  />
+</BaseLayout>

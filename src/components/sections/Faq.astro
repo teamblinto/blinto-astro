@@ -1,7 +1,6 @@
 ---
 import SectionHeader from '~/components/ui/SectionHeader.astro';
 import Icon from '~/components/ui/Icon.astro';
-import { faqs } from '~/data/home';
 
 /**
  * Section / FAQ (Figma 149:266) with FAQ Item (131:79) — "Accordion row.
@@ -13,8 +12,9 @@ import { faqs } from '~/data/home';
  * keyboard support and correct semantics from the platform. The first row is
  * open, matching the design.
  *
- * The props default to the homepage instance, so service pages pass their own
- * copy and the homepage keeps calling `<Faq />` with no arguments.
+ * Every caller passes its own copy. Nothing defaults: a page that omitted
+ * `subheading` used to inherit the homepage's line, which is the kind of bug
+ * that ships quietly.
  */
 export interface FaqEntry {
   question: string;
@@ -22,21 +22,17 @@ export interface FaqEntry {
 }
 
 interface Props {
-  eyebrow?: string;
-  heading?: string;
+  eyebrow: string;
+  heading: string;
+  /** Omitted by the pages migrated from WordPress, which have no such line. */
   subheading?: string;
-  items?: FaqEntry[];
+  items: FaqEntry[];
   /** Figma's Stacked Compact heading: Display/Feature (60) rather than 72. */
   compact?: boolean;
 }
 
-const {
-  eyebrow = 'FAQs',
-  heading = 'Questions App Teams Ask Before Choosing a Shopify Expert Agency',
-  subheading = "Here's what most teams want to know before they reach out.",
-  items = faqs,
-  compact = false,
-}: Props = Astro.props;
+const { eyebrow, heading, subheading, items, compact = false }: Props =
+  Astro.props;
 ---
 
 <section class="faq">

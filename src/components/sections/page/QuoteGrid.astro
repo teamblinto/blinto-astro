@@ -1,0 +1,60 @@
+---
+import SectionHeader from '~/components/ui/SectionHeader.astro';
+import QuoteCard from '~/components/ui/QuoteCard.astro';
+import type { SectionCopy, Testimonial } from '~/data/types';
+
+/**
+ * A section header over a row of client quotes.
+ *
+ * Every page migrated from WordPress carried a "Client Words…" band, and the
+ * old /testimonials/ page is the same quotes at greater length. One component
+ * serves both, so the quotes stay in one place in the data.
+ */
+interface Props {
+  copy: SectionCopy;
+  quotes: Testimonial[];
+  /** Column floor. Default is `--layout-card-min` (330). */
+  cardMin?: number;
+  /** Quote card min-height. Figma's card rhythm is 320. */
+  cardMinHeight?: number;
+}
+
+const { copy, quotes, cardMin, cardMinHeight }: Props = Astro.props;
+---
+
+<section class="quotes">
+  <div class="container quotes__inner">
+    <SectionHeader eyebrow={copy.eyebrow} subheading={copy.subheading}>
+      {copy.heading}
+    </SectionHeader>
+
+    <ul
+      class="card-row"
+      style={cardMin ? `--layout-card-min: ${cardMin}px` : undefined}
+    >
+      {quotes.map((quote) => (
+        <li>
+          <QuoteCard
+            quote={quote.quote}
+            name={quote.name}
+            role={quote.role}
+            tone={quote.tone}
+            minHeight={cardMinHeight}
+          />
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .quotes {
+    padding-top: var(--space-4xl);
+  }
+
+  .quotes__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xl);
+  }
+</style>

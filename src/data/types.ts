@@ -8,11 +8,17 @@ import type { CardTone } from '~/components/ui/FeatureCard.astro';
  * import from a particular page to know its own prop types.
  */
 
-/** The eyebrow / heading / subheading triple every Section Header carries. */
+/**
+ * The eyebrow / heading / subheading triple every Section Header carries.
+ *
+ * `subheading` is optional because several sections migrated from WordPress
+ * have a heading and nothing else, and inventing a supporting line would be
+ * writing copy rather than migrating it.
+ */
 export interface SectionCopy {
   eyebrow: string;
   heading: string;
-  subheading: string;
+  subheading?: string;
 }
 
 export interface CardImage {
@@ -48,6 +54,18 @@ export interface StageCard {
   cta?: { label: string; href?: string };
 }
 
+/**
+ * Client quote. The Figma library has no testimonial component, so QuoteCard
+ * builds one from Card / Belief's shape; `tone` picks the pastel fill the same
+ * way every other card in the system does.
+ */
+export interface Testimonial {
+  quote: string;
+  name: string;
+  role: string;
+  tone: CardTone;
+}
+
 /** Card / Person (Figma 247:4815) — portrait, name, role. No bio by design. */
 export interface Person {
   name: string;
@@ -70,4 +88,16 @@ export interface ProcessStep {
   tone: CardTone;
   heading: string;
   body?: string;
+}
+
+/**
+ * A portfolio tile: a live client site, its sector, and a screenshot. The
+ * shots are the ones the WordPress site served, kept in `src/assets` so they
+ * survive the platform move.
+ */
+export interface WorkItem {
+  name: string;
+  sector: string;
+  href: string;
+  shot: ImageMetadata;
 }

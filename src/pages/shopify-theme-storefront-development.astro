@@ -1,0 +1,80 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/page/Hero.astro';
+import BeliefGrid from '~/components/sections/page/BeliefGrid.astro';
+import ListGrid from '~/components/sections/page/ListGrid.astro';
+import ProcessGrid from '~/components/sections/page/ProcessGrid.astro';
+import QuoteGrid from '~/components/sections/page/QuoteGrid.astro';
+import Faq from '~/components/sections/Faq.astro';
+import Cta from '~/components/sections/Cta.astro';
+import * as page from '~/data/services/shopify-theme-storefront-development';
+
+/**
+ * Shopify Theme & Storefront Development, migrated from
+ * https://blinto.co/shopify-theme-storefront-development/.
+ *
+ * Lives at its WordPress path for now; step 3 of the migration moves it under
+ * /services/. Section order follows the original: hero, the problem, core
+ * services, process, why Blinto, client words, FAQ, CTA.
+ */
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: page.faqs.map((faq) => ({
+    '@type': 'Question',
+    name: faq.question,
+    acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+  })),
+};
+---
+
+<BaseLayout title={page.meta.title} description={page.meta.description}>
+  <script
+    slot="head"
+    type="application/ld+json"
+    is:inline
+    set:html={JSON.stringify(faqSchema)}
+  />
+
+  <Hero
+    eyebrow={page.hero.eyebrow}
+    heading={page.hero.heading}
+    subheading={page.hero.subheading}
+    actions={page.hero.actions}
+  />
+
+  <BeliefGrid
+    copy={page.problemSection}
+    cells={page.problemCells}
+    cardMin={500}
+    cellMinHeight={200}
+  />
+
+  <ListGrid
+    copy={page.coreServicesSection}
+    panels={page.coreServices}
+    actions={[page.coreServicesAction]}
+  />
+
+  <ProcessGrid copy={page.processSection} steps={page.processSteps} />
+
+  <BeliefGrid copy={page.whySection} cells={page.whyCells} />
+
+  <QuoteGrid copy={page.quotesSection} quotes={page.quotes} cardMin={500} />
+
+  <Faq
+    eyebrow={page.faqSection.eyebrow}
+    heading={page.faqSection.heading}
+    items={page.faqs}
+    compact
+  />
+
+  <Cta
+    kicker={page.closingCta.kicker}
+    heading={page.closingCta.heading}
+    body={page.closingCta.body}
+    actions={page.closingCta.actions}
+    backdrop={page.closingCta.backdrop}
+  />
+</BaseLayout>

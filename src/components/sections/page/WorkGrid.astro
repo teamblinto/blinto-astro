@@ -1,0 +1,77 @@
+---
+import SectionHeader from '~/components/ui/SectionHeader.astro';
+import WorkCard from '~/components/ui/WorkCard.astro';
+import type { SectionCopy, WorkItem } from '~/data/types';
+
+/**
+ * A section header over a row of portfolio tiles.
+ *
+ * Only the WordPress Design & Development page carries this band ("Our Work
+ * Speaks for Itself"); it is a section shell rather than page-local markup so
+ * the Case Studies work, when it lands, has the row already built.
+ */
+interface Props {
+  copy: SectionCopy;
+  items: WorkItem[];
+  /** Column floor. Default is `--layout-card-min` (330). */
+  cardMin?: number;
+  /** Designed tile size in px — the aspect Astro crops the shot to. */
+  tileWidth?: number;
+  tileHeight?: number;
+}
+
+const {
+  copy,
+  items,
+  cardMin,
+  tileWidth = 426,
+  tileHeight = 295,
+}: Props = Astro.props;
+---
+
+<section class="work">
+  <div class="container work__inner">
+    <SectionHeader eyebrow={copy.eyebrow} subheading={copy.subheading}>
+      {copy.heading}
+    </SectionHeader>
+
+    <ul
+      class="card-grid work__row"
+      style={cardMin ? `--layout-card-min: ${cardMin}px` : undefined}
+    >
+      {items.map((item) => (
+        <li>
+          <WorkCard
+            name={item.name}
+            sector={item.sector}
+            href={item.href}
+            shot={item.shot}
+            width={tileWidth}
+            height={tileHeight}
+          />
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .work {
+    padding-top: var(--space-4xl);
+  }
+
+  .work__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xl);
+  }
+
+  /**
+   * A grid rather than `card-row`: the strip is eight tiles over three
+   * columns, and a wrapping flex line would stretch the short last row's
+   * tiles wider than the ones above them.
+   */
+  .work__row > * {
+    align-items: flex-start;
+  }
+</style>

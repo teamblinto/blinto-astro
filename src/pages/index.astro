@@ -7,7 +7,7 @@ import WhatWeDo from '~/components/sections/WhatWeDo.astro';
 import WhyOneTeam from '~/components/sections/WhyOneTeam.astro';
 import Faq from '~/components/sections/Faq.astro';
 import Cta from '~/components/sections/Cta.astro';
-import { faqs } from '~/data/home';
+import { faqs, faqSection } from '~/data/home';
 
 const title = 'Blinto — Shopify Expert Agency for App Founders and Product Teams';
 const description =
@@ -38,6 +38,11 @@ const faqSchema = {
   <WhereYouAre />
   <WhatWeDo />
   <WhyOneTeam />
-  <Faq />
+  <Faq
+    eyebrow={faqSection.eyebrow}
+    heading={faqSection.heading}
+    subheading={faqSection.subheading}
+    items={faqs}
+  />
   <Cta />
 </BaseLayout>
