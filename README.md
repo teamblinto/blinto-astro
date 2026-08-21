@@ -8,6 +8,8 @@ Implements the **Blinto Revamp 2026** Figma design:
 | --- | --- |
 | `/` | [`145:3` — Homepage · Desktop](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Revamp-2026?node-id=145-3) |
 | `/services/app-development` | [`213:2429` — Service · Shopify App Development · Desktop](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Revamp-2026?node-id=213-2429) |
+| `/services/app-growth` | [`232:2234` — Service · Shopify App Growth · Desktop](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Revamp-2026?node-id=232-2234) |
+| `/services/support-maintenance` | [`240:3463` — Service · App Support & Maintenance · Desktop](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Revamp-2026?node-id=240-3463) |
 
 ## Getting started
 
@@ -33,7 +35,10 @@ src/
 │   ├── site.ts           Nav, footer, offices, socials
 │   ├── home.ts           Homepage copy, keyed to Figma nodes
 │   └── services/         One module per service page
-│       └── app-development.ts
+│       ├── types.ts      Shapes shared by the pages and the shells
+│       ├── app-development.ts
+│       ├── app-growth.ts
+│       └── support-maintenance.ts
 ├── styles/
 │   ├── tokens.css        Figma design variables, 1:1
 │   └── global.css        Reset, a11y kit, layout primitives
@@ -47,7 +52,9 @@ src/
 └── pages/
     ├── index.astro       Composes the homepage sections
     └── services/
-        └── app-development.astro
+        ├── app-development.astro
+        ├── app-growth.astro
+        └── support-maintenance.astro
 ```
 
 ### Conventions
@@ -143,34 +150,64 @@ JPEG down to about 500 KB of shipped WebP.
 | `svc-why-blinto-1.jpg` | 213:2476 | 1000x667 | Why Blinto |
 | `svc-why-blinto-2.jpg` | 213:2481 | 1000x667 | Why Blinto |
 | `svc-after-launch.jpg` | 217:3206 | 1300x731 | After Launch |
-| `svc-cta-backdrop.png` | 213:2503 | 2400x1100 | CTA band backdrop |
+| `grw-hero-banner.jpg` | 232:2284 | 2400x1600 | App Growth hero banner |
+| `grw-where-growth-stalls.jpg` | 233:2316 | 1200x800 | Where Growth Stalls |
+| `grw-growth-funnel.jpg` | 233:2492 | 1200x800 | The Growth Funnel |
+| `grw-why-blinto-1.jpg` | 234:2462 | 1200x800 | Why Blinto |
+| `grw-why-blinto-2.jpg` | 234:2475 | 1200x800 | Why Blinto |
+| `grw-keep-learning.jpg` | 234:2597 | 1200x800 | Keep Learning |
+| `sup-hero-banner.jpg` | 240:3513 | 2400x1600 | Support hero banner |
+| `sup-after-launch.jpg` | 241:3535 | 1200x800 | After Launch |
+| `sup-what-we-investigate.jpg` | 241:3725 | 1200x800 | What We Investigate |
+| `sup-why-blinto-1.jpg` | 242:3790 | 1200x1799 | Why Blinto |
+| `sup-why-blinto-2.jpg` | 242:3803 | 1200x900 | Why Blinto |
+| `sup-keep-learning.jpg` | 242:3908 | 1200x800 | Keep Learning |
+| `cta-backdrop.png` | 213:2503 | 2400x1100 | CTA band backdrop, all pages |
 
 Alt text lives beside each import in the page's `src/data` module.
 
-**The CTA backdrop.** The homepage was built before the band's raster gradient
-could be exported, so `Cta.astro` reproduces it with layered CSS gradients. The
-export is available now and ships on the App Development page — 863 KB of
-source PNG down to a 22 KB WebP — passed in as the component's `backdrop` prop
-and drawn as a `background-image` so `background-position` can pin the glow to
-the bottom of the band whatever height the copy gives it. Callers without a
-backdrop still get the CSS approximation, which is why the homepage looks
-unchanged; passing it `svc-cta-backdrop.png` is a one-line change if the real
-artwork is wanted there too.
+**Density is capped to the source.** `ImageCard` and the service hero compute
+their own `densities` rather than always asking for `[1, 2]`. Several Figma
+exports come back at 1200px against a 650px slot, and a blanket 2x makes Astro
+*upscale* — a visibly softer image in a larger file than the 1x it would
+otherwise have shipped. The build is audited: no generated image is wider than
+its source.
+
+**The CTA backdrop is one shared asset.** All three service pages' CTA
+gradients export byte-identical, so `cta-backdrop.png` is imported by each
+rather than committed three times. It is passed in as `Cta.astro`'s `backdrop`
+prop and drawn as a `background-image`, so `background-position` can pin the
+glow to the bottom of the band whatever height the copy gives it — 863 KB of
+source PNG down to a 22 KB WebP. The homepage was built before this could be
+exported and still falls back to `Cta.astro`'s layered CSS gradients, which is
+why it looks unchanged; passing it the same asset is a one-line change if the
+real artwork is wanted there too.
 
 ## Service pages
 
-`/services/app-development` (Figma `213:2429`) reuses the homepage's design
-system rather than forking it. Section shells live in
+The three service pages reuse the homepage's design system rather than forking
+it, and reuse each other's. Section shells live in
 `src/components/sections/service/` and are driven by data, because the design
-repeats four shapes across its ten sections:
+repeats five shapes across all thirty-one sections:
 
-| Shell | Figma sections it serves |
+| Shell | Sections it serves |
 | --- | --- |
-| `Hero.astro` | Section / Hero (`217:3139`) |
-| `ListWithImage.astro` | Before the Code, App Types, After Launch |
-| `BeliefGrid.astro` | What We Build, Why Blinto |
-| `StageGrid.astro` | Where You Are |
-| `ProcessGrid.astro` | Our Process |
+| `Hero.astro` | all three heroes |
+| `ListWithImage.astro` | Before the Code, App Types, After Launch (×2), Where Growth Stalls, The Growth Funnel, What We Investigate, Keep Learning (×2) |
+| `BeliefGrid.astro` | What We Build, What We Do (×2), Why Blinto (×3) |
+| `StageGrid.astro` | Where You Are (×3), Support Models |
+| `ProcessGrid.astro` | Our Process (×3) |
+
+Each page is one `.astro` file that composes those shells over one content
+module in `src/data/services/`. The shapes they exchange live in
+`src/data/services/types.ts`, so a shell never imports from a particular page
+to learn its own prop types.
+
+Support Models (`242:3672`) is worth calling out as reuse rather than a new
+shape: Figma builds it from the same Card / Feature in its short, button-less
+form as Where You Are, so it renders through `StageGrid` with different copy.
+`ListWithImage` takes a list of actions because Figma's Keep Learning sections
+put two buttons under the grid where After Launch puts one.
 
 Four design-system cards were missing and are new: `ListCard` (Card / List
 `173:1127`, including Bullet Row `170:1034`), `ImageCard` (Card / Image

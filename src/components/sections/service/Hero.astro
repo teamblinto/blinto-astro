@@ -3,7 +3,7 @@ import { Image } from 'astro:assets';
 import SectionHeader from '~/components/ui/SectionHeader.astro';
 import LargeButton from '~/components/ui/LargeButton.astro';
 import type { CtaAction } from '~/components/sections/Cta.astro';
-import type { CardImage } from '~/data/services/app-development';
+import type { CardImage } from '~/data/services/types';
 
 /**
  * Section / Hero (Figma 217:3139) — the service-page hero: a Split Compact
@@ -22,6 +22,9 @@ interface Props {
 }
 
 const { eyebrow, heading, subheading, actions, banner }: Props = Astro.props;
+
+/** See ImageCard: never ask for a 2x that the export cannot actually supply. */
+const bannerDensities = banner.src.width >= banner.width * 2 ? [1, 2] : [1];
 ---
 
 <section class="service-hero">
@@ -47,7 +50,7 @@ const { eyebrow, heading, subheading, actions, banner }: Props = Astro.props;
     alt={banner.alt}
     width={banner.width}
     height={banner.height}
-    densities={[1, 2]}
+    densities={bannerDensities}
     loading="eager"
     fetchpriority="high"
     decoding="async"

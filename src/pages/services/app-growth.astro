@@ -7,15 +7,14 @@ import BeliefGrid from '~/components/sections/service/BeliefGrid.astro';
 import ProcessGrid from '~/components/sections/service/ProcessGrid.astro';
 import Faq from '~/components/sections/Faq.astro';
 import Cta from '~/components/sections/Cta.astro';
-import * as page from '~/data/services/app-development';
+import * as page from '~/data/services/app-growth';
 
 /**
- * Service — Shopify App Development (Figma 213:2429).
+ * Service — Shopify App Growth (Figma 232:2234).
  *
- * The section order is the design's: hero, before the code, where you are,
- * what we build, app types, our process, why Blinto, after launch, FAQ, CTA.
- * Navigation and footer come from BaseLayout, which is where the design's
- * shared Navigation bar (213:2430) and Footer (213:2504) instances live.
+ * Section order is the design's: hero, where growth stalls, where you are,
+ * what we do, the growth funnel, our process, why Blinto, keep learning, FAQ,
+ * CTA. Navigation and footer come from BaseLayout.
  */
 
 /** Surfaces the FAQ copy to search engines as structured data. */
@@ -47,19 +46,19 @@ const faqSchema = {
   />
 
   <ListWithImage
-    copy={page.beforeTheCodeSection}
-    panel={page.beforeTheCodePanel}
-    image={page.beforeTheCodeImage}
+    copy={page.growthStallsSection}
+    panel={page.growthStallsPanel}
+    image={page.growthStallsImage}
   />
 
   <StageGrid copy={page.stagesSection} cards={page.stageCards} />
 
-  <BeliefGrid copy={page.whatWeBuildSection} cells={page.whatWeBuildCells} />
+  <BeliefGrid copy={page.whatWeDoSection} cells={page.whatWeDoCells} />
 
   <ListWithImage
-    copy={page.appTypesSection}
-    panel={page.appTypesPanel}
-    image={page.appTypesImage}
+    copy={page.funnelSection}
+    panel={page.funnelPanel}
+    image={page.funnelImage}
   />
 
   <ProcessGrid
@@ -72,10 +71,10 @@ const faqSchema = {
   <BeliefGrid copy={page.whyBlintoSection} cells={page.whyBlintoCells} />
 
   <ListWithImage
-    copy={page.afterLaunchSection}
-    panel={page.afterLaunchPanel}
-    image={page.afterLaunchImage}
-    actions={[page.afterLaunchAction]}
+    copy={page.keepLearningSection}
+    panel={page.keepLearningPanel}
+    image={page.keepLearningImage}
+    actions={page.keepLearningActions}
   />
 
   <Faq

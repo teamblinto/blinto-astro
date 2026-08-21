@@ -8,23 +8,27 @@ import type {
   CardImage,
   ListPanel,
   SectionCopy,
-} from '~/data/services/app-development';
+} from '~/data/services/types';
 
 /**
- * The two-up band used by Section / Before the Code (213:2439), Section / App
- * Types (213:2459) and Section / After Launch (213:2488): a section header
- * over a Card / List beside a Card / Image, with an optional centred action
- * closing the section.
+ * The two-up band used across the service pages — Before the Code (213:2439),
+ * App Types (213:2459), After Launch (213:2488), Where Growth Stalls
+ * (233:2277), The Growth Funnel (233:2453), What We Investigate (241:3672) and
+ * both Keep Learning sections: a section header over a Card / List beside a
+ * Card / Image, closing with an optional row of actions.
+ *
+ * The action row wraps and centres, because Figma's Keep Learning sections
+ * put two buttons here where After Launch puts one.
  */
 interface Props {
   copy: SectionCopy;
   panel: ListPanel;
   image: CardImage;
-  action?: CtaAction;
+  actions?: CtaAction[];
   id?: string;
 }
 
-const { copy, panel, image, action, id }: Props = Astro.props;
+const { copy, panel, image, actions = [], id }: Props = Astro.props;
 ---
 
 <section class="list-image" {id}>
@@ -52,13 +56,15 @@ const { copy, panel, image, action, id }: Props = Astro.props;
       </li>
     </ul>
 
-    {action && (
-      <div class="list-image__action">
-        <LargeButton
-          label={action.label}
-          href={action.href}
-          tone={action.tone ?? 'black'}
-        />
+    {actions.length > 0 && (
+      <div class="list-image__actions">
+        {actions.map((action) => (
+          <LargeButton
+            label={action.label}
+            href={action.href}
+            tone={action.tone ?? 'black'}
+          />
+        ))}
       </div>
     )}
   </div>
@@ -75,8 +81,11 @@ const { copy, panel, image, action, id }: Props = Astro.props;
     gap: var(--space-3xl);
   }
 
-  .list-image__action {
+  .list-image__actions {
     display: flex;
+    flex-wrap: wrap;
+    align-items: center;
     justify-content: center;
+    gap: var(--space-xs) var(--layout-grid-gap);
   }
 </style>

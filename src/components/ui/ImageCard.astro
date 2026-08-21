@@ -30,6 +30,14 @@ const {
   minHeight = height,
   loading = 'lazy',
 }: Props = Astro.props;
+
+/**
+ * Only offer a 2x candidate when the source has the pixels for it. Several
+ * Figma exports come back at 1200px against a 650px slot, and asking for 2x
+ * there makes Astro upscale — a visibly softer image in a *larger* file than
+ * the 1x it would otherwise have shipped.
+ */
+const densities = src.width >= width * 2 ? [1, 2] : [1];
 ---
 
 <Image
@@ -39,7 +47,7 @@ const {
   {width}
   {height}
   {loading}
-  densities={[1, 2]}
+  {densities}
   decoding="async"
   style={`--image-card-min-height: ${minHeight}px`}
 />

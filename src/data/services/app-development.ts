@@ -1,7 +1,13 @@
-import type { IconName } from '~/components/ui/Icon.astro';
-import type { CardTone } from '~/components/ui/FeatureCard.astro';
 import type { CtaAction } from '~/components/sections/Cta.astro';
 import type { FaqEntry } from '~/components/sections/Faq.astro';
+import type {
+  BeliefCell,
+  CardImage,
+  ListPanel,
+  ProcessStep,
+  SectionCopy,
+  StageCard,
+} from './types';
 
 /**
  * Photography lives in `src/assets` (not `public`) so Astro's build pipeline
@@ -14,7 +20,7 @@ import appTypes from '~/assets/images/svc-app-types.jpg';
 import whyBlintoTeam from '~/assets/images/svc-why-blinto-1.jpg';
 import whyBlintoHighFive from '~/assets/images/svc-why-blinto-2.jpg';
 import afterLaunch from '~/assets/images/svc-after-launch.jpg';
-import ctaBackdrop from '~/assets/images/svc-cta-backdrop.png';
+import ctaBackdrop from '~/assets/images/cta-backdrop.png';
 
 /**
  * Shopify App Development service page content, kept out of the markup so
@@ -24,32 +30,6 @@ import ctaBackdrop from '~/assets/images/svc-cta-backdrop.png';
  * Alt text is authored here: the design carries no alternative text, so each
  * string describes the photograph that shipped in that slot.
  */
-
-export interface SectionCopy {
-  eyebrow: string;
-  heading: string;
-  subheading: string;
-}
-
-export interface CardImage {
-  src: ImageMetadata;
-  alt: string;
-  /** Designed slot size from Figma, in px. */
-  width: number;
-  height: number;
-}
-
-export interface ListPanel {
-  tone: CardTone;
-  heading: string;
-  subheading?: string;
-  items: string[];
-}
-
-/** A cell in a belief grid: either a statement card or a photo tile. */
-export type BeliefCell =
-  | { kind: 'belief'; tone: CardTone; heading: string; body: string }
-  | { kind: 'image'; image: CardImage };
 
 export const meta = {
   title:
@@ -124,12 +104,7 @@ export const stagesSection: SectionCopy = {
     'No two founders arrive at the same starting point. We meet you where you are and build from there.',
 };
 
-export const stageCards: {
-  icon: IconName;
-  tone: CardTone;
-  heading: string;
-  body: string;
-}[] = [
+export const stageCards: StageCard[] = [
   {
     icon: 'idea',
     tone: 'blue',
@@ -239,12 +214,7 @@ export const processSection: SectionCopy = {
     'A structured process gives founders clearer decisions, visible progress, and fewer surprises as the product moves from idea to launch.',
 };
 
-export const processSteps: {
-  number: string;
-  tone: CardTone;
-  heading: string;
-  body: string;
-}[] = [
+export const processSteps: ProcessStep[] = [
   {
     number: '01',
     tone: 'green',
