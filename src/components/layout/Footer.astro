@@ -23,7 +23,15 @@ import {
     <ul class="footer__offices">
       {offices.map((office) => (
         <li class="footer__office">
-          <Icon name={office.icon} size={84} />
+          <img
+            class="footer__office-map"
+            src={office.map}
+            alt=""
+            width={84}
+            height={84}
+            loading="lazy"
+            decoding="async"
+          />
           <div class="footer__office-text">
             <p class="footer__office-name">{office.name}</p>
             <address class="footer__office-address">{office.address}</address>
@@ -82,7 +90,15 @@ import {
       </div>
     </div>
 
-    <p class="footer__watermark" aria-hidden="true">blinto</p>
+    <img
+      class="footer__watermark"
+      src="/images/wordmark.svg"
+      alt=""
+      width={1320}
+      height={426}
+      loading="lazy"
+      decoding="async"
+    />
   </div>
 </footer>
 
@@ -127,6 +143,12 @@ import {
     padding: var(--space-md);
     border: 1px solid var(--color-border-inverse-subtle);
     border-radius: var(--radius-md);
+  }
+
+  .footer__office-map {
+    width: 84px;
+    height: 84px;
+    flex-shrink: 0;
   }
 
   .footer__office-text {
@@ -282,21 +304,13 @@ import {
   /* ---------------------------------------------------------- watermark -- */
 
   /**
-   * The oversized decorative wordmark. Figma ships it as a 1320x425 vector;
-   * it is reproduced as clipped live text so it scales with the column and
-   * costs nothing to download. Hidden at narrow widths, matching the
+   * The oversized decorative wordmark (Figma 72:185), a 1320x426 vector that
+   * already carries its own 4% opacity. Hidden at narrow widths, matching the
    * design's "Show watermark" toggle.
    */
   .footer__watermark {
     width: 100%;
-    font-family: var(--font-family-body);
-    font-size: clamp(150px, 36.7vw, 528px);
-    font-weight: var(--font-weight-medium);
-    line-height: 0.78;
-    letter-spacing: -0.02em;
-    text-align: center;
-    color: color-mix(in srgb, var(--color-text-inverse) 4%, transparent);
-    user-select: none;
+    height: auto;
   }
 
   @media (width <= 1024px) {

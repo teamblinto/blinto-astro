@@ -1,14 +1,18 @@
 ---
 /**
- * Inline icon set.
+ * Icon set — exported verbatim from the Figma file via the Plugin API
+ * (`exportAsync({ format: 'SVG_STRING' })`), then normalised:
  *
- * Icons render inline (not via <img>) so they inherit `currentColor` and stay
- * crisp at any size, and so the page makes no extra requests for them.
+ * - the design's literal `#222222` / `white` strokes and fills become
+ *   `currentColor`, so an icon takes its colour from context;
+ * - each icon keeps its own Figma `viewBox`, so geometry is exact rather than
+ *   refitted to a common grid;
+ * - coordinates are rounded to 2dp (these render at <= 48px).
  *
- * NOTE: Figma's exported icon SVGs were unreachable in this environment (see
- * README "Design assets"), so these glyphs are authored to match the design
- * renders. `region-us` / `region-bd` are explicit stand-ins for the two
- * illustrated map silhouettes in the footer.
+ * Brand-coloured artwork (the Shopify bag) keeps its real palette — those
+ * colours identify the brand and must not follow the surrounding text.
+ *
+ * Node IDs are recorded per icon so any of these can be re-exported.
  */
 export type IconName =
   | 'caret-down'
@@ -16,21 +20,20 @@ export type IconName =
   | 'menu'
   | 'close'
   | 'plus'
+  | 'minus'
   | 'check'
   | 'facebook'
   | 'instagram'
   | 'linkedin'
   | 'x'
   | 'youtube'
+  | 'shopify-bag'
   | 'idea'
-  | 'launch'
-  | 'system'
-  | 'maintain'
   | 'growth'
   | 'support'
-  | 'shopify-bag'
-  | 'region-us'
-  | 'region-bd';
+  | 'launch'
+  | 'admin'
+  | 'updates';
 
 interface Props {
   name: IconName;
@@ -48,8 +51,138 @@ interface Props {
   label?: string;
 }
 
-const { name, size, class: className, label }: Props = Astro.props;
+type IconDef = { viewBox: string; body: string };
 
+const S = 'stroke="currentColor"';
+const F = 'fill="currentColor"';
+
+const ICONS: Record<IconName, IconDef> = {
+  /* Figma I145:4;54:1398 */
+  'caret-down': {
+    viewBox: '0 0 11 6',
+    body: `<path d="M10.85 0.85L5.85 5.85C5.81 5.9 5.75 5.94 5.69 5.96C5.63 5.99 5.57 6 5.5 6C5.43 6 5.37 5.99 5.31 5.96C5.25 5.94 5.19 5.9 5.15 5.85L0.15 0.85C0.05 0.76 0 0.63 0 0.5C0 0.37 0.05 0.24 0.15 0.15C0.24 0.05 0.37 0 0.5 0C0.63 0 0.76 0.05 0.85 0.15L5.5 4.79L10.15 0.15C10.19 0.1 10.25 0.06 10.31 0.04C10.37 0.01 10.43 0 10.5 0C10.57 0 10.63 0.01 10.69 0.04C10.75 0.06 10.81 0.1 10.85 0.15C10.9 0.19 10.94 0.25 10.96 0.31C10.99 0.37 11 0.43 11 0.5C11 0.57 10.99 0.63 10.96 0.69C10.94 0.75 10.9 0.81 10.85 0.85Z" ${F}/>`,
+  },
+
+  /* Figma I145:44;54:1435 — the orange disc is drawn in CSS by the button. */
+  'arrow-right': {
+    viewBox: '0 0 44 44',
+    body: `<path d="M13.75 22H30.25" ${S} stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 13.75L30.25 22L22 30.25" ${S} stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>`,
+  },
+
+  /* Figma 152:399 — note the deliberately shorter third bar. */
+  menu: {
+    viewBox: '0 0 24 24',
+    body: `<rect y="6" width="24" height="2" rx="1" ${F}/><rect y="11.5" width="24" height="2" rx="1" ${F}/><rect y="17" width="16" height="2" rx="1" ${F}/>`,
+  },
+
+  /**
+   * The design system has no close glyph, so this rotates the real Plus
+   * (125:181) by 45deg rather than introducing a foreign icon.
+   */
+  close: {
+    viewBox: '0 0 32 32',
+    body: `<path d="M16 5.33V26.67M26.67 16H5.34" ${S} stroke-width="1.5" stroke-linejoin="round" transform="rotate(45 16 16)"/>`,
+  },
+
+  /* Figma 125:181 */
+  plus: {
+    viewBox: '0 0 32 32',
+    body: `<path d="M16 5.33V26.67M26.67 16H5.34" ${S} stroke-width="1.5" stroke-linejoin="round"/>`,
+  },
+
+  /* Figma 125:185 */
+  minus: {
+    viewBox: '0 0 32 32',
+    body: `<path d="M26.66 16L5.33 16" ${S} stroke-width="1.5" stroke-linejoin="round"/>`,
+  },
+
+  /* Figma 125:177 — Icon / 16 / Tick */
+  check: {
+    viewBox: '0 0 16 16',
+    body: `<path d="M3.33 9.67C3.33 9.67 4.33 9.67 5.67 12C5.67 12 9.37 5.89 12.67 4.67" ${S} stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>`,
+  },
+
+  /* Figma 125:142 — Icon / 48 / Idea */
+  idea: {
+    viewBox: '0 0 48 48',
+    body: `<path d="M38 19.24C38 24.4 35.46 28.37 31.6 30.98C30.7 31.59 30.25 31.9 30.02 32.24C29.8 32.59 29.73 33.04 29.58 33.95L29.46 34.66C29.19 36.25 29.06 37.05 28.5 37.53C27.94 38 27.13 38 25.51 38H20.29C18.67 38 17.86 38 17.3 37.53C16.74 37.05 16.61 36.25 16.34 34.66L16.23 33.95C16.07 33.05 16 32.59 15.78 32.25C15.56 31.9 15.11 31.6 14.21 30.98C10.38 28.37 8 24.4 8 19.24C8 10.82 14.72 4 23 4C24.03 4 25.03 4.1 26 4.3" ${S} stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M33 4L33.52 5.39C34.19 7.22 34.53 8.14 35.2 8.8C35.86 9.47 36.78 9.81 38.61 10.48L40 11L38.61 11.52C36.78 12.19 35.86 12.53 35.2 13.2C34.53 13.86 34.19 14.78 33.52 16.61L33 18L32.48 16.61C31.81 14.78 31.47 13.86 30.8 13.2C30.14 12.53 29.22 12.19 27.39 11.52L26 11L27.39 10.48C29.22 9.81 30.14 9.47 30.8 8.8C31.47 8.14 31.81 7.22 32.48 5.39L33 4Z" ${S} stroke-width="3" stroke-linejoin="round"/><path d="M27 38V40C27 41.89 27 42.83 26.41 43.41C25.83 44 24.89 44 23 44C21.11 44 20.17 44 19.59 43.41C19 42.83 19 41.89 19 40V38" ${S} stroke-width="3" stroke-linejoin="round"/>`,
+  },
+
+  /* Figma 125:155 — Icon / 48 / Growth */
+  growth: {
+    viewBox: '0 0 48 48',
+    body: `<path d="M42 42H20C13.4 42 10.1 42 8.05 39.95C6 37.9 6 34.6 6 28V6" ${S} stroke-width="3" stroke-linecap="round"/><path d="M15.99 34C23.06 34 37.82 31.07 37.4 12.87M32.98 16.09L36.74 12.29C37.13 11.9 37.76 11.9 38.15 12.29L41.99 16.09" ${S} stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`,
+  },
+
+  /* Figma 125:167 — Icon / 48 / Support */
+  support: {
+    viewBox: '0 0 48 48',
+    body: `<path d="M34 21.61C34 20.92 34 20.57 34.1 20.26C34.41 19.37 35.2 19.02 36 18.66C36.9 18.25 37.35 18.04 37.79 18.01C38.3 17.97 38.8 18.08 39.24 18.32C39.81 18.64 40.21 19.25 40.62 19.75C42.5 22.04 43.45 23.18 43.79 24.45C44.07 25.47 44.07 26.53 43.79 27.55C43.29 29.4 41.7 30.94 40.52 32.37C39.92 33.1 39.62 33.47 39.24 33.68C38.8 33.92 38.3 34.03 37.79 33.99C37.35 33.96 36.9 33.75 36 33.34C35.2 32.98 34.41 32.63 34.1 31.74C34 31.43 34 31.08 34 30.39V21.61Z" ${S} stroke-width="3"/><path d="M14 21.61C14 20.74 13.98 19.96 13.27 19.34C13.02 19.12 12.68 18.97 12 18.66C11.1 18.25 10.65 18.04 10.21 18.01C8.87 17.9 8.15 18.81 7.38 19.75C5.5 22.04 4.55 23.18 4.21 24.45C3.93 25.47 3.93 26.53 4.21 27.55C4.71 29.4 6.3 30.94 7.48 32.37C8.22 33.27 8.93 34.09 10.21 33.99C10.65 33.96 11.1 33.75 12 33.34C12.68 33.03 13.02 32.88 13.27 32.66C13.98 32.04 14 31.26 14 30.39V21.61Z" ${S} stroke-width="3"/><path d="M10 18C10 11.37 16.27 6 24 6C31.73 6 38 11.37 38 18" ${S} stroke-width="3" stroke-linecap="square" stroke-linejoin="round"/><path d="M38 34V35.6C38 39.13 34.42 42 30 42H26" ${S} stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`,
+  },
+
+  /* Figma 125:150 — Icon / 48 / Launch */
+  launch: {
+    viewBox: '0 0 48 48',
+    body: `<path d="M14.59 34C7.06 14.5 17.73 5.88 24 4C30.27 5.88 40.94 14.5 33.41 34C32.27 33.38 28.8 32.13 24 32.13C19.2 32.13 15.73 33.38 14.59 34Z" ${S} stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M28 18C28 15.79 26.21 14 24 14C21.79 14 20 15.79 20 18C20 20.21 21.79 22 24 22C26.21 22 28 20.21 28 18Z" ${S} stroke-width="3"/><path d="M35 31.12C37.88 31.38 41.42 32.16 43.96 34C43.96 34 45.01 24.13 36 22" ${S} stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 31.12C10.12 31.38 6.58 32.16 4.04 34C4.04 34 2.99 24.13 12 22" ${S} stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 38C19 38 19.83 43 24 44C28.17 43 29 38 29 38" ${S} stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`,
+  },
+
+  /* Figma 125:160 — Icon / 48 / Admin */
+  admin: {
+    viewBox: '0 0 48 48',
+    body: `<path d="M24 4V44M41 24H7" ${S} stroke-width="3" stroke-linecap="round"/><path d="M42 22.37V16.56C42 13.28 42 11.64 41.19 10.57C40.38 9.5 38.56 8.98 34.9 7.94C32.4 7.23 30.2 6.38 28.44 5.6C26.05 4.53 24.85 4 24 4C23.15 4 21.95 4.53 19.56 5.6C17.8 6.38 15.6 7.23 13.1 7.94C9.44 8.98 7.62 9.5 6.81 10.57C6 11.64 6 13.28 6 16.56V22.37C6 33.62 16.13 40.37 21.19 43.04C22.4 43.68 23.01 44 24 44C24.99 44 25.6 43.68 26.81 43.04C31.87 40.37 42 33.62 42 22.37Z" ${S} stroke-width="3" stroke-linecap="round"/>`,
+  },
+
+  /* Figma 125:173 — Icon / 48 / Updates */
+  updates: {
+    viewBox: '0 0 48 48',
+    body: `<path d="M30 21.5C30 24.81 27.31 27.5 24 27.5C20.69 27.5 18 24.81 18 21.5C18 18.19 20.69 15.5 24 15.5C27.31 15.5 30 18.19 30 21.5Z" ${S} stroke-width="3"/><path d="M40.14 12.98L39.28 11.48C38.63 10.35 38.3 9.78 37.75 9.56C37.19 9.33 36.57 9.51 35.31 9.87L33.19 10.47C32.39 10.65 31.55 10.55 30.82 10.17L30.23 9.83C29.6 9.43 29.12 8.84 28.86 8.14L28.27 6.39C27.89 5.24 27.7 4.66 27.24 4.33C26.79 4 26.18 4 24.97 4H23.03C21.82 4 21.21 4 20.76 4.33C20.3 4.66 20.11 5.24 19.73 6.39L19.14 8.14C18.88 8.84 18.4 9.43 17.77 9.83L17.18 10.17C16.45 10.55 15.61 10.65 14.81 10.47L12.69 9.87C11.43 9.51 10.81 9.33 10.25 9.56C9.7 9.78 9.37 10.35 8.72 11.48L7.86 12.98C7.25 14.05 6.95 14.58 7.01 15.14C7.07 15.71 7.47 16.16 8.29 17.08L10.09 19.09C10.53 19.65 10.84 20.63 10.84 21.5C10.84 22.38 10.53 23.35 10.09 23.91L8.29 25.92C7.47 26.84 7.07 27.29 7.01 27.86C6.95 28.42 7.25 28.95 7.86 30.02L8.72 31.52C9.37 32.65 9.7 33.22 10.25 33.44C10.81 33.67 11.43 33.49 12.69 33.13L14.81 32.53C15.61 32.35 16.45 32.45 17.18 32.83L17.77 33.17C18.4 33.57 18.88 34.16 19.14 34.86L19.73 36.61C20.11 37.76 20.3 38.34 20.76 38.67C21.21 39 21.82 39 23.03 39H24.97C26.18 39 26.79 39 27.24 38.67C27.7 38.34 27.89 37.76 28.27 36.61L28.86 34.86C29.12 34.16 29.6 33.57 30.23 33.17L30.82 32.83C31.55 32.45 32.39 32.35 33.19 32.53L35.31 33.13C36.57 33.49 37.19 33.67 37.75 33.44C38.3 33.22 38.63 32.65 39.28 31.52L40.14 30.02C40.75 28.95 41.05 28.42 40.99 27.86C40.93 27.29 40.53 26.84 39.71 25.92L37.91 23.91C37.47 23.35 37.16 22.38 37.16 21.5C37.16 20.63 37.47 19.65 37.91 19.09L39.71 17.08C40.53 16.16 40.93 15.71 40.99 15.14C41.05 14.58 40.75 14.05 40.14 12.98Z" ${S} stroke-width="3" stroke-linecap="round"/><path d="M44 36C44 37.86 44 38.79 43.8 39.55C43.24 41.62 41.62 43.24 39.55 43.8C38.79 44 37.86 44 36 44H12C10.14 44 9.21 44 8.45 43.8C6.38 43.24 4.76 41.62 4.2 39.55C4 38.79 4 37.86 4 36" ${S} stroke-width="3" stroke-linecap="round"/>`,
+  },
+
+  /* Figma I150:310;61:4357 */
+  facebook: {
+    viewBox: '0 0 20 20',
+    body: `<path fill-rule="evenodd" clip-rule="evenodd" d="M5.15 8.61C4.34 8.61 4.17 8.77 4.17 9.54V10.93C4.17 11.69 4.34 11.85 5.15 11.85H7.12V17.41C7.12 18.17 7.29 18.33 8.11 18.33H10.08C10.89 18.33 11.06 18.17 11.06 17.41V11.85H13.27C13.89 11.85 14.05 11.74 14.22 11.18L14.64 9.79C14.93 8.83 14.75 8.61 13.69 8.61H11.06V6.3C11.06 5.78 11.5 5.37 12.05 5.37H14.85C15.66 5.37 15.83 5.21 15.83 4.44V2.59C15.83 1.83 15.66 1.67 14.85 1.67H12.05C9.33 1.67 7.12 3.74 7.12 6.3V8.61H5.15Z" ${S} stroke-width="1.25" stroke-linejoin="round"/>`,
+  },
+
+  /* Figma I150:310;61:4360 */
+  instagram: {
+    viewBox: '0 0 20 20',
+    body: `<path d="M2.5 10C2.5 6.46 2.5 4.7 3.6 3.6C4.7 2.5 6.46 2.5 10 2.5C13.54 2.5 15.3 2.5 16.4 3.6C17.5 4.7 17.5 6.46 17.5 10C17.5 13.54 17.5 15.3 16.4 16.4C15.3 17.5 13.54 17.5 10 17.5C6.46 17.5 4.7 17.5 3.6 16.4C2.5 15.3 2.5 13.54 2.5 10Z" ${S} stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.33 10C13.33 11.84 11.84 13.33 10 13.33C8.16 13.33 6.67 11.84 6.67 10C6.67 8.16 8.16 6.67 10 6.67C11.84 6.67 13.33 8.16 13.33 10Z" ${S} stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.48 5.63H14.37M14.58 5.63C14.58 5.74 14.49 5.83 14.37 5.83C14.26 5.83 14.17 5.74 14.17 5.63C14.17 5.51 14.26 5.42 14.37 5.42C14.49 5.42 14.58 5.51 14.58 5.63Z" ${S} stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>`,
+  },
+
+  /**
+   * Figma I150:310;61:4365. The source node carries stroke-opacity="0.2" and
+   * no stroke-width, which renders it visibly faded next to its four
+   * siblings — an inconsistency in the design, not an intent. Normalised to
+   * match the rest of the row; see README "Deviations from the design".
+   */
+  linkedin: {
+    viewBox: '0 0 20 20',
+    body: `<path d="M3.75 7.92H3.33C2.55 7.92 2.15 7.92 1.91 8.16C1.67 8.4 1.67 8.8 1.67 9.58V16.67C1.67 17.45 1.67 17.85 1.91 18.09C2.15 18.33 2.55 18.33 3.33 18.33H3.75C4.54 18.33 4.93 18.33 5.17 18.09C5.42 17.85 5.42 17.45 5.42 16.67V9.58C5.42 8.8 5.42 8.4 5.17 8.16C4.93 7.92 4.54 7.92 3.75 7.92Z" ${S} stroke-width="1.25"/><path d="M5.42 3.54C5.42 4.58 4.58 5.42 3.54 5.42C2.51 5.42 1.67 4.58 1.67 3.54C1.67 2.51 2.51 1.67 3.54 1.67C4.58 1.67 5.42 2.51 5.42 3.54Z" ${S} stroke-width="1.25"/><path d="M10.27 7.92H9.58C8.8 7.92 8.4 7.92 8.16 8.16C7.92 8.4 7.92 8.8 7.92 9.58V16.67C7.92 17.45 7.92 17.85 8.16 18.09C8.4 18.33 8.8 18.33 9.58 18.33H10C10.79 18.33 11.18 18.33 11.42 18.09C11.67 17.85 11.67 17.45 11.67 16.67L11.67 13.75C11.67 12.37 12.11 11.25 13.41 11.25C14.06 11.25 14.58 11.81 14.58 12.5V16.25C14.58 17.04 14.58 17.43 14.83 17.67C15.07 17.92 15.46 17.92 16.25 17.92H16.67C17.45 17.92 17.84 17.92 18.09 17.67C18.33 17.43 18.33 17.04 18.33 16.25L18.33 11.67C18.33 9.6 16.36 7.92 14.41 7.92C13.3 7.92 12.31 8.46 11.67 9.31C11.67 8.79 11.67 8.52 11.55 8.33C11.48 8.21 11.38 8.1 11.25 8.03C11.06 7.92 10.8 7.92 10.27 7.92Z" ${S} stroke-width="1.25" stroke-linejoin="round"/>`,
+  },
+
+  /* Figma I150:310;61:4371 */
+  x: {
+    viewBox: '0 0 20 20',
+    body: `<path d="M2.5 17.5L8.79 11.21M11.21 8.79L17.5 17.5H13.33L8.79 11.21L2.5 2.5H6.67L11.21 8.79ZM17.5 2.5L11.21 8.79" ${S} stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>`,
+  },
+
+  /* Figma I150:310;61:4374 */
+  youtube: {
+    viewBox: '0 0 20 20',
+    body: `<path d="M10 17.08C11.51 17.08 12.95 16.93 14.29 16.66C15.97 16.32 16.81 16.15 17.57 15.17C18.33 14.18 18.33 13.06 18.33 10.8V9.2C18.33 6.94 18.33 5.81 17.57 4.83C16.81 3.85 15.97 3.68 14.29 3.34C12.95 3.07 11.51 2.92 10 2.92C8.49 2.92 7.05 3.07 5.71 3.34C4.03 3.68 3.19 3.85 2.43 4.83C1.67 5.81 1.67 6.94 1.67 9.2V10.8C1.67 13.06 1.67 14.18 2.43 15.17C3.19 16.15 4.03 16.32 5.71 16.66C7.05 16.93 8.49 17.08 10 17.08Z" ${S} stroke-width="1.25"/><path d="M13.3 10.26C13.18 10.77 12.52 11.13 11.2 11.85C9.77 12.64 9.06 13.04 8.48 12.88C8.28 12.83 8.1 12.74 7.95 12.62C7.5 12.26 7.5 11.51 7.5 10C7.5 8.5 7.5 7.74 7.95 7.38C8.1 7.26 8.28 7.17 8.48 7.12C9.06 6.96 9.77 7.36 11.2 8.15C12.52 8.87 13.18 9.23 13.3 9.74C13.34 9.91 13.34 10.09 13.3 10.26Z" ${S} stroke-width="1.25" stroke-linejoin="round"/>`,
+  },
+
+  /* Figma 145:40 — the Shopify mark keeps its own brand palette. */
+  'shopify-bag': {
+    viewBox: '0 0 70 80',
+    body: `<path d="M61.18 15.5C61.12 15.1 60.77 14.87 60.48 14.85C60.2 14.83 54.09 14.37 54.09 14.37C54.09 14.37 49.85 10.15 49.39 9.69C48.92 9.22 48.01 9.36 47.66 9.47C47.6 9.48 46.73 9.75 45.28 10.2C43.87 6.12 41.37 2.36 36.97 2.36C36.85 2.36 36.72 2.37 36.6 2.38C35.35 0.72 33.8 0 32.46 0C22.22 0 17.32 12.83 15.79 19.35C11.81 20.59 8.98 21.47 8.62 21.58C6.4 22.28 6.33 22.35 6.03 24.45C5.81 26.03 0 71.08 0 71.08L45.3 79.59L69.85 74.27C69.85 74.27 61.23 15.9 61.18 15.5ZM42.78 10.98C41.64 11.33 40.35 11.73 38.95 12.17C38.95 11.9 38.95 11.63 38.95 11.34C38.95 8.8 38.6 6.76 38.03 5.14C40.3 5.42 41.81 8 42.78 10.98ZM35.22 5.64C35.85 7.22 36.26 9.49 36.26 12.55C36.26 12.71 36.26 12.85 36.26 13C33.77 13.77 31.06 14.61 28.34 15.46C29.87 9.56 32.72 6.71 35.22 5.64ZM32.18 2.75C32.62 2.75 33.07 2.9 33.49 3.2C30.21 4.75 26.69 8.64 25.2 16.43C23.03 17.1 20.91 17.76 18.95 18.37C20.69 12.43 24.82 2.75 32.18 2.75Z" fill="#95BF46"/><path d="M60.48 14.85C60.2 14.83 54.09 14.37 54.09 14.37C54.09 14.37 49.85 10.15 49.39 9.69C49.21 9.51 48.98 9.43 48.73 9.39L45.31 79.59L69.85 74.27C69.85 74.27 61.23 15.9 61.18 15.5C61.12 15.1 60.77 14.87 60.48 14.85Z" fill="#5E8E3E"/><path d="M36.97 28.44L33.94 37.46C33.94 37.46 31.29 36.04 28.04 36.04C23.28 36.04 23.04 39.04 23.04 39.79C23.04 43.91 33.75 45.49 33.75 55.14C33.75 62.74 28.95 67.62 22.47 67.62C14.69 67.62 10.71 62.78 10.71 62.78L12.8 55.88C12.8 55.88 16.88 59.4 20.33 59.4C22.59 59.4 23.5 57.62 23.5 56.32C23.5 50.95 14.71 50.71 14.71 41.88C14.71 34.44 20.04 27.25 30.78 27.25C34.92 27.25 36.97 28.44 36.97 28.44Z" fill="#FFFFFF"/>`,
+  },
+};
+
+const { name, size, class: className, label } = Astro.props as Props;
+
+const icon = ICONS[name];
 const length = typeof size === 'number' ? `${size}px` : size;
 /** Only a px size can seed the intrinsic width/height attributes. */
 const intrinsic = typeof size === 'number' ? size : undefined;
@@ -63,188 +196,11 @@ const a11y = label
   class:list={['icon', className]}
   width={intrinsic}
   height={intrinsic}
-  viewBox="0 0 24 24"
+  viewBox={icon.viewBox}
   fill="none"
   style={`--icon-size: ${length}`}
   {...a11y}
->
-  {name === 'caret-down' && (
-    <path d="M6 9.5 12 15.5 18 9.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-  )}
-
-  {name === 'arrow-right' && (
-    <>
-      <path d="M4.5 12h15" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-      <path d="M13 5.5 19.5 12 13 18.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-    </>
-  )}
-
-  {name === 'menu' && (
-    <path d="M3.5 7h17M3.5 12h17M3.5 17h17" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-  )}
-
-  {name === 'close' && (
-    <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-  )}
-
-  {name === 'plus' && (
-    <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-  )}
-
-  {name === 'check' && (
-    <path d="M4.5 12.5 9.5 17.5 19.5 6.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-  )}
-
-  {name === 'facebook' && (
-    <path
-      d="M13.2 21v-8h2.6l.4-3h-3V8.2c0-.9.25-1.5 1.5-1.5H16.3V4a20 20 0 0 0-2.2-.1c-2.2 0-3.7 1.35-3.7 3.85V10H7.8v3h2.6v8z"
-      fill="currentColor"
-    />
-  )}
-
-  {name === 'instagram' && (
-    <>
-      <rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" stroke="currentColor" stroke-width="1.8" />
-      <circle cx="12" cy="12" r="4.1" stroke="currentColor" stroke-width="1.8" />
-      <circle cx="17.1" cy="6.9" r="1.2" fill="currentColor" />
-    </>
-  )}
-
-  {name === 'linkedin' && (
-    <>
-      <path d="M4.6 9.4h2.9V20H4.6zM6.05 4a1.7 1.7 0 1 0 0 3.4 1.7 1.7 0 0 0 0-3.4" fill="currentColor" />
-      <path
-        d="M10.1 9.4H13v1.45a3.2 3.2 0 0 1 2.87-1.6c2.3 0 3.63 1.45 3.63 4.2V20h-2.9v-6.05c0-1.45-.55-2.2-1.7-2.2-1.05 0-1.9.7-1.9 2.3V20h-2.9z"
-        fill="currentColor"
-      />
-    </>
-  )}
-
-  {name === 'x' && (
-    <path
-      d="M4 4h4.3l4.05 5.5L16.9 4H20l-6.05 7.35L20.4 20h-4.3l-4.3-5.8L6.9 20H3.8l6.3-7.6z"
-      fill="currentColor"
-    />
-  )}
-
-  {name === 'youtube' && (
-    <>
-      <rect x="2.6" y="5.4" width="18.8" height="13.2" rx="4" stroke="currentColor" stroke-width="1.8" />
-      <path d="M10.5 9.4 15.4 12l-4.9 2.6z" fill="currentColor" />
-    </>
-  )}
-
-  {name === 'launch' && (
-    <>
-      <path
-        d="M12 2.6c2.35 2.2 3.6 5.1 3.6 8.35v3.7H8.4v-3.7c0-3.25 1.25-6.15 3.6-8.35"
-        stroke="currentColor"
-        stroke-width="1.7"
-        stroke-linejoin="round"
-      />
-      <circle cx="12" cy="9.6" r="2.1" stroke="currentColor" stroke-width="1.7" />
-      <path
-        d="M8.4 12.4 5.6 15v3.3h2.8M15.6 12.4 18.4 15v3.3h-2.8"
-        stroke="currentColor"
-        stroke-width="1.7"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path d="M10.4 20.2c.5.8 1.05 1.2 1.6 1.2s1.1-.4 1.6-1.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
-    </>
-  )}
-
-  {name === 'system' && (
-    <>
-      <path
-        d="M12 2.7 20.2 5.6v6.05c0 4.3-2.85 8.15-8.2 9.65-5.35-1.5-8.2-5.35-8.2-9.65V5.6z"
-        stroke="currentColor"
-        stroke-width="1.7"
-        stroke-linejoin="round"
-      />
-      <path d="M12 3.2v18M4.1 12h15.8" stroke="currentColor" stroke-width="1.7" />
-    </>
-  )}
-
-  {name === 'maintain' && (
-    <>
-      <circle cx="12" cy="12" r="3.1" stroke="currentColor" stroke-width="1.7" />
-      <path
-        d="M12 2.6c.66 0 1.3.06 1.92.18l.35 2.06a7.5 7.5 0 0 1 1.9 1.1l1.96-.72c.44.47.84.98 1.18 1.53l-1.28 1.65c.3.63.52 1.3.65 2l1.97.72a9.6 9.6 0 0 1 0 1.9l-1.97.72c-.13.7-.35 1.37-.65 2l1.28 1.65c-.34.55-.74 1.06-1.18 1.53l-1.96-.72a7.5 7.5 0 0 1-1.9 1.1l-.35 2.06a9.7 9.7 0 0 1-3.84 0l-.35-2.06a7.5 7.5 0 0 1-1.9-1.1l-1.96.72a9.6 9.6 0 0 1-1.18-1.53l1.28-1.65a7.4 7.4 0 0 1-.65-2l-1.97-.72a9.6 9.6 0 0 1 0-1.9l1.97-.72c.13-.7.35-1.37.65-2L4.69 6.75c.34-.55.74-1.06 1.18-1.53l1.96.72a7.5 7.5 0 0 1 1.9-1.1l.35-2.06A9.7 9.7 0 0 1 12 2.6"
-        stroke="currentColor"
-        stroke-width="1.7"
-        stroke-linejoin="round"
-      />
-    </>
-  )}
-
-  {name === 'shopify-bag' && (
-    <>
-      <path
-        d="M6.1 6.7h11.8l1.3 12.4a1.5 1.5 0 0 1-1.5 1.65H6.3a1.5 1.5 0 0 1-1.5-1.65z"
-        fill="currentColor"
-      />
-      <path
-        d="M9.1 8V5.9a2.9 2.9 0 0 1 5.8 0V8"
-        stroke="currentColor"
-        stroke-width="1.7"
-        stroke-linecap="round"
-      />
-      <path
-        d="M13.7 11.3a3.2 3.2 0 0 0-1.85-.55c-1.3 0-2.15.75-2.15 1.75 0 .95.7 1.4 1.65 1.85.95.45 1.2.7 1.2 1.1 0 .4-.35.65-.9.65a3.3 3.3 0 0 1-1.85-.6l-.4 1.5a4 4 0 0 0 2.2.6c1.45 0 2.5-.8 2.5-2 0-1-.7-1.55-1.7-2-.85-.4-1.15-.6-1.15-1 0-.35.3-.6.85-.6.5 0 1 .15 1.4.35z"
-        fill="var(--color-bg-page)"
-      />
-    </>
-  )}
-
-  {name === 'idea' && (
-    <>
-      <path
-        d="M9.1 16.2a5.9 5.9 0 1 1 5.8 0v1.05a1.3 1.3 0 0 1-1.3 1.3h-3.2a1.3 1.3 0 0 1-1.3-1.3z"
-        stroke="currentColor"
-        stroke-width="1.7"
-        stroke-linejoin="round"
-      />
-      <path d="M10.2 21h3.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
-      <path
-        d="M18.9 2.2l.52 1.48 1.48.52-1.48.52-.52 1.48-.52-1.48L16.9 4.2l1.48-.52z"
-        fill="currentColor"
-      />
-    </>
-  )}
-
-  {name === 'growth' && (
-    <>
-      <path d="M4.2 3.5v17h16.3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-      <path d="M7.8 15.6c2.4-.35 4.15-1.6 5.25-3.75 1.1-2.15 1.9-4 2.4-5.55" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
-      <path d="M12.9 5.4h3.05v3.05" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-    </>
-  )}
-
-  {name === 'support' && (
-    <>
-      <path d="M4.6 14.5v-2.4a7.4 7.4 0 0 1 14.8 0v2.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
-      <rect x="2.7" y="13.1" width="4" height="6.4" rx="2" stroke="currentColor" stroke-width="1.7" />
-      <rect x="17.3" y="13.1" width="4" height="6.4" rx="2" stroke="currentColor" stroke-width="1.7" />
-      <path d="M19.4 19.5v.6a2.3 2.3 0 0 1-2.3 2.3h-2.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
-    </>
-  )}
-
-  {name === 'region-us' && (
-    <>
-      <circle cx="12" cy="12" r="8.6" stroke="currentColor" stroke-width="1.6" opacity="0.5" />
-      <path d="M3.4 12h17.2" stroke="currentColor" stroke-width="1.6" opacity="0.5" />
-      <path d="M12 3.4c2.5 2.4 3.9 5.4 3.9 8.6s-1.4 6.2-3.9 8.6c-2.5-2.4-3.9-5.4-3.9-8.6S9.5 5.8 12 3.4" stroke="currentColor" stroke-width="1.6" opacity="0.5" />
-    </>
-  )}
-
-  {name === 'region-bd' && (
-    <>
-      <circle cx="12" cy="12" r="8.6" stroke="currentColor" stroke-width="1.6" opacity="0.5" />
-      <circle cx="12" cy="12" r="3.6" fill="currentColor" opacity="0.5" />
-    </>
-  )}
-</svg>
+><Fragment set:html={icon.body} /></svg>
 
 <style>
   /**

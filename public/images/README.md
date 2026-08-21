@@ -1,10 +1,17 @@
 # Homepage photography
 
-These files are referenced from `src/data/home.ts`. They could **not** be
-exported from Figma in the environment this page was built in — `www.figma.com`
-is blocked by the network egress policy, so the design's raster fills were
-unreachable. Drop the real exports in with these exact filenames and the page
-picks them up with no code change.
+These files are referenced from `src/data/home.ts`. They are currently
+**generated placeholders**.
+
+The real photography could not be retrieved in the environment this page was
+built in: `www.figma.com` is blocked by the network egress policy, and the
+Figma Plugin API text channel (which did successfully carry every vector
+asset) caps a response at 20 KB — far below the 81-176 KB these JPEGs need.
+
+Drop the real exports in with these exact filenames and the page picks them up
+with no code change. The vector assets in this directory
+(`region-us.svg`, `region-bd.svg`, `wordmark.svg`) *are* the real Figma
+artwork.
 
 | File | Figma node | Intrinsic size | Used by |
 | --- | --- | --- | --- |

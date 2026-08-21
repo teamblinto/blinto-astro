@@ -110,7 +110,7 @@ export const serviceCards: StageCard[] = [
     cta: { label: 'Explore App Development', href: '/services/app-development' },
   },
   {
-    icon: 'system',
+    icon: 'admin',
     tone: 'blue',
     heading: 'Build a System for Installs, Activation, and Retention.',
     body: "Getting listed isn't the same as getting used. We work on App Store positioning, SEO, paid media, and the small product changes that keep merchants active.",
@@ -122,7 +122,7 @@ export const serviceCards: StageCard[] = [
     cta: { label: 'Explore App Growth', href: '/services/app-growth' },
   },
   {
-    icon: 'maintain',
+    icon: 'updates',
     tone: 'yellow',
     heading: 'Keep the App Stable, Updated, and Easier to Manage',
     body: 'Shopify changes its API. Merchants report bugs. We stay on top of both, so your app keeps running smoothly long after launch day.',
