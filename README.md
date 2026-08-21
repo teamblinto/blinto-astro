@@ -2,24 +2,78 @@
 
 The Blinto marketing site, built with [Astro](https://astro.build).
 
-Implements the **Blinto Revamp 2026** Figma design:
+It is both an implementation of the **Blinto Revamp 2026** Figma design and the
+migration target for the current WordPress site at blinto.co. Every URL carries
+a trailing slash, pinned via `trailingSlash: 'always'`.
 
-Paths follow the approved launch sitemap, not Astro convention: `/about-us/`,
-`/contact-us/` and `/case-studies/` deliberately reuse the paths the current
-WordPress site already ranks on, so those need no redirect at launch. Every URL
-carries a trailing slash, pinned via `trailingSlash: 'always'`.
+## Routes
 
-| Route | Figma node |
+Twenty-one pages. Six come from Figma; the rest carry the WordPress site's
+content into the new design system, since no frame exists for them.
+
+| Route | From |
 | --- | --- |
 | `/` | [`145:3` — Homepage · Desktop](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Revamp-2026?node-id=145-3) |
-| `/services/shopify-app-development/` | [`213:2429` — Service · Shopify App Development · Desktop](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Revamp-2026?node-id=213-2429) |
-| `/services/shopify-app-marketing/` | [`232:2234` — Service · Shopify App Growth · Desktop](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Revamp-2026?node-id=232-2234) |
-| `/services/shopify-app-support-maintenance/` | [`240:3463` — Service · App Support & Maintenance · Desktop](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Revamp-2026?node-id=240-3463) |
+| `/services/` | [`272:6260` — Shopify Services · Desktop](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Revamp-2026?node-id=272-6260) |
+| `/services/shopify-app-development/` | [`213:2429` — Service · Shopify App Development](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Revamp-2026?node-id=213-2429) |
+| `/services/shopify-app-marketing/` | [`232:2234` — Service · Shopify App Growth](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Revamp-2026?node-id=232-2234) |
+| `/services/shopify-app-support-maintenance/` | [`240:3463` — Service · App Support & Maintenance](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Revamp-2026?node-id=240-3463) |
+| `/shopify-apps/` | [`269:5897` — Our Apps · Desktop](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Revamp-2026?node-id=269-5897) |
 | `/about-us/` | [`251:4816` — About Us · Desktop](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Revamp-2026?node-id=251-4816) |
+| `/services/shopify-theme-storefront-development/` | migrated content |
+| `/services/wordpress-design-development/` | migrated content |
+| `/services/wordpress-plugin-development/` | migrated content |
+| `/services/wordpress-growth-marketing/` | migrated content |
+| `/services/seo/` | migrated content |
+| `/services/website-maintenance/` | migrated content |
+| `/contact-us/` | migrated content |
+| `/career/` | migrated content |
+| `/testimonials/` | migrated content |
+| `/book-a-call/` | migrated content |
+| `/support/` | migrated content |
+| `/privacy-policy/`, `/terms-conditions/`, `/cookies-policy/` | migrated verbatim |
 
-Still to build, and linked from the nav today: `/services/` (index),
-`/shopify-apps/`, `/contact-us/`, `/case-studies/`. All four 404 until they
-exist — none may ship to production in that state.
+`/case-studies/` is linked from the navigation and does not exist yet. **It must
+not ship in that state** — along with `/works/` and the two case-study detail
+pages, it is the only part of the current site with no home here.
+
+## Launch redirects
+
+`redirects.mjs` holds the redirect map — every current URL that moves, with its
+final destination, so nothing lands on a second hop. Pages that keep the
+path they already rank on (`/about-us/`, `/contact-us/`, `/career/`,
+`/testimonials/`, `/book-a-call/`, `/support/` and the three policies) have no
+entry.
+
+| Current URL | 301 to |
+| --- | --- |
+| `/shopify-app-development/` | `/services/shopify-app-development/` |
+| `/shopify-growth-marketing/` | `/services/shopify-app-marketing/` |
+| `/shopify-theme-storefront-development/` | `/services/shopify-theme-storefront-development/` |
+| `/wordpress-design-development/` | `/services/wordpress-design-development/` |
+| `/wordpress-plugin-development/` | `/services/wordpress-plugin-development/` |
+| `/wordpress-growth-marketing/` | `/services/wordpress-growth-marketing/` |
+| `/website-maintenance/` | `/services/website-maintenance/` |
+| `/seo/` | `/services/seo/` |
+| `/contact/` | `/contact-us/` |
+| `/growth-plan/` | `/services/wordpress-growth-marketing/` |
+| `/pricing/` | `/services/` |
+
+The last three already 301 on the current site; they live in WordPress and
+disappear with it, so they are carried over here. `/growth-plan/` points
+straight at the final URL rather than chaining through the old one, and
+`/pricing/` has no page behind it — it 301s to the homepage today, so nothing is
+indexed there.
+
+A build hook writes the map into `dist/_redirects` (Netlify, Cloudflare Pages)
+and `dist/.htaccess` (Apache, which is what the WordPress site runs on today).
+**On any other host — nginx, Vercel, S3/CloudFront — those files are inert and
+the same table has to be translated into that host's own config.**
+
+Astro's own `redirects` option is deliberately unused: in a static build it
+writes a meta-refresh HTML page at each old path, and on Netlify a file that
+exists shadows the `_redirects` rule for the same path, so the weaker
+client-side redirect would win over the 301.
 
 ## Getting started
 
@@ -42,17 +96,16 @@ Requires Node 20.10+ (Astro 7).
 ```
 src/
 ├── data/                 Page content, separated from markup
-│   ├── site.ts           Nav, footer, offices, socials
+│   ├── site.ts           Nav, footer, offices, contact details, socials
 │   ├── home.ts           Homepage copy, keyed to Figma nodes
-│   ├── types.ts          Shapes shared by the pages and the section shells
 │   ├── about.ts          About Us copy
-│   └── services/         One module per service page
-│       ├── app-development.ts
-│       ├── app-growth.ts
-│       └── support-maintenance.ts
+│   ├── types.ts          Shapes shared by the pages and the section shells
+│   ├── services/         One module per service page (nine)
+│   ├── pages/            services, shopify-apps, contact-us, career, …
+│   └── legal/            The three policies, as block lists
 ├── styles/
 │   ├── tokens.css        Figma design variables, 1:1
-│   └── global.css        Reset, a11y kit, layout primitives
+│   └── global.css        Reset, a11y kit, layout and form primitives
 ├── layouts/
 │   └── BaseLayout.astro  <head>, meta/OG tags, nav + footer shell
 ├── components/
@@ -62,12 +115,13 @@ src/
 │       └── page/         Data-driven shells shared across the inner pages
 └── pages/
     ├── index.astro       Composes the homepage sections
-    ├── about.astro
-    └── services/
-        ├── app-development.astro
-        ├── app-growth.astro
-        └── support-maintenance.astro
+    ├── services.astro    The /services/ hub
+    ├── services/         The nine service pages
+    └── …                 about-us, shopify-apps, contact-us, career, …
 ```
+
+A page file is composition only: it imports section shells and one content
+module, and passes props. Copy never lives in markup.
 
 ### Conventions
 
@@ -177,12 +231,22 @@ JPEG down to about 500 KB of shipped WebP.
 | `abt-hero-banner.jpg` | 251:4866 | 2400x1600 | About hero banner |
 | `abt-how-we-work-1..3.jpg` | 254:4992-4994 | 1200x800 | How We Work |
 | `team-01..16-*.png` | 254:4941 … 260:6009 | 564x676 (one 1024²) | The Team |
+| `apps-hero-banner.jpg` | 269:5942 | 2400x1602 | Our Apps hero banner |
+| `apps-why-1..2.jpg` | 270:6210-6211 | 1000x1500, 1000x667 | Why It Matters |
+| `services-hero-banner.jpg` | 272:6310 | 2400x1603 | Services hero banner |
+| `services-own-apps.jpg` | 274:6576 | 1200x800 | Our Own Apps |
+| `work/work-img1..8.webp` | — | 770x534 | WordPress design portfolio strip |
 | `cta-backdrop.png` | 213:2503 | 2400x1100 | CTA band backdrop, all pages |
 
 The team portraits stay PNG because their corners are pre-cut to the card
 radius and one is a full cut-out; JPEG would fill that transparency with
 black. Astro takes the 6.1 MB of source down to 264 KB of WebP across all
 sixteen.
+
+The eight `work/` shots are the only assets not from Figma: the WordPress
+design page's portfolio strip served them from `/wp-content/uploads/`, a path
+that stops existing at launch, so they are checked in and go through
+`astro:assets` like everything else.
 
 Alt text lives beside each import in the page's `src/data` module.
 

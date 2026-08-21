@@ -2,16 +2,24 @@
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import Hero from '~/components/sections/page/Hero.astro';
 import BeliefGrid from '~/components/sections/page/BeliefGrid.astro';
-import WorkGrid from '~/components/sections/page/WorkGrid.astro';
+import ListGrid from '~/components/sections/page/ListGrid.astro';
+import ProcessGrid from '~/components/sections/page/ProcessGrid.astro';
 import QuoteGrid from '~/components/sections/page/QuoteGrid.astro';
 import Faq from '~/components/sections/Faq.astro';
 import Cta from '~/components/sections/Cta.astro';
-import * as page from '~/data/services/website-maintenance';
+import * as page from '~/data/services/wordpress-plugin-development';
 
 /**
- * Migrated from https://blinto.co/website-maintenance/, at the same path.
- * Section order follows the original: hero, what's included, industries,
- * recent projects, why Blinto, testimonials, FAQ, CTA.
+ * WordPress Plugin Development, migrated from
+ * https://blinto.co/wordpress-plugin-development/.
+ *
+ * Moved under /services/ at launch; its WordPress path 301s here (see the
+ * redirect map in redirects.mjs). Section order follows the original: hero, the problem, core
+ * services, process, why Blinto, client words, FAQ, CTA.
+ *
+ * The original repeats its "Let's Discuss Your Project" CTA four times. Two are
+ * kept — under core services and as the closing band — and the two standalone
+ * mid-page repeats are dropped rather than reproduced verbatim.
  */
 
 const faqSchema = {
@@ -41,33 +49,23 @@ const faqSchema = {
   />
 
   <BeliefGrid
-    copy={page.includedSection}
-    cells={page.includedCells}
-    cardMin={300}
-  />
-
-  <BeliefGrid
-    copy={page.industriesSection}
-    cells={page.industryCells}
-    cardMin={260}
-    cellMinHeight={140}
-  />
-
-  <WorkGrid
-    copy={page.projectsSection}
-    items={page.projects}
-    cardMin={400}
-    actions={[page.projectsAction]}
-  />
-
-  <BeliefGrid copy={page.whySection} cells={page.whyCells} cardMin={300} />
-
-  <QuoteGrid
-    copy={page.quotesSection}
-    quotes={page.quotes}
+    copy={page.problemSection}
+    cells={page.problemCells}
     cardMin={500}
-    cardMinHeight={420}
+    cellMinHeight={200}
   />
+
+  <ListGrid
+    copy={page.coreServicesSection}
+    panels={page.coreServices}
+    actions={[page.coreServicesAction]}
+  />
+
+  <ProcessGrid copy={page.processSection} steps={page.processSteps} />
+
+  <BeliefGrid copy={page.whySection} cells={page.whyCells} />
+
+  <QuoteGrid copy={page.quotesSection} quotes={page.quotes} cardMin={500} />
 
   <Faq
     eyebrow={page.faqSection.eyebrow}

@@ -1,21 +1,21 @@
 ---
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import Hero from '~/components/sections/page/Hero.astro';
-import ListGrid from '~/components/sections/page/ListGrid.astro';
 import BeliefGrid from '~/components/sections/page/BeliefGrid.astro';
+import ListGrid from '~/components/sections/page/ListGrid.astro';
+import ProcessGrid from '~/components/sections/page/ProcessGrid.astro';
 import QuoteGrid from '~/components/sections/page/QuoteGrid.astro';
 import Faq from '~/components/sections/Faq.astro';
 import Cta from '~/components/sections/Cta.astro';
-import * as page from '~/data/services/seo';
+import * as page from '~/data/services/wordpress-growth-marketing';
 
 /**
- * SEO Services, migrated from https://blinto.co/seo/.
+ * WordPress Growth Marketing, migrated from
+ * https://blinto.co/wordpress-growth-marketing/.
  *
- * Lives at its WordPress path for now; step 3 of the migration moves it under
- * /services/. The original's "Get Your Free SEO Audit" form is not reproduced
- * here — the site is a static build with no form endpoint yet, so the band
- * closes with the audit-call CTA instead and the form lands with the contact
- * page decision.
+ * Moved under /services/ at launch; its WordPress path 301s here (see the
+ * redirect map in redirects.mjs). Section order follows the original: hero, the problem, core
+ * services, process, why Blinto, client words, FAQ, CTA.
  */
 
 const faqSchema = {
@@ -44,18 +44,22 @@ const faqSchema = {
     actions={page.hero.actions}
   />
 
-  <ListGrid
-    copy={page.solutionsSection}
-    panels={page.solutions}
-    cardMin={260}
+  <BeliefGrid
+    copy={page.problemSection}
+    cells={page.problemCells}
+    cardMin={500}
+    cellMinHeight={200}
   />
 
-  <BeliefGrid
-    copy={page.resultsSection}
-    cells={page.resultsCells}
-    cardMin={260}
-    cellMinHeight={260}
+  <ListGrid
+    copy={page.coreServicesSection}
+    panels={page.coreServices}
+    actions={[page.coreServicesAction]}
   />
+
+  <ProcessGrid copy={page.processSection} steps={page.processSteps} />
+
+  <BeliefGrid copy={page.whySection} cells={page.whyCells} />
 
   <QuoteGrid copy={page.quotesSection} quotes={page.quotes} cardMin={500} />
 

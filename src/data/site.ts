@@ -84,6 +84,13 @@ export const contact = {
 export const footerTagline =
   'A product-focused Shopify expert agency helping app founders and product teams build, grow, and maintain Shopify apps.';
 
+/**
+ * The footer carries every service page, not just the three in the navigation.
+ * The approved sitemap caps the Services dropdown at three, but all nine pages
+ * are indexed today and a page nothing links to is a page search engines treat
+ * as abandoned — the current WordPress footer lists its six services for the
+ * same reason. Client Support is here on the same grounds.
+ */
 export const footerColumns = [
   {
     title: 'Services',
@@ -91,6 +98,24 @@ export const footerColumns = [
       { label: 'Shopify App Development', href: '/services/shopify-app-development/' },
       { label: 'Shopify App Growth', href: '/services/shopify-app-marketing/' },
       { label: 'Support & Maintenance', href: '/services/shopify-app-support-maintenance/' },
+      {
+        label: 'Shopify Theme & Storefront',
+        href: '/services/shopify-theme-storefront-development/',
+      },
+      {
+        label: 'WordPress Design & Development',
+        href: '/services/wordpress-design-development/',
+      },
+      {
+        label: 'WordPress Plugin Development',
+        href: '/services/wordpress-plugin-development/',
+      },
+      {
+        label: 'WordPress Growth Marketing',
+        href: '/services/wordpress-growth-marketing/',
+      },
+      { label: 'SEO', href: '/services/seo/' },
+      { label: 'Website Maintenance', href: '/services/website-maintenance/' },
     ],
   },
   {
@@ -101,6 +126,7 @@ export const footerColumns = [
       { label: 'Case Studies', href: '/case-studies/' },
       { label: 'Testimonials', href: '/testimonials/' },
       { label: 'Careers', href: '/career/' },
+      { label: 'Client Support', href: '/support/' },
       { label: 'Contact Us', href: '/contact-us/' },
     ],
   },

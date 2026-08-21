@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import { emitHostRedirects } from './redirects.mjs';
 
 // https://astro.build/config
 export default defineConfig({
@@ -14,4 +15,6 @@ export default defineConfig({
   build: {
     inlineStylesheets: 'auto',
   },
+  /** Launch 301s for the WordPress URLs that move. See `redirects.mjs`. */
+  integrations: [emitHostRedirects()],
 });
