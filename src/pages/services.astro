@@ -1,0 +1,114 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/page/Hero.astro';
+import StageGrid from '~/components/sections/page/StageGrid.astro';
+import BeliefGrid from '~/components/sections/page/BeliefGrid.astro';
+import ProcessGrid from '~/components/sections/page/ProcessGrid.astro';
+import Faq from '~/components/sections/Faq.astro';
+import Cta from '~/components/sections/Cta.astro';
+import * as page from '~/data/pages/services';
+
+/**
+ * Services — Figma "Shopify Services · Desktop" (272:6260), at /services/.
+ * Section order is the design's: hero, where you are, what we do, one product
+ * story, choose your service, how we start, our own apps, why Blinto, FAQ, CTA.
+ */
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: page.faqs.map((faq) => ({
+    '@type': 'Question',
+    name: faq.question,
+    acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+  })),
+};
+
+/** The three services this hub routes to, as an itemised list. */
+const servicesSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Shopify services by Blinto',
+  itemListElement: page.serviceCards.map((card, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    item: {
+      '@type': 'Service',
+      name: card.cta?.label.replace(/^Explore /, ''),
+      description: card.body,
+      url: new URL(card.cta?.href ?? '/services/', Astro.site).href,
+      provider: { '@type': 'Organization', name: 'Blinto LLC' },
+    },
+  })),
+};
+---
+
+<BaseLayout title={page.meta.title} description={page.meta.description}>
+  <script
+    slot="head"
+    type="application/ld+json"
+    is:inline
+    set:html={JSON.stringify([faqSchema, servicesSchema])}
+  />
+
+  <Hero
+    eyebrow={page.hero.eyebrow}
+    heading={page.hero.heading}
+    subheading={page.hero.subheading}
+    actions={page.hero.actions}
+    banner={page.hero.banner}
+  />
+
+  <StageGrid copy={page.stageSection} cards={page.stageCards} />
+
+  <StageGrid copy={page.servicesSection} cards={page.serviceCards} align />
+
+  <BeliefGrid
+    copy={page.storySection}
+    cells={page.storyCells}
+    cardMin={260}
+    cellMinHeight={220}
+  />
+
+  <BeliefGrid
+    copy={page.chooseSection}
+    cells={page.chooseCells}
+    note={page.chooseNote}
+    actions={[page.chooseAction]}
+    id="choose-your-service"
+  />
+
+  <ProcessGrid
+    copy={page.startSection}
+    steps={page.startSteps}
+    cardMin={260}
+    action={page.startAction}
+  />
+
+  <StageGrid
+    copy={page.ownAppsSection}
+    cards={page.ownAppsCards}
+    image={page.ownAppsImage}
+    layout="row"
+    cardMin={500}
+    actions={[page.ownAppsAction]}
+  />
+
+  <BeliefGrid copy={page.whySection} cells={page.whyCells} />
+
+  <Faq
+    eyebrow={page.faqSection.eyebrow}
+    heading={page.faqSection.heading}
+    subheading={page.faqSection.subheading}
+    items={page.faqs}
+    compact
+  />
+
+  <Cta
+    kicker={page.closingCta.kicker}
+    heading={page.closingCta.heading}
+    body={page.closingCta.body}
+    actions={page.closingCta.actions}
+    backdrop={page.closingCta.backdrop}
+  />
+</BaseLayout>

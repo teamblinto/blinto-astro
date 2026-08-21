@@ -43,15 +43,38 @@ export type BeliefCell =
   | { kind: 'image'; image: CardImage };
 
 /**
- * Card / Feature (Figma 129:96) without its tick list. `cta` is Figma's
- * "Show button" — omitted it gives the short, button-less stage card.
+ * Card / Feature (Figma 129:96). `cta` is Figma's "Show button" and `features`
+ * its "Features" toggle — omit both for the short, button-less stage card.
+ *
+ * `body` is optional because Figma's "Show body=false" routing tile is icon,
+ * heading and button only; /shopify-apps/ uses it for the Find Your Fit row.
  */
 export interface StageCard {
   icon: import('~/components/ui/Icon.astro').IconName;
   tone: CardTone;
   heading: string;
-  body: string;
+  body?: string;
+  /** Feature Row (126:24) labels — the divider and tick list. */
+  features?: string[];
   cta?: { label: string; href?: string };
+}
+
+/**
+ * Card / Product (Figma 248:4838) — the app-portfolio tile.
+ *
+ * Figma's note on the component: the screenshot slot is "a neutral surface
+ * carrying an editable pending-note rather than a stand-in photo — set an
+ * image fill on the Screenshot frame and turn Show note off once real UI is
+ * available". So `screenshot` is optional and `note` stands in until it lands.
+ */
+export interface ProductTile {
+  name: string;
+  description: string;
+  tone: CardTone;
+  screenshot?: ImageMetadata;
+  /** Shown in the empty slot while no screenshot exists. */
+  note?: string;
+  cta?: { label: string; href: string };
 }
 
 /**

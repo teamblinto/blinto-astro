@@ -2,6 +2,8 @@
 import SectionHeader from '~/components/ui/SectionHeader.astro';
 import BeliefCard from '~/components/ui/BeliefCard.astro';
 import ImageCard from '~/components/ui/ImageCard.astro';
+import LargeButton from '~/components/ui/LargeButton.astro';
+import type { CtaAction } from '~/components/sections/Cta.astro';
 import type { BeliefCell, SectionCopy } from '~/data/types';
 
 /**
@@ -22,19 +24,38 @@ interface Props {
   cardMin?: number;
   /** Card / Belief min-height. Figma's default is 320. */
   cellMinHeight?: number;
+  /**
+   * `grid` (default) lays the cells on equal tracks. `row` uses Figma's
+   * wrapping flex line, which /shopify-apps/ needs for Where You Are: five
+   * cards rendered 3 x 426 then 2 x 650, a split equal tracks cannot express.
+   */
+  layout?: 'grid' | 'row';
+  /** The centred line some sections close with, e.g. 274:6486. */
+  note?: string;
+  actions?: CtaAction[];
+  id?: string;
 }
 
-const { copy, cells, cardMin, cellMinHeight }: Props = Astro.props;
+const {
+  copy,
+  cells,
+  cardMin,
+  cellMinHeight,
+  layout = 'grid',
+  note,
+  actions = [],
+  id,
+}: Props = Astro.props;
 ---
 
-<section class="belief-grid">
+<section class="belief-grid" {id}>
   <div class="container belief-grid__inner">
     <SectionHeader eyebrow={copy.eyebrow} subheading={copy.subheading}>
       {copy.heading}
     </SectionHeader>
 
     <ul
-      class="card-grid"
+      class={layout === 'row' ? 'card-row' : 'card-grid'}
       style={cardMin ? `--layout-card-min: ${cardMin}px` : undefined}
     >
       {cells.map((cell) => (
@@ -57,6 +78,20 @@ const { copy, cells, cardMin, cellMinHeight }: Props = Astro.props;
         </li>
       ))}
     </ul>
+
+    {note && <p class="belief-grid__note">{note}</p>}
+
+    {actions.length > 0 && (
+      <div class="belief-grid__actions">
+        {actions.map((action) => (
+          <LargeButton
+            label={action.label}
+            href={action.href}
+            tone={action.tone ?? 'black'}
+          />
+        ))}
+      </div>
+    )}
   </div>
 </section>
 
@@ -69,6 +104,24 @@ const { copy, cells, cardMin, cellMinHeight }: Props = Astro.props;
     display: flex;
     flex-direction: column;
     gap: var(--space-3xl);
+  }
+
+  /* Figma sets the closing note in Body/Subheading, centred under the grid. */
+  .belief-grid__note {
+    max-width: 874px;
+    margin-inline: auto;
+    font-size: var(--font-size-body-md);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+    text-align: center;
+  }
+
+  .belief-grid__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs) var(--layout-grid-gap);
   }
 
 </style>

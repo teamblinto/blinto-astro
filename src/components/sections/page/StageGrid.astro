@@ -1,29 +1,68 @@
 ---
 import SectionHeader from '~/components/ui/SectionHeader.astro';
 import FeatureCard from '~/components/ui/FeatureCard.astro';
-import type { SectionCopy, StageCard } from '~/data/types';
+import ImageCard from '~/components/ui/ImageCard.astro';
+import LargeButton from '~/components/ui/LargeButton.astro';
+import type { CtaAction } from '~/components/sections/Cta.astro';
+import type { CardImage, SectionCopy, StageCard } from '~/data/types';
 
 /**
- * The Card / Feature grid without its tick list — Where You Are (213:2444),
- * Support Models (242:3672) and the About page's What We Do (253:4836).
- * A card with no `cta` is Figma's Show button=false short stage card; About
- * sets one, which adds the outline pill at the foot of each card.
+ * The Card / Feature grid — Where You Are (213:2444), Support Models
+ * (242:3672), the About page's What We Do (253:4836), and on the two index
+ * pages The Apps (269:5981), Find Your Fit (270:6006), What We Do (272:6433)
+ * and Our Own Apps (274:6542).
+ *
+ * A card with no `cta` is Figma's Show button=false short stage card; with no
+ * `body` it is the routing tile that carries only an icon, a heading and a
+ * button. `features` adds the divider and tick list, and `align` shares row
+ * tracks so those bands line up across the row.
+ *
+ * `layout="row"` swaps the equal grid tracks for Figma's wrapping flex line,
+ * which is what Our Own Apps needs: one 650 card beside one 650 photo.
  */
 interface Props {
   copy: SectionCopy;
   cards: StageCard[];
+  /** Trailing Card / Image cell, as in Our Own Apps (274:6576). */
+  image?: CardImage;
+  /** `grid` (default) gives equal tracks; `row` a wrapping flex line. */
+  layout?: 'grid' | 'row';
+  /** Column floor. Default is `--layout-card-min` (330). */
+  cardMin?: number;
+  /** Share row tracks so divider, ticks and CTA align across the row. */
+  align?: boolean;
+  /** The centred line some sections close with, e.g. 270:6107. */
+  note?: string;
+  actions?: CtaAction[];
+  id?: string;
 }
 
-const { copy, cards }: Props = Astro.props;
+const {
+  copy,
+  cards,
+  image,
+  layout = 'grid',
+  cardMin,
+  align = false,
+  note,
+  actions = [],
+  id,
+}: Props = Astro.props;
 ---
 
-<section class="stage-grid">
+<section class="stage-grid" {id}>
   <div class="container stage-grid__inner">
     <SectionHeader eyebrow={copy.eyebrow} subheading={copy.subheading}>
       {copy.heading}
     </SectionHeader>
 
-    <ul class="card-grid">
+    <ul
+      class:list={[
+        layout === 'row' ? 'card-row' : 'card-grid',
+        align && 'card-grid--aligned',
+      ]}
+      style={cardMin ? `--layout-card-min: ${cardMin}px` : undefined}
+    >
       {cards.map((card) => (
         <li>
           <FeatureCard
@@ -31,22 +70,68 @@ const { copy, cards }: Props = Astro.props;
             tone={card.tone}
             heading={card.heading}
             body={card.body}
+            features={card.features}
             cta={card.cta}
+            {align}
           />
         </li>
       ))}
+
+      {image && (
+        <li>
+          <ImageCard
+            src={image.src}
+            alt={image.alt}
+            width={image.width}
+            height={image.height}
+          />
+        </li>
+      )}
     </ul>
+
+    {note && <p class="stage-grid__note">{note}</p>}
+
+    {actions.length > 0 && (
+      <div class="stage-grid__actions">
+        {actions.map((action) => (
+          <LargeButton
+            label={action.label}
+            href={action.href}
+            tone={action.tone ?? 'black'}
+          />
+        ))}
+      </div>
+    )}
   </div>
 </section>
 
 <style>
   .stage-grid {
     padding-top: var(--space-4xl);
+    scroll-margin-top: var(--space-xl);
   }
 
   .stage-grid__inner {
     display: flex;
     flex-direction: column;
     gap: var(--space-3xl);
+  }
+
+  /* Figma sets the closing note in Body/Subheading, centred under the row. */
+  .stage-grid__note {
+    max-width: 874px;
+    margin-inline: auto;
+    font-size: var(--font-size-body-md);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+    text-align: center;
+  }
+
+  .stage-grid__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs) var(--layout-grid-gap);
   }
 </style>

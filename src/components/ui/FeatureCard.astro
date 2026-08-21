@@ -14,7 +14,11 @@ interface Props {
   icon: IconName;
   tone: CardTone;
   heading: string;
-  body: string;
+  /**
+   * Figma's "Show body". Omitted, the card is icon, heading and button only —
+   * the routing tile /shopify-apps/ uses for Find Your Fit.
+   */
+  body?: string;
   /** Feature Row (126:24) labels. Omitting them gives the short stage card. */
   features?: string[];
   cta?: { label: string; href?: string };
@@ -50,7 +54,7 @@ const {
 
   <div class="feature-card__content">
     <Heading class="feature-card__heading">{heading}</Heading>
-    <p class="feature-card__body">{body}</p>
+    {body && <p class="feature-card__body">{body}</p>}
   </div>
 
   {features.length > 0 && (

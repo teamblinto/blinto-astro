@@ -1,0 +1,120 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/page/Hero.astro';
+import BeliefGrid from '~/components/sections/page/BeliefGrid.astro';
+import StageGrid from '~/components/sections/page/StageGrid.astro';
+import ProcessGrid from '~/components/sections/page/ProcessGrid.astro';
+import ProductGrid from '~/components/sections/page/ProductGrid.astro';
+import Faq from '~/components/sections/Faq.astro';
+import Cta from '~/components/sections/Cta.astro';
+import * as page from '~/data/pages/shopify-apps';
+
+/**
+ * Our Apps — Figma "Our Apps · Desktop" (269:5897), at /shopify-apps/ per the
+ * approved sitemap. Section order is the design's: hero, where you are, the
+ * apps, find your fit, how we build, the journey, product tour, why it
+ * matters, FAQ, CTA.
+ */
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: page.faqs.map((faq) => ({
+    '@type': 'Question',
+    name: faq.question,
+    acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+  })),
+};
+
+/**
+ * The apps themselves, as software rather than as page content. Each carries
+ * only what the page actually states — no ratings or prices we cannot verify.
+ */
+const appsSchema = page.appCards.map((card, index) => ({
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: page.products[index].name,
+  applicationCategory: 'BusinessApplication',
+  operatingSystem: 'Shopify',
+  description: card.body,
+  author: { '@type': 'Organization', name: 'Blinto LLC' },
+}));
+---
+
+<BaseLayout title={page.meta.title} description={page.meta.description}>
+  <script
+    slot="head"
+    type="application/ld+json"
+    is:inline
+    set:html={JSON.stringify([faqSchema, ...appsSchema])}
+  />
+
+  <Hero
+    eyebrow={page.hero.eyebrow}
+    heading={page.hero.heading}
+    subheading={page.hero.subheading}
+    actions={page.hero.actions}
+    banner={page.hero.banner}
+  />
+
+  <BeliefGrid
+    copy={page.opportunitySection}
+    cells={page.opportunityCells}
+    layout="row"
+  />
+
+  <StageGrid
+    copy={page.appsSection}
+    cards={page.appCards}
+    align
+    id="the-apps"
+  />
+
+  <StageGrid
+    copy={page.fitSection}
+    cards={page.fitCards}
+    note={page.fitNote}
+  />
+
+  <BeliefGrid
+    copy={page.buildSection}
+    cells={page.buildCells}
+    cardMin={260}
+    cellMinHeight={220}
+  />
+
+  <ProcessGrid
+    copy={page.journeySection}
+    steps={page.journeySteps}
+    note={page.journeyNote}
+  />
+
+  <ProductGrid
+    copy={page.tourSection}
+    products={page.products}
+    id="product-tour"
+  />
+
+  <BeliefGrid
+    copy={page.whySection}
+    cells={page.whyCells}
+    cardMin={500}
+    actions={[page.whyAction]}
+  />
+
+  <Faq
+    eyebrow={page.faqSection.eyebrow}
+    heading={page.faqSection.heading}
+    subheading={page.faqSection.subheading}
+    items={page.faqs}
+    compact
+  />
+
+  <Cta
+    kicker={page.closingCta.kicker}
+    heading={page.closingCta.heading}
+    body={page.closingCta.body}
+    actions={page.closingCta.actions}
+    backdrop={page.closingCta.backdrop}
+  />
+</BaseLayout>

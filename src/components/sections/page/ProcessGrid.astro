@@ -21,10 +21,12 @@ interface Props {
   action?: CtaAction;
   /** Column floor. Default is `--layout-card-min` (330). */
   cardMin?: number;
+  /** The centred line The Journey (270:6160) closes with. */
+  note?: string;
   id?: string;
 }
 
-const { copy, steps, action, cardMin, id }: Props = Astro.props;
+const { copy, steps, action, cardMin, note, id }: Props = Astro.props;
 ---
 
 <section class="process" {id}>
@@ -49,6 +51,8 @@ const { copy, steps, action, cardMin, id }: Props = Astro.props;
       ))}
     </ol>
 
+    {note && <p class="process__note">{note}</p>}
+
     {action && (
       <div class="process__action">
         <LargeButton
@@ -70,6 +74,16 @@ const { copy, steps, action, cardMin, id }: Props = Astro.props;
     display: flex;
     flex-direction: column;
     gap: var(--space-3xl);
+  }
+
+  /* Figma sets the closing note in Body/Subheading, centred under the row. */
+  .process__note {
+    max-width: 874px;
+    margin-inline: auto;
+    font-size: var(--font-size-body-md);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+    text-align: center;
   }
 
   .process__action {
