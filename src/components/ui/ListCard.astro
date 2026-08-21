@@ -1,0 +1,123 @@
+---
+import type { CardTone } from './FeatureCard.astro';
+
+/**
+ * Card / List (Figma 173:1127) — "Pastel card holding a display heading, an
+ * optional supporting Subheading, and a bulleted list."
+ *
+ * Figma models the row count as Item 4/5/6 booleans on a fixed six-row
+ * component so one component serves the 3-, 5- and 6-item lists. In code the
+ * same intent is just an array, so the caller passes the rows it has.
+ *
+ * Bullet Row (170:1034) — "Neutral bulleted list item … the marker sits in a
+ * line-height-tall box so it aligns to the first line of wrapping copy." That
+ * box is the 8x21 wrapper below: 21px is the 16px/1.3 line box, so the 6px dot
+ * centres on the first line however far the label wraps.
+ */
+interface Props {
+  tone: CardTone;
+  heading: string;
+  /** Body/Subheading line between the heading and the list. */
+  subheading?: string;
+  items: string[];
+  /** Heading level for the card title, to keep the outline sane. */
+  as?: 'h3' | 'h4';
+}
+
+const { tone, heading, subheading, items, as: Heading = 'h3' }: Props =
+  Astro.props;
+---
+
+<article class:list={['list-card', `list-card--${tone}`]}>
+  <Heading class="list-card__heading">{heading}</Heading>
+
+  {subheading && <p class="list-card__subheading">{subheading}</p>}
+
+  <ul class="list-card__list">
+    {items.map((item) => (
+      <li class="list-card__row">
+        <span class="list-card__marker" aria-hidden="true">
+          <span class="list-card__dot"></span>
+        </span>
+        <span>{item}</span>
+      </li>
+    ))}
+  </ul>
+</article>
+
+<style>
+  .list-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-md);
+    width: 100%;
+    padding: var(--space-lg);
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+  }
+
+  .list-card--blue {
+    background-color: var(--color-bg-accent-blue);
+  }
+
+  .list-card--yellow {
+    background-color: var(--color-bg-accent-yellow);
+  }
+
+  .list-card--green {
+    background-color: var(--color-bg-accent-green);
+  }
+
+  .list-card__heading {
+    /* Heading/Row */
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-heading-2);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.25;
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  .list-card__subheading {
+    /* Body/Subheading */
+    font-size: var(--font-size-body-md);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  .list-card__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    width: 100%;
+  }
+
+  .list-card__row {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-xs);
+    /* Body/Default */
+    font-size: var(--font-size-body-xs);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.3;
+  }
+
+  /* The line-height-tall marker box: 8 wide x 21 tall, dot centred. */
+  .list-card__marker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 8px;
+    height: 21px;
+  }
+
+  .list-card__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--radius-full);
+    background-color: var(--color-icon-primary);
+  }
+</style>

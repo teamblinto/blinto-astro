@@ -12,19 +12,43 @@ import { faqs } from '~/data/home';
  * Built on <details>/<summary> so it works with no JavaScript and gets
  * keyboard support and correct semantics from the platform. The first row is
  * open, matching the design.
+ *
+ * The props default to the homepage instance, so service pages pass their own
+ * copy and the homepage keeps calling `<Faq />` with no arguments.
  */
+export interface FaqEntry {
+  question: string;
+  answer: string;
+}
+
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  subheading?: string;
+  items?: FaqEntry[];
+  /** Figma's Stacked Compact heading: Display/Feature (60) rather than 72. */
+  compact?: boolean;
+}
+
+const {
+  eyebrow = 'FAQs',
+  heading = 'Questions App Teams Ask Before Choosing a Shopify Expert Agency',
+  subheading = "Here's what most teams want to know before they reach out.",
+  items = faqs,
+  compact = false,
+}: Props = Astro.props;
 ---
 
 <section class="faq">
   <div class="container faq__columns">
     <div class="faq__aside">
-      <SectionHeader layout="stacked" eyebrow="FAQs" subheading="Here's what most teams want to know before they reach out.">
-        Questions App Teams Ask Before Choosing a Shopify Expert Agency
+      <SectionHeader layout="stacked" {eyebrow} {subheading} {compact}>
+        {heading}
       </SectionHeader>
     </div>
 
     <div class="faq__list">
-      {faqs.map((faq, index) => (
+      {items.map((faq, index) => (
         <details class="faq__item" open={index === 0} name="blinto-faq">
           <summary class="faq__summary">
             <span class="faq__question">{faq.question}</span>

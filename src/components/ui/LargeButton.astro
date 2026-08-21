@@ -33,6 +33,11 @@ const { label, href = '#contact', tone = 'black', class: className } = Astro.pro
     justify-content: space-between;
     gap: var(--space-md);
     min-width: 278px;
+    /* Figma caps the pill at 560 and lets the label wrap inside it, which is
+       what keeps a long CTA ("Explore Shopify App Support and Maintenance
+       Services", 513 wide in the design) on two lines instead of one very
+       wide button. Short labels still hug the 278 minimum on one line. */
+    max-width: 560px;
     padding: var(--space-2xs) var(--space-2xs) var(--space-2xs) var(--space-md);
     border-radius: var(--radius-full);
     border: 1px solid transparent;
@@ -49,7 +54,10 @@ const { label, href = '#contact', tone = 'black', class: className } = Astro.pro
   }
 
   .large-button__label {
-    white-space: nowrap;
+    /* `flex: 1 0 0` + a zero min-width is Figma's label slot: it fills the
+       pill and wraps rather than pushing the arrow out of the shape. */
+    flex: 1 0 0;
+    min-width: 0;
   }
 
   /**

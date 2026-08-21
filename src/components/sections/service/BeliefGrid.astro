@@ -1,0 +1,64 @@
+---
+import SectionHeader from '~/components/ui/SectionHeader.astro';
+import BeliefCard from '~/components/ui/BeliefCard.astro';
+import ImageCard from '~/components/ui/ImageCard.astro';
+import type { BeliefCell, SectionCopy } from '~/data/services/app-development';
+
+/**
+ * The belief grid used by Section / What We Build (213:2450) and Section / Why
+ * Blinto (213:2473): a section header over a 3-up grid of Card / Belief cells,
+ * some of which Figma swaps for a Card / Image photo tile.
+ */
+interface Props {
+  copy: SectionCopy;
+  cells: BeliefCell[];
+}
+
+const { copy, cells }: Props = Astro.props;
+---
+
+<section class="belief-grid">
+  <div class="container belief-grid__inner">
+    <SectionHeader eyebrow={copy.eyebrow} subheading={copy.subheading}>
+      {copy.heading}
+    </SectionHeader>
+
+    <ul class="card-grid">
+      {cells.map((cell) => (
+        <li class="belief-grid__cell">
+          {cell.kind === 'image' ? (
+            <ImageCard
+              src={cell.image.src}
+              alt={cell.image.alt}
+              width={cell.image.width}
+              height={cell.image.height}
+            />
+          ) : (
+            <BeliefCard
+              tone={cell.tone}
+              heading={cell.heading}
+              body={cell.body}
+            />
+          )}
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .belief-grid {
+    padding-top: var(--space-4xl);
+  }
+
+  .belief-grid__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xl);
+  }
+
+  .belief-grid__cell {
+    /* Figma pins every cell in this grid to 320px tall. */
+    min-height: 320px;
+  }
+</style>

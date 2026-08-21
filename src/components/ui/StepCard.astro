@@ -1,0 +1,98 @@
+---
+import type { CardTone } from './FeatureCard.astro';
+
+/**
+ * Card / Step (Figma 170:1056) — "Numbered process card for ordered
+ * sequences. The badge is a white pill on the pastel fill so the step number
+ * reads clearly. Tone cycles across the sequence."
+ *
+ * The number is decorative: the step order is already carried by the ordered
+ * list the cards sit in, so repeating it to a screen reader would only add
+ * noise.
+ */
+interface Props {
+  tone: CardTone;
+  /** Two-digit step label, e.g. "01". */
+  number: string;
+  heading: string;
+  body: string;
+  /** Heading level for the card title, to keep the outline sane. */
+  as?: 'h3' | 'h4';
+}
+
+const { tone, number, heading, body, as: Heading = 'h3' }: Props = Astro.props;
+---
+
+<article class:list={['step-card', `step-card--${tone}`]}>
+  <span class="step-card__number" aria-hidden="true">{number}</span>
+
+  <div class="step-card__content">
+    <Heading class="step-card__heading">{heading}</Heading>
+    <p class="step-card__body">{body}</p>
+  </div>
+</article>
+
+<style>
+  .step-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-xl);
+    width: 100%;
+    padding: var(--space-lg);
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+  }
+
+  .step-card--blue {
+    background-color: var(--color-bg-accent-blue);
+  }
+
+  .step-card--yellow {
+    background-color: var(--color-bg-accent-yellow);
+  }
+
+  .step-card--green {
+    background-color: var(--color-bg-accent-green);
+  }
+
+  /* A 48px white disc, matching the icon slot the other cards open with. */
+  .step-card__number {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-full);
+    background-color: var(--color-bg-page);
+    /* Heading/Row */
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-heading-2);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.25;
+  }
+
+  .step-card__content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    width: 100%;
+  }
+
+  .step-card__heading {
+    /* Heading/Card */
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-heading-1);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.25;
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  .step-card__body {
+    /* Body/Default */
+    font-size: var(--font-size-body-xs);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.3;
+  }
+</style>
