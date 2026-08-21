@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import SectionHeader from '~/components/ui/SectionHeader.astro';
 import { whyCells } from '~/data/home';
 
@@ -21,12 +22,13 @@ import { whyCells } from '~/data/home';
       {whyCells.map((cell) =>
         cell.kind === 'image' ? (
           <li class="why__cell">
-            <img
+            <Image
               class="why__image"
               src={cell.src}
               alt={cell.alt}
               width={427}
               height={320}
+              densities={[1, 2]}
               loading="lazy"
               decoding="async"
             />

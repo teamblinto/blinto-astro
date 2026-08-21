@@ -2,20 +2,35 @@ import type { IconName } from '~/components/ui/Icon.astro';
 import type { CardTone } from '~/components/ui/FeatureCard.astro';
 
 /**
+ * Photography lives in `src/assets` (not `public`) so Astro's build pipeline
+ * optimises it — emitting modern formats and a density srcset — instead of
+ * shipping the raw 2x JPEGs. Exported from Figma at 2x the designed slot size.
+ */
+import heroWireframes from '~/assets/images/hero-wireframes.jpg';
+import heroLaptop from '~/assets/images/hero-laptop.jpg';
+import heroMobileStorefront from '~/assets/images/hero-mobile-storefront.jpg';
+import heroShopifyApp from '~/assets/images/hero-shopify-app.jpg';
+import heroCode from '~/assets/images/hero-code.jpg';
+import whyPairProgramming from '~/assets/images/why-pair-programming.jpg';
+import whyTeamWorkshop from '~/assets/images/why-team-workshop.jpg';
+
+/**
  * Homepage content, kept out of the markup so copy can change without
  * touching layout. Strings are transcribed from the Figma design
  * (node 145:3, "Homepage — Desktop").
  */
 
 export interface HeroImage {
-  /** Path under /public. See public/images/README.md for the export list. */
-  src: string;
+  src: ImageMetadata;
   alt: string;
   /** Figma image height inside the slot, in px. */
   height: number;
   /** Figma slot top offset, in px — this is what forms the hero arc. */
   offset: number;
 }
+
+/** Designed slot width from Figma's Hero Image Strip (1420 / 5 columns). */
+export const HERO_SLOT_WIDTH = 264;
 
 /**
  * Hero Image Strip (Figma 135:137) — "Five staggered photo slots forming the
@@ -24,31 +39,31 @@ export interface HeroImage {
  */
 export const heroImages: HeroImage[] = [
   {
-    src: '/images/hero-wireframes.jpg',
+    src: heroWireframes,
     alt: 'Designer sketching Shopify app wireframes on paper prototypes',
     height: 380,
     offset: 0,
   },
   {
-    src: '/images/hero-laptop.jpg',
+    src: heroLaptop,
     alt: 'Developer reviewing app code on a laptop while holding a phone',
     height: 380,
     offset: 80,
   },
   {
-    src: '/images/hero-mobile-storefront.jpg',
+    src: heroMobileStorefront,
     alt: 'Shopper browsing a Shopify storefront on a mobile phone',
     height: 300,
     offset: 160,
   },
   {
-    src: '/images/hero-shopify-app.jpg',
+    src: heroShopifyApp,
     alt: 'Shopify mobile app open on a phone beside a notebook',
     height: 380,
     offset: 80,
   },
   {
-    src: '/images/hero-code.jpg',
+    src: heroCode,
     alt: 'Close-up of Shopify app source code on a monitor',
     height: 380,
     offset: 0,
@@ -144,13 +159,13 @@ export const serviceCards: StageCard[] = [
  * designed checkerboard order lives in data rather than in the markup.
  */
 export type WhyCell =
-  | { kind: 'image'; src: string; alt: string }
+  | { kind: 'image'; src: ImageMetadata; alt: string }
   | { kind: 'belief'; tone: CardTone; heading: string; body: string };
 
 export const whyCells: WhyCell[] = [
   {
     kind: 'image',
-    src: '/images/why-pair-programming.jpg',
+    src: whyPairProgramming,
     alt: 'Two Blinto engineers reviewing Shopify app code together at a desk',
   },
   {
@@ -179,7 +194,7 @@ export const whyCells: WhyCell[] = [
   },
   {
     kind: 'image',
-    src: '/images/why-team-workshop.jpg',
+    src: whyTeamWorkshop,
     alt: 'The Blinto team planning an app roadmap around a shared monitor',
   },
 ];

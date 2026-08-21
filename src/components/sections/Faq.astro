@@ -11,8 +11,7 @@ import { faqs } from '~/data/home';
  *
  * Built on <details>/<summary> so it works with no JavaScript and gets
  * keyboard support and correct semantics from the platform. The first row is
- * open, matching the design. The plus/minus glyph is drawn with two spans
- * rather than swapped icons so it can animate.
+ * open, matching the design.
  */
 ---
 
@@ -30,8 +29,12 @@ import { faqs } from '~/data/home';
           <summary class="faq__summary">
             <span class="faq__question">{faq.question}</span>
             <span class="faq__toggle">
-              <Icon name="plus" size={32} class="faq__glyph faq__glyph--plus" />
-              <Icon name="minus" size={32} class="faq__glyph faq__glyph--minus" />
+              <span class="faq__glyph faq__glyph--plus">
+                <Icon name="plus" size={32} />
+              </span>
+              <span class="faq__glyph faq__glyph--minus">
+                <Icon name="minus" size={32} />
+              </span>
             </span>
           </summary>
           <div class="faq__answer">
@@ -124,16 +127,27 @@ import { faqs } from '~/data/home';
 
   /**
    * State=Collapsed shows Icon / 32 / Plus, State=Expanded swaps in
-   * Icon / 32 / Minus — both real design-system icons, stacked so the swap
-   * needs no JavaScript.
+   * Icon / 32 / Minus — both real design-system icons, toggled with CSS so the
+   * swap needs no JavaScript.
+   *
+   * The wrappers exist because Astro's scoped styles do not reach a child
+   * component's root element: a class passed straight into <Icon> would carry
+   * Icon's scope, not this component's, and these rules would never match.
    */
-  .faq__glyph--minus,
+  .faq__glyph {
+    display: flex;
+  }
+
+  .faq__glyph--minus {
+    display: none;
+  }
+
   .faq__item[open] .faq__glyph--plus {
     display: none;
   }
 
   .faq__item[open] .faq__glyph--minus {
-    display: block;
+    display: flex;
   }
 
   .faq__answer {
@@ -152,12 +166,6 @@ import { faqs } from '~/data/home';
 
   .faq__summary:hover .faq__question {
     color: var(--color-text-brand);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .faq__glyph::after {
-      transition: none;
-    }
   }
 
   @media (width <= 900px) {

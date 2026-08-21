@@ -6,21 +6,41 @@ import { marqueeItems } from '~/data/home';
  * centred and deliberately overflows a clipping frame, so it bleeds at every
  * breakpoint. Top and bottom hairlines only."
  *
- * Figma pins a static overflowing line; here it actually scrolls, which is
- * what "scrolling statement band" describes. The track is duplicated so the
- * loop is seamless, and the animation is dropped entirely for anyone who asks
- * for reduced motion — the copy then reads as the centred static line.
+ * Figma pins a static overflowing line; the component description calls it a
+ * "scrolling statement band", so it scrolls here — continuously, with no
+ * visible seam.
+ *
+ * How the seamless loop works: the track holds exactly TWO identical groups
+ * and animates from 0 to -50%, so the moment the first group has fully exited
+ * the second sits precisely where the first began. The shift only lands on an
+ * item boundary if each group's width includes its own trailing gap, which is
+ * why the gap is applied as `padding-inline-end` on the group rather than as a
+ * `gap` on the track — a track-level gap would leave the translation half a
+ * gap short and the loop would visibly jump.
+ *
+ * Each group repeats the phrase list twice so the track stays wider than the
+ * viewport on ultrawide displays, where a single pass would otherwise scroll
+ * a blank stretch into view.
  */
-const items = [...marqueeItems, ...marqueeItems];
+const REPEATS_PER_GROUP = 2;
+
+const groupItems = Array.from({ length: REPEATS_PER_GROUP }, () => marqueeItems).flat();
+
+/** Two passes: the first is read out, the second is purely visual. */
+const groups = [false, true];
 ---
 
 <div class="marquee">
   <div class="marquee__track">
-    {items.map((item, index) => (
-      <span class="marquee__item" aria-hidden={index >= marqueeItems.length}>
-        <span class="marquee__bullet">•</span>
-        {item}
-      </span>
+    {groups.map((isDuplicate) => (
+      <div class="marquee__group" aria-hidden={isDuplicate ? 'true' : undefined}>
+        {groupItems.map((item) => (
+          <span class="marquee__item">
+            <span class="marquee__bullet" aria-hidden="true">&bull;</span>
+            {item}
+          </span>
+        ))}
+      </div>
     ))}
   </div>
 </div>
@@ -29,7 +49,6 @@ const items = [...marqueeItems, ...marqueeItems];
   .marquee {
     display: flex;
     align-items: center;
-    justify-content: center;
     height: 112px;
     padding-block: var(--space-xl);
     border-top: 1px solid var(--color-border-subtle);
@@ -39,11 +58,19 @@ const items = [...marqueeItems, ...marqueeItems];
 
   .marquee__track {
     display: flex;
+    width: max-content;
+    animation: marquee-scroll 48s linear infinite;
+    /* Promote once so the transform does not repaint the band every frame. */
+    will-change: transform;
+  }
+
+  .marquee__group {
+    display: flex;
     flex-shrink: 0;
     align-items: center;
     gap: var(--space-2xl);
-    width: max-content;
-    animation: marquee-scroll 32s linear infinite;
+    /* Carries the seam gap, so the group's width is its full repeat length. */
+    padding-inline-end: var(--space-2xl);
   }
 
   .marquee__item {
@@ -64,7 +91,7 @@ const items = [...marqueeItems, ...marqueeItems];
     color: var(--color-icon-brand);
   }
 
-  /* The track holds two copies, so shifting by half its width loops cleanly. */
+  /* Two identical groups, so -50% is exactly one group's advance. */
   @keyframes marquee-scroll {
     from {
       transform: translateX(0);
@@ -74,10 +101,25 @@ const items = [...marqueeItems, ...marqueeItems];
     }
   }
 
+  /* Hovering pauses the band so a reader can finish a phrase. */
+  .marquee:hover .marquee__track {
+    animation-play-state: paused;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .marquee__track {
       animation: none;
-      justify-content: center;
+      will-change: auto;
+      /* Centre the single remaining pass, as the static design has it. */
+      margin-inline: auto;
+    }
+
+    .marquee__group[aria-hidden='true'] {
+      display: none;
+    }
+
+    .marquee__group {
+      padding-inline-end: 0;
     }
   }
 </style>
