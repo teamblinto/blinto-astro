@@ -92,21 +92,21 @@ export const stageCards: StageCard[] = [
     tone: 'blue',
     heading: 'You Have an App Idea but Need a Clear Path to Launch',
     body: 'You know what your app should do, but turning that idea into a working product takes planning. We help you scope, build, and launch with confidence.',
-    cta: { label: 'Discuss Your App Idea', href: '/contact' },
+    cta: { label: 'Discuss Your App Idea', href: '/contact-us/' },
   },
   {
     icon: 'growth',
     tone: 'yellow',
     heading: 'Your App Is Live, but Growth Has Slowed',
     body: "Installs have stalled and merchants aren't sticking around. We sharpen your positioning, boost activation, and turn browsers into loyal users.",
-    cta: { label: 'Explore App Growth Support', href: '/services/app-growth' },
+    cta: { label: 'Explore App Growth Support', href: '/services/shopify-app-marketing/' },
   },
   {
     icon: 'support',
     tone: 'green',
     heading: 'Your App Needs Reliable Support After Launch',
     body: 'Bugs pile up and Shopify keeps updating its API. We handle fixes, updates, and day-to-day support so your app stays stable.',
-    cta: { label: 'Request Maintenance Support', href: '/contact' },
+    cta: { label: 'Request Maintenance Support', href: '/contact-us/' },
   },
 ];
 
@@ -122,7 +122,7 @@ export const serviceCards: StageCard[] = [
       'Custom Shopify app development',
       'Shopify API integrations',
     ],
-    cta: { label: 'Explore App Development', href: '/services/app-development' },
+    cta: { label: 'Explore App Development', href: '/services/shopify-app-development/' },
   },
   {
     icon: 'admin',
@@ -134,7 +134,7 @@ export const serviceCards: StageCard[] = [
       'SEO, paid media, and content',
       'Activation and retention',
     ],
-    cta: { label: 'Explore App Growth', href: '/services/app-growth' },
+    cta: { label: 'Explore App Growth', href: '/services/shopify-app-marketing/' },
   },
   {
     icon: 'updates',
@@ -148,7 +148,7 @@ export const serviceCards: StageCard[] = [
     ],
     cta: {
       label: 'Explore Support & Maintenance',
-      href: '/services/support-maintenance',
+      href: '/services/shopify-app-support-maintenance/',
     },
   },
 ];
@@ -227,5 +227,5 @@ export const faqs = [
 export const closingCta = {
   kicker: 'Next Step',
   heading: "Your Shopify App's Next Stage Can Start With One Conversation",
-  action: { label: 'Book a Discovery Call', href: '/contact' },
+  action: { label: 'Book a Discovery Call', href: '/contact-us/' },
 };

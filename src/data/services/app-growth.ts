@@ -42,7 +42,7 @@ export const hero = {
   subheading:
     'Turn app visibility into real growth. We help Shopify app teams win qualified installs, stronger activation, and lasting retention through marketing built around the product.',
   actions: [
-    { label: 'Book a Growth Strategy Call', href: '/contact', tone: 'black' },
+    { label: 'Book a Growth Strategy Call', href: '/contact-us/', tone: 'black' },
     {
       label: 'Explore Our Growth Process',
       href: '#our-process',
@@ -243,7 +243,7 @@ export const processSteps: ProcessStep[] = [
 
 export const processAction: CtaAction = {
   label: 'Book a Growth Strategy Call',
-  href: '/contact',
+  href: '/contact-us/',
   tone: 'black',
 };
 
@@ -334,12 +334,12 @@ export const keepLearningImage: CardImage = {
 export const keepLearningActions: CtaAction[] = [
   {
     label: 'Explore Shopify App Development Services',
-    href: '/services/app-development',
+    href: '/services/shopify-app-development/',
     tone: 'black',
   },
   {
     label: 'Explore Shopify App Support and Maintenance Services',
-    href: '/services/support-maintenance',
+    href: '/services/shopify-app-support-maintenance/',
     tone: 'outline',
   },
 ];
@@ -387,7 +387,7 @@ export const closingCta = {
   body: 'Whether growth is blocked by visibility, conversion, activation, or retention, we can help you find the right priority and build a clearer path forward.',
   backdrop: ctaBackdrop,
   actions: [
-    { label: 'Book a Growth Strategy Call', href: '/contact', tone: 'black' },
-    { label: 'Explore All Shopify Services', href: '/services', tone: 'white' },
+    { label: 'Book a Growth Strategy Call', href: '/contact-us/', tone: 'black' },
+    { label: 'Explore All Shopify Services', href: '/services/', tone: 'white' },
   ] satisfies CtaAction[],
 };

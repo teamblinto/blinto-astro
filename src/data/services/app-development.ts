@@ -48,7 +48,7 @@ export const hero = {
   subheading:
     'We help Shopify app founders and product teams turn an idea into a scoped, buildable product ready for launch, through structured planning and Shopify-specific development.',
   actions: [
-    { label: 'Discuss Your App Idea', href: '/contact', tone: 'black' },
+    { label: 'Discuss Your App Idea', href: '/contact-us/', tone: 'black' },
     {
       label: 'Explore Our Development Process',
       href: '#our-process',
@@ -249,7 +249,7 @@ export const processSteps: ProcessStep[] = [
 
 export const processAction: CtaAction = {
   label: 'Start With a Discovery Call',
-  href: '/contact',
+  href: '/contact-us/',
   tone: 'black',
 };
 
@@ -339,7 +339,7 @@ export const afterLaunchImage: CardImage = {
 
 export const afterLaunchAction: CtaAction = {
   label: 'Explore Shopify App Support and Maintenance Services',
-  href: '/services/support-maintenance',
+  href: '/services/shopify-app-support-maintenance/',
   tone: 'black',
 };
 
@@ -386,7 +386,7 @@ export const closingCta = {
   body: 'Whether you have an early idea or a defined product plan, we can help turn your next development decision into real progress.',
   backdrop: ctaBackdrop,
   actions: [
-    { label: 'Discuss Your App Idea', href: '/contact', tone: 'black' },
-    { label: 'Explore All Shopify Services', href: '/services', tone: 'white' },
+    { label: 'Discuss Your App Idea', href: '/contact-us/', tone: 'black' },
+    { label: 'Explore All Shopify Services', href: '/services/', tone: 'white' },
   ] satisfies CtaAction[],
 };

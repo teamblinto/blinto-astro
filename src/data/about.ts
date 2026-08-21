@@ -56,8 +56,8 @@ export const hero = {
   subheading:
     'We help founders and product teams build, grow, and maintain Shopify apps. We also build our own Shopify products, using what we learn to serve clients better.',
   actions: [
-    { label: 'Explore Our Shopify Services', href: '/services', tone: 'black' },
-    { label: 'Explore Our Shopify Apps', href: '/products', tone: 'outline' },
+    { label: 'Explore Our Shopify Services', href: '/services/', tone: 'black' },
+    { label: 'Explore Our Shopify Apps', href: '/shopify-apps/', tone: 'outline' },
   ] satisfies CtaAction[],
   banner: {
     src: heroBanner,
@@ -113,7 +113,7 @@ export const whatWeDoCards: StageCard[] = [
     body: 'MVP planning, Shopify app development, integrations, testing, and launch preparation.',
     cta: {
       label: 'Explore Shopify App Development',
-      href: '/services/app-development',
+      href: '/services/shopify-app-development/',
     },
   },
   {
@@ -123,7 +123,7 @@ export const whatWeDoCards: StageCard[] = [
     body: 'Positioning, visibility, installs, activation, retention, and app-focused marketing.',
     cta: {
       label: 'Explore Shopify App Marketing',
-      href: '/services/app-growth',
+      href: '/services/shopify-app-marketing/',
     },
   },
   {
@@ -133,7 +133,7 @@ export const whatWeDoCards: StageCard[] = [
     body: 'Bug fixes, Shopify API updates, support, and ongoing improvements.',
     cta: {
       label: 'Explore Support & Maintenance',
-      href: '/services/support-maintenance',
+      href: '/services/shopify-app-support-maintenance/',
     },
   },
 ];
@@ -323,6 +323,6 @@ export const closingCta = {
   body: 'Whether you are building your first app or growing one that is already live, we would like to hear about it.',
   backdrop: ctaBackdrop,
   actions: [
-    { label: 'Start a Conversation', href: '/contact', tone: 'white' },
+    { label: 'Start a Conversation', href: '/contact-us/', tone: 'white' },
   ] satisfies CtaAction[],
 };

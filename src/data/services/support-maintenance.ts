@@ -42,7 +42,7 @@ export const hero = {
   subheading:
     'Blinto helps app owners fix recurring bugs, manage Shopify API updates, and keep live apps stable through structured technical support and ongoing maintenance.',
   actions: [
-    { label: 'Request Maintenance Support', href: '/contact', tone: 'black' },
+    { label: 'Request Maintenance Support', href: '/contact-us/', tone: 'black' },
     {
       label: 'Explore Our Support Process',
       href: '#our-process',
@@ -247,7 +247,7 @@ export const processSteps: ProcessStep[] = [
 
 export const processAction: CtaAction = {
   label: 'Request Maintenance Support',
-  href: '/contact',
+  href: '/contact-us/',
   tone: 'black',
 };
 
@@ -368,12 +368,12 @@ export const keepLearningImage: CardImage = {
 export const keepLearningActions: CtaAction[] = [
   {
     label: 'Explore Shopify App Development Services',
-    href: '/services/app-development',
+    href: '/services/shopify-app-development/',
     tone: 'black',
   },
   {
     label: 'Explore Shopify App Marketing',
-    href: '/services/app-growth',
+    href: '/services/shopify-app-marketing/',
     tone: 'outline',
   },
 ];
@@ -421,7 +421,7 @@ export const closingCta = {
   body: 'Whether you need one urgent fix or ongoing technical support, we can help you sort the priorities and build a manageable path forward.',
   backdrop: ctaBackdrop,
   actions: [
-    { label: 'Request Maintenance Support', href: '/contact', tone: 'black' },
-    { label: 'Explore All Shopify Services', href: '/services', tone: 'white' },
+    { label: 'Request Maintenance Support', href: '/contact-us/', tone: 'black' },
+    { label: 'Explore All Shopify Services', href: '/services/', tone: 'white' },
   ] satisfies CtaAction[],
 };

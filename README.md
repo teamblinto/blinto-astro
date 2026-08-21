@@ -4,13 +4,22 @@ The Blinto marketing site, built with [Astro](https://astro.build).
 
 Implements the **Blinto Revamp 2026** Figma design:
 
+Paths follow the approved launch sitemap, not Astro convention: `/about-us/`,
+`/contact-us/` and `/case-studies/` deliberately reuse the paths the current
+WordPress site already ranks on, so those need no redirect at launch. Every URL
+carries a trailing slash, pinned via `trailingSlash: 'always'`.
+
 | Route | Figma node |
 | --- | --- |
 | `/` | [`145:3` — Homepage · Desktop](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Revamp-2026?node-id=145-3) |
-| `/services/app-development` | [`213:2429` — Service · Shopify App Development · Desktop](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Revamp-2026?node-id=213-2429) |
-| `/services/app-growth` | [`232:2234` — Service · Shopify App Growth · Desktop](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Revamp-2026?node-id=232-2234) |
-| `/services/support-maintenance` | [`240:3463` — Service · App Support & Maintenance · Desktop](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Revamp-2026?node-id=240-3463) |
-| `/about` | [`251:4816` — About Us · Desktop](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Revamp-2026?node-id=251-4816) |
+| `/services/shopify-app-development/` | [`213:2429` — Service · Shopify App Development · Desktop](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Revamp-2026?node-id=213-2429) |
+| `/services/shopify-app-marketing/` | [`232:2234` — Service · Shopify App Growth · Desktop](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Revamp-2026?node-id=232-2234) |
+| `/services/shopify-app-support-maintenance/` | [`240:3463` — Service · App Support & Maintenance · Desktop](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Revamp-2026?node-id=240-3463) |
+| `/about-us/` | [`251:4816` — About Us · Desktop](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Revamp-2026?node-id=251-4816) |
+
+Still to build, and linked from the nav today: `/services/` (index),
+`/shopify-apps/`, `/contact-us/`, `/case-studies/`. All four 404 until they
+exist — none may ship to production in that state.
 
 ## Getting started
 
