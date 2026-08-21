@@ -1,0 +1,52 @@
+---
+import SectionHeader from '~/components/ui/SectionHeader.astro';
+import FeatureCard from '~/components/ui/FeatureCard.astro';
+import type { IconName } from '~/components/ui/Icon.astro';
+import type { CardTone } from '~/components/ui/FeatureCard.astro';
+import type { SectionCopy } from '~/data/services/app-development';
+
+/**
+ * Section / Where You Are (Figma 213:2444) — three Card / Feature instances
+ * with Features=false and Show button=false, so they render as the short stage
+ * card: icon, heading, body, no divider or CTA.
+ */
+interface Props {
+  copy: SectionCopy;
+  cards: { icon: IconName; tone: CardTone; heading: string; body: string }[];
+}
+
+const { copy, cards }: Props = Astro.props;
+---
+
+<section class="stage-grid">
+  <div class="container stage-grid__inner">
+    <SectionHeader eyebrow={copy.eyebrow} subheading={copy.subheading}>
+      {copy.heading}
+    </SectionHeader>
+
+    <ul class="card-grid">
+      {cards.map((card) => (
+        <li>
+          <FeatureCard
+            icon={card.icon}
+            tone={card.tone}
+            heading={card.heading}
+            body={card.body}
+          />
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .stage-grid {
+    padding-top: var(--space-4xl);
+  }
+
+  .stage-grid__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xl);
+  }
+</style>

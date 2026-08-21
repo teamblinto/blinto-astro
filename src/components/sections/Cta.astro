@@ -1,4 +1,5 @@
 ---
+import { getImage } from 'astro:assets';
 import LargeButton from '~/components/ui/LargeButton.astro';
 import { closingCta } from '~/data/home';
 
@@ -9,32 +10,72 @@ import { closingCta } from '~/data/home';
  * the content column fills to a 790 max-width so it reflows at narrow
  * breakpoints."
  *
- * The homepage instance uses showBody=false and showSecondary=false, so only
- * the kicker, heading and primary action render.
+ * The props default to the homepage instance, which uses showBody=false and
+ * showSecondary=false, so only the kicker, heading and primary action render.
  *
- * NOTE: Figma backs this band with a raster gradient that could not be
- * exported here (see README "Design assets"). It is reproduced with layered
- * CSS gradients — a blue glow rising from the bottom centre with a dot
- * texture over it — which also means it scales cleanly and ships no image.
+ * Backdrop: Figma backs this band with a raster gradient. Callers that have
+ * the export pass it as `backdrop` and it is served as an optimised WebP,
+ * anchored bottom-centre where the glow sits. Callers that don't fall back to
+ * the layered CSS gradients below, which approximate the same artwork with no
+ * image at all.
  */
+export interface CtaAction {
+  label: string;
+  href: string;
+  tone?: 'black' | 'white' | 'outline';
+}
+
+interface Props {
+  kicker?: string;
+  heading?: string;
+  /** Body/Lead line under the heading — Figma's "Show body". */
+  body?: string;
+  actions?: CtaAction[];
+  backdrop?: ImageMetadata;
+}
+
+const {
+  kicker = closingCta.kicker,
+  heading = closingCta.heading,
+  body,
+  actions = [{ ...closingCta.action, tone: 'white' as const }],
+  backdrop,
+}: Props = Astro.props;
+
+/**
+ * Rendered as a CSS background rather than an <img> so `background-position`
+ * can pin the glow to the bottom of the band whatever height the copy gives
+ * it. 2400 is the source's own width, so this never upscales.
+ */
+const backdropImage = backdrop
+  ? await getImage({ src: backdrop, width: 2400, format: 'webp' })
+  : undefined;
 ---
 
 <section class="cta-section">
   <div class="container">
     <div class="cta">
-      <div class="cta__backdrop" aria-hidden="true"></div>
+      <div
+        class:list={['cta__backdrop', backdropImage && 'cta__backdrop--image']}
+        style={backdropImage && `background-image: url(${backdropImage.src})`}
+        aria-hidden="true"
+      >
+      </div>
 
       <div class="cta__content">
-        <p class="cta__kicker">{closingCta.kicker}</p>
-        <h2 class="cta__heading">{closingCta.heading}</h2>
+        <p class="cta__kicker">{kicker}</p>
+        <h2 class="cta__heading">{heading}</h2>
+        {body && <p class="cta__body">{body}</p>}
       </div>
 
       <div class="cta__actions">
-        <LargeButton
-          label={closingCta.action.label}
-          href={closingCta.action.href}
-          tone="white"
-        />
+        {actions.map((action) => (
+          <LargeButton
+            label={action.label}
+            href={action.href}
+            tone={action.tone ?? 'black'}
+          />
+        ))}
       </div>
     </div>
   </div>
@@ -108,6 +149,25 @@ import { closingCta } from '~/data/home';
     );
   }
 
+  /**
+   * With the real export in hand the CSS approximation is redundant, so both
+   * layers are switched off and the raster takes over. The glow sits at the
+   * bottom of the artwork, so that is the edge that must survive the crop.
+   *
+   * Declared after both pseudo-element rules above: these selectors carry the
+   * same specificity, so source order is what decides them.
+   */
+  .cta__backdrop--image {
+    background-position: center bottom;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+  .cta__backdrop--image::before,
+  .cta__backdrop--image::after {
+    content: none;
+  }
+
   .cta__content {
     display: flex;
     flex-direction: column;
@@ -134,8 +194,19 @@ import { closingCta } from '~/data/home';
     font-weight: var(--font-weight-regular);
     line-height: 1.2;
     text-transform: uppercase;
-    text-wrap: balance;
+    /* Greedy, as everywhere else in this design system: Figma fills each line
+       to the 790 content width before breaking, and `balance` re-breaks the
+       heading into two shorter lines that no longer match the design. */
+    text-wrap: normal;
     margin: 0;
+  }
+
+  .cta__body {
+    /* Body/Lead */
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body-lg);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
   }
 
   .cta__actions {

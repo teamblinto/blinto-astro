@@ -179,3 +179,33 @@ ol {
     grid-template-rows: subgrid;
   }
 }
+
+/**
+ * Wrapping card row.
+ *
+ * Where `.card-grid` above lays cards on equal tracks, Figma models some rows
+ * as a plain wrapping flex line of `flex: 1 0 0` cards. The difference is
+ * visible whenever the item count is not a multiple of the column count: the
+ * Our Process row is five cards, which Figma renders as 3 x 426 then 2 x 650,
+ * because the trailing line shares the full width between two cards. Grid
+ * `auto-fit` would leave those two at 426 with a hole beside them.
+ *
+ * Also used for the two-up Card/List + Card/Image rows, where it gives the
+ * 650/650 split at 1440 and drops to one column below `--layout-card-min`.
+ */
+.card-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--layout-grid-gap);
+  width: 100%;
+}
+
+.card-row > * {
+  display: flex;
+  flex: 1 0 0;
+  min-width: min(var(--layout-card-min), 100%);
+}
+
+.card-row > * > * {
+  width: 100%;
+}

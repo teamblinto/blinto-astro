@@ -1,0 +1,96 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/service/Hero.astro';
+import ListWithImage from '~/components/sections/service/ListWithImage.astro';
+import StageGrid from '~/components/sections/service/StageGrid.astro';
+import BeliefGrid from '~/components/sections/service/BeliefGrid.astro';
+import ProcessGrid from '~/components/sections/service/ProcessGrid.astro';
+import Faq from '~/components/sections/Faq.astro';
+import Cta from '~/components/sections/Cta.astro';
+import * as page from '~/data/services/app-development';
+
+/**
+ * Service — Shopify App Development (Figma 213:2429).
+ *
+ * The section order is the design's: hero, before the code, where you are,
+ * what we build, app types, our process, why Blinto, after launch, FAQ, CTA.
+ * Navigation and footer come from BaseLayout, which is where the design's
+ * shared Navigation bar (213:2430) and Footer (213:2504) instances live.
+ */
+
+/** Surfaces the FAQ copy to search engines as structured data. */
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: page.faqs.map((faq) => ({
+    '@type': 'Question',
+    name: faq.question,
+    acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+  })),
+};
+---
+
+<BaseLayout title={page.meta.title} description={page.meta.description}>
+  <script
+    slot="head"
+    type="application/ld+json"
+    is:inline
+    set:html={JSON.stringify(faqSchema)}
+  />
+
+  <Hero
+    eyebrow={page.hero.eyebrow}
+    heading={page.hero.heading}
+    subheading={page.hero.subheading}
+    actions={page.hero.actions}
+    banner={page.hero.banner}
+  />
+
+  <ListWithImage
+    copy={page.beforeTheCodeSection}
+    panel={page.beforeTheCodePanel}
+    image={page.beforeTheCodeImage}
+  />
+
+  <StageGrid copy={page.stagesSection} cards={page.stageCards} />
+
+  <BeliefGrid copy={page.whatWeBuildSection} cells={page.whatWeBuildCells} />
+
+  <ListWithImage
+    copy={page.appTypesSection}
+    panel={page.appTypesPanel}
+    image={page.appTypesImage}
+  />
+
+  <ProcessGrid
+    id="our-process"
+    copy={page.processSection}
+    steps={page.processSteps}
+    action={page.processAction}
+  />
+
+  <BeliefGrid copy={page.whyBlintoSection} cells={page.whyBlintoCells} />
+
+  <ListWithImage
+    copy={page.afterLaunchSection}
+    panel={page.afterLaunchPanel}
+    image={page.afterLaunchImage}
+    action={page.afterLaunchAction}
+  />
+
+  <Faq
+    eyebrow={page.faqSection.eyebrow}
+    heading={page.faqSection.heading}
+    subheading={page.faqSection.subheading}
+    items={page.faqs}
+    compact
+  />
+
+  <Cta
+    kicker={page.closingCta.kicker}
+    heading={page.closingCta.heading}
+    body={page.closingCta.body}
+    actions={page.closingCta.actions}
+    backdrop={page.closingCta.backdrop}
+  />
+</BaseLayout>

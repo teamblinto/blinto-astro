@@ -9,6 +9,11 @@ import Eyebrow from './Eyebrow.astro';
  * Layout=centered — homepage hero on Display/Hero.
  * Layout=stacked  — narrow column beside the FAQ list.
  *
+ * `compact` is Figma's "… Compact" half of each layout: the same structure on
+ * Display/Feature (60) instead of Display/Section (72), with a tighter eyebrow
+ * gap on the split layouts. Service pages use it for their hero and FAQ so
+ * their headings sit one step below the homepage's.
+ *
  * The heading is a slot so callers can mark up part of it (the hero tints
  * "Shopify" and drops the Shopify bag inline).
  */
@@ -16,6 +21,7 @@ interface Props {
   eyebrow: string;
   subheading?: string;
   layout?: 'split' | 'centered' | 'stacked';
+  compact?: boolean;
   /** Heading level — pick per document outline, not per size. */
   as?: 'h1' | 'h2' | 'h3';
 }
@@ -24,11 +30,18 @@ const {
   eyebrow,
   subheading,
   layout = 'split',
+  compact = false,
   as: Heading = 'h2',
 }: Props = Astro.props;
 ---
 
-<div class:list={['section-header', `section-header--${layout}`]}>
+<div
+  class:list={[
+    'section-header',
+    `section-header--${layout}`,
+    compact && 'section-header--compact',
+  ]}
+>
   <Eyebrow label={eyebrow} />
 
   <div class="section-header__columns">
@@ -145,6 +158,22 @@ const {
 
   .section-header--stacked .section-header__heading {
     font-size: var(--font-size-display-2);
+  }
+
+  /* ---------------------------------------------------------- compact ---- */
+
+  /**
+   * Display/Feature (60) in place of Display/Section (72). Declared after the
+   * per-layout rules so it wins on source order without needing an
+   * `!important` or a doubled selector.
+   */
+  .section-header--compact .section-header__heading {
+    font-size: var(--font-size-display-3);
+  }
+
+  /* Split Compact also tightens the eyebrow gap from 16 to 12. */
+  .section-header--split.section-header--compact {
+    gap: var(--space-xs);
   }
 
   /* On narrow viewports the split aside can no longer sit beside the

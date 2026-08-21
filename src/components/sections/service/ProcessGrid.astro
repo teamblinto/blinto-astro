@@ -1,0 +1,72 @@
+---
+import SectionHeader from '~/components/ui/SectionHeader.astro';
+import StepCard from '~/components/ui/StepCard.astro';
+import LargeButton from '~/components/ui/LargeButton.astro';
+import type { CardTone } from '~/components/ui/FeatureCard.astro';
+import type { CtaAction } from '~/components/sections/Cta.astro';
+import type { SectionCopy } from '~/data/services/app-development';
+
+/**
+ * Section / Our Process (Figma 213:2464) — five Card / Step cards on one
+ * wrapping line, closing with a centred action.
+ *
+ * `.card-row` rather than `.card-grid`: Figma's wrapping flex line gives the
+ * trailing pair the full width (3 x 426 then 2 x 650), which equal grid tracks
+ * cannot express. The list is ordered because the steps are a sequence — the
+ * "01"…"05" badges are decorative repetition of that order.
+ */
+interface Props {
+  copy: SectionCopy;
+  steps: { number: string; tone: CardTone; heading: string; body: string }[];
+  action: CtaAction;
+  id?: string;
+}
+
+const { copy, steps, action, id }: Props = Astro.props;
+---
+
+<section class="process" {id}>
+  <div class="container process__inner">
+    <SectionHeader eyebrow={copy.eyebrow} subheading={copy.subheading}>
+      {copy.heading}
+    </SectionHeader>
+
+    <ol class="card-row">
+      {steps.map((step) => (
+        <li>
+          <StepCard
+            tone={step.tone}
+            number={step.number}
+            heading={step.heading}
+            body={step.body}
+          />
+        </li>
+      ))}
+    </ol>
+
+    <div class="process__action">
+      <LargeButton
+        label={action.label}
+        href={action.href}
+        tone={action.tone ?? 'black'}
+      />
+    </div>
+  </div>
+</section>
+
+<style>
+  .process {
+    padding-top: var(--space-4xl);
+  }
+
+  .process__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xl);
+  }
+
+  .process__action {
+    display: flex;
+    justify-content: center;
+  }
+</style>

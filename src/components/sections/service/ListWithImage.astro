@@ -1,0 +1,82 @@
+---
+import SectionHeader from '~/components/ui/SectionHeader.astro';
+import ListCard from '~/components/ui/ListCard.astro';
+import ImageCard from '~/components/ui/ImageCard.astro';
+import LargeButton from '~/components/ui/LargeButton.astro';
+import type { CtaAction } from '~/components/sections/Cta.astro';
+import type {
+  CardImage,
+  ListPanel,
+  SectionCopy,
+} from '~/data/services/app-development';
+
+/**
+ * The two-up band used by Section / Before the Code (213:2439), Section / App
+ * Types (213:2459) and Section / After Launch (213:2488): a section header
+ * over a Card / List beside a Card / Image, with an optional centred action
+ * closing the section.
+ */
+interface Props {
+  copy: SectionCopy;
+  panel: ListPanel;
+  image: CardImage;
+  action?: CtaAction;
+  id?: string;
+}
+
+const { copy, panel, image, action, id }: Props = Astro.props;
+---
+
+<section class="list-image" {id}>
+  <div class="container list-image__inner">
+    <SectionHeader eyebrow={copy.eyebrow} subheading={copy.subheading}>
+      {copy.heading}
+    </SectionHeader>
+
+    <ul class="card-row">
+      <li>
+        <ListCard
+          tone={panel.tone}
+          heading={panel.heading}
+          subheading={panel.subheading}
+          items={panel.items}
+        />
+      </li>
+      <li>
+        <ImageCard
+          src={image.src}
+          alt={image.alt}
+          width={image.width}
+          height={image.height}
+        />
+      </li>
+    </ul>
+
+    {action && (
+      <div class="list-image__action">
+        <LargeButton
+          label={action.label}
+          href={action.href}
+          tone={action.tone ?? 'black'}
+        />
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .list-image {
+    padding-top: var(--space-4xl);
+  }
+
+  .list-image__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xl);
+  }
+
+  .list-image__action {
+    display: flex;
+    justify-content: center;
+  }
+</style>

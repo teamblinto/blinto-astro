@@ -1,0 +1,57 @@
+---
+import { Image } from 'astro:assets';
+
+/**
+ * Card / Image (Figma 130:145) — "Photo tile that sits in the belief grid
+ * alongside Card / Belief. Same footprint and radius/md so it wraps
+ * identically."
+ *
+ * `width`/`height` are the designed slot, so Astro crops the source to the
+ * right aspect at build time rather than letting CSS letterbox it. The tile
+ * then stretches to whatever height its row settles on; `minHeight` is the
+ * floor it keeps once it wraps onto a line of its own.
+ */
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  /** Designed slot width in px. */
+  width: number;
+  /** Designed slot height in px — also the default `minHeight`. */
+  height: number;
+  minHeight?: number;
+  loading?: 'eager' | 'lazy';
+}
+
+const {
+  src,
+  alt,
+  width,
+  height,
+  minHeight = height,
+  loading = 'lazy',
+}: Props = Astro.props;
+---
+
+<Image
+  class="image-card"
+  {src}
+  {alt}
+  {width}
+  {height}
+  {loading}
+  densities={[1, 2]}
+  decoding="async"
+  style={`--image-card-min-height: ${minHeight}px`}
+/>
+
+<style>
+  .image-card {
+    width: 100%;
+    height: 100%;
+    min-height: var(--image-card-min-height);
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    /* Holds the tile's shape while the image decodes. */
+    background-color: var(--color-border-faint);
+  }
+</style>

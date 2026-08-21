@@ -1,0 +1,67 @@
+---
+import type { CardTone } from './FeatureCard.astro';
+
+/**
+ * Card / Belief (Figma 130:144) — "Statement card. Title pinned top, copy
+ * pinned bottom via space-between over a 320 min-height, so longer copy grows
+ * the card instead of overflowing."
+ */
+interface Props {
+  tone: CardTone;
+  heading: string;
+  body: string;
+  /** Heading level for the card title, to keep the outline sane. */
+  as?: 'h3' | 'h4';
+}
+
+const { tone, heading, body, as: Heading = 'h3' }: Props = Astro.props;
+---
+
+<article class:list={['belief-card', `belief-card--${tone}`]}>
+  <Heading class="belief-card__heading">{heading}</Heading>
+  <p class="belief-card__body">{body}</p>
+</article>
+
+<style>
+  .belief-card {
+    display: flex;
+    flex-direction: column;
+    /* Heading top, body bottom. */
+    justify-content: space-between;
+    gap: var(--space-xl);
+    width: 100%;
+    min-height: 320px;
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+  }
+
+  .belief-card--blue {
+    background-color: var(--color-bg-accent-blue);
+  }
+
+  .belief-card--yellow {
+    background-color: var(--color-bg-accent-yellow);
+  }
+
+  .belief-card--green {
+    background-color: var(--color-bg-accent-green);
+  }
+
+  .belief-card__heading {
+    /* Heading/Card */
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-heading-1);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.25;
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  .belief-card__body {
+    /* Body/Default */
+    font-size: var(--font-size-body-xs);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.3;
+  }
+</style>
