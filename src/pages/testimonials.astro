@@ -1,0 +1,35 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/page/Hero.astro';
+import QuoteGrid from '~/components/sections/page/QuoteGrid.astro';
+import Cta from '~/components/sections/Cta.astro';
+import * as page from '~/data/pages/testimonials';
+
+/**
+ * Migrated from https://blinto.co/testimonials/, at the same path, so the link
+ * needs no redirect at launch.
+ */
+---
+
+<BaseLayout title={page.meta.title} description={page.meta.description}>
+  <Hero
+    eyebrow={page.hero.eyebrow}
+    heading={page.hero.heading}
+    subheading={page.hero.subheading}
+  />
+
+  <QuoteGrid
+    copy={page.quotesSection}
+    quotes={page.quotes}
+    cardMin={500}
+    cardMinHeight={420}
+  />
+
+  <Cta
+    kicker={page.closingCta.kicker}
+    heading={page.closingCta.heading}
+    body={page.closingCta.body}
+    actions={page.closingCta.actions}
+    backdrop={page.closingCta.backdrop}
+  />
+</BaseLayout>

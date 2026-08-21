@@ -1,0 +1,138 @@
+---
+import type { LegalBlock } from '~/data/types';
+
+/**
+ * A single column of legal prose.
+ *
+ * The design system has no long-form text component — every other page is
+ * cards and grids — so this is the one place the site sets running body copy.
+ * It is deliberately plain: a measure narrow enough to read, the body face at
+ * its default size, and the display face on headings so the page still reads
+ * as Blinto.
+ *
+ * Bare URLs and email addresses in the source are linked here rather than in
+ * the data, so the copy stays plain text and no page has to hand-mark them.
+ */
+interface Props {
+  blocks: LegalBlock[];
+}
+
+const { blocks }: Props = Astro.props;
+
+/** Splits a run of text into plain parts and the links found inside it. */
+const LINKABLE = /(https?:\/\/[^\s,)]+[^\s,).]|[\w.+-]+@[\w-]+\.[\w.-]+)/g;
+
+function segments(text: string) {
+  return text.split(LINKABLE).map((part, index) => {
+    if (index % 2 === 0) return { text: part };
+    const href = part.includes('@') ? `mailto:${part}` : part;
+    return { text: part, href };
+  });
+}
+---
+
+<div class="prose">
+  {blocks.map((block) => {
+    if (block.kind === 'heading') {
+      const Tag = `h${block.level}` as 'h2' | 'h3' | 'h4';
+      return <Tag class={`prose__h prose__h--${block.level}`}>{block.text}</Tag>;
+    }
+
+    if (block.kind === 'list') {
+      return (
+        <ul class="prose__list">
+          {block.items.map((item) => (
+            <li>
+              {segments(item).map((seg) =>
+                seg.href ? <a href={seg.href}>{seg.text}</a> : seg.text,
+              )}
+            </li>
+          ))}
+        </ul>
+      );
+    }
+
+    return (
+      <p class="prose__p">
+        {segments(block.text).map((seg) =>
+          seg.href ? <a href={seg.href}>{seg.text}</a> : seg.text,
+        )}
+      </p>
+    );
+  })}
+</div>
+
+<style>
+  .prose {
+    /* Long-form copy wants a reading measure, not the full 1320 content width. */
+    max-width: 820px;
+    color: var(--color-text-primary);
+  }
+
+  .prose__p,
+  .prose__list {
+    /* Body/Answer */
+    font-size: var(--font-size-body-sm);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.55;
+  }
+
+  .prose__p + .prose__p,
+  .prose__list + .prose__p,
+  .prose__p + .prose__list,
+  .prose__list + .prose__list {
+    margin-top: var(--space-md);
+  }
+
+  .prose__h {
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .prose__h--2 {
+    font-size: var(--font-size-heading-1);
+    margin-top: var(--space-2xl);
+    margin-bottom: var(--space-sm);
+  }
+
+  .prose__h--3 {
+    font-size: var(--font-size-heading-2);
+    margin-top: var(--space-xl);
+    margin-bottom: var(--space-xs);
+  }
+
+  /* The cookie table's row labels: the body face, since the display face at
+     this size would read as another section break. */
+  .prose__h--4 {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body-md);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.4;
+    text-transform: none;
+    margin-top: var(--space-lg);
+    margin-bottom: var(--space-2xs);
+  }
+
+  /* The first heading follows the page hero, which sets its own rhythm. */
+  .prose > .prose__h:first-child {
+    margin-top: 0;
+  }
+
+  .prose__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+    padding-left: var(--space-lg);
+    list-style: disc;
+  }
+
+  .prose a {
+    color: var(--color-text-brand);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    /* Long policy URLs must not push the column wider than the page. */
+    overflow-wrap: anywhere;
+  }
+</style>

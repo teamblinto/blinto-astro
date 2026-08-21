@@ -1,0 +1,71 @@
+---
+import SectionHeader from '~/components/ui/SectionHeader.astro';
+import JobCard from '~/components/ui/JobCard.astro';
+import type { Job } from '~/components/ui/JobCard.astro';
+import type { SectionCopy } from '~/data/types';
+
+/**
+ * A section header over the open roles. `id` exists so the careers hero's
+ * "Join Our Team" button can jump straight to it, as it does on the original.
+ */
+interface Props {
+  copy: SectionCopy;
+  jobs: Job[];
+  /** Column floor. Default is `--layout-card-min` (330). */
+  cardMin?: number;
+  id?: string;
+}
+
+const { copy, jobs, cardMin, id }: Props = Astro.props;
+---
+
+<section class="jobs" {id}>
+  <div class="container jobs__inner">
+    <SectionHeader eyebrow={copy.eyebrow} subheading={copy.subheading}>
+      {copy.heading}
+    </SectionHeader>
+
+    {jobs.length > 0 ? (
+      <ul
+        class="card-grid"
+        style={cardMin ? `--layout-card-min: ${cardMin}px` : undefined}
+      >
+        {jobs.map((job) => (
+          <li>
+            <JobCard
+              title={job.title}
+              tone={job.tone}
+              terms={job.terms}
+              deadline={job.deadline}
+              href={job.href}
+            />
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="jobs__empty">
+        We have no openings posted right now. Send us your CV anyway — we keep
+        good people in mind.
+      </p>
+    )}
+  </div>
+</section>
+
+<style>
+  .jobs {
+    padding-top: var(--space-4xl);
+    /* The hero's jump link lands here; keep the heading clear of the header. */
+    scroll-margin-top: var(--space-xl);
+  }
+
+  .jobs__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xl);
+  }
+
+  .jobs__empty {
+    font-size: var(--font-size-body-sm);
+    line-height: 1.55;
+  }
+</style>

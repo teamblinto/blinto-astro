@@ -1,0 +1,141 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/page/Hero.astro';
+import Icon from '~/components/ui/Icon.astro';
+import { contact } from '~/data/site';
+
+/**
+ * Migrated from https://blinto.co/support/, at the same path — existing
+ * clients bookmark it, so it keeps its URL rather than getting a redirect.
+ *
+ * Same endpoint arrangement as the contact form, on its own variable so
+ * support requests can be routed somewhere different (a ticketing inbox rather
+ * than sales). This form takes an attachment, which the mail-client fallback
+ * cannot carry: set PUBLIC_SUPPORT_FORM_ENDPOINT to a backend that accepts
+ * multipart/form-data before launch, or the upload field is dropped rather
+ * than silently lost.
+ */
+const endpoint = import.meta.env.PUBLIC_SUPPORT_FORM_ENDPOINT;
+const action = endpoint || `mailto:${contact.email}`;
+const enctype = endpoint ? 'multipart/form-data' : 'text/plain';
+
+const meta = {
+  title: 'Customer Support — Blinto | Premium Support for Blinto Clients',
+  description:
+    'Blinto clients: raise an urgent support request here. Our whole support team is notified immediately and you can expect a response within two hours.',
+};
+
+const fields: {
+  name: string;
+  label: string;
+  type: 'text' | 'email' | 'tel' | 'url';
+  autocomplete: string;
+}[] = [
+  { name: 'name', label: 'Full Name', type: 'text', autocomplete: 'name' },
+  { name: 'email', label: 'Email', type: 'email', autocomplete: 'email' },
+  { name: 'phone', label: 'Phone Number', type: 'tel', autocomplete: 'tel' },
+  { name: 'company', label: 'Company', type: 'text', autocomplete: 'organization' },
+  { name: 'website', label: 'Website', type: 'url', autocomplete: 'url' },
+  { name: 'subject', label: 'Subject', type: 'text', autocomplete: 'off' },
+];
+
+const priorities = ['Urgent', 'High', 'Normal', 'Low'];
+---
+
+<BaseLayout title={meta.title} description={meta.description}>
+  <Hero
+    eyebrow="Client Support"
+    heading="Blinto Customer Support Form"
+    subheading="Blinto clients can use the form below to take advantage of our premium support! This form is designed for urgent and important matters that need a fast response from the Blinto Team. Once you complete the form, our entire support team is immediately notified to their phones and your issue will be processed as quickly as possible. You can typically expect a response within 2 hours or less."
+  />
+
+  <section class="support">
+    <div class="container">
+      <form class="form-grid" {action} method="post" {enctype}>
+        {fields.map((field) => (
+          <p class="field">
+            <label class="field__label" for={`support-${field.name}`}>
+              {field.label}
+            </label>
+            <input
+              class="field__control"
+              id={`support-${field.name}`}
+              name={field.name}
+              type={field.type}
+              autocomplete={field.autocomplete}
+              required
+            />
+          </p>
+        ))}
+
+        <p class="field">
+          <label class="field__label" for="support-priority">Priority</label>
+          <select
+            class="field__control"
+            id="support-priority"
+            name="priority"
+            required
+          >
+            {priorities.map((priority) => (
+              <option value={priority}>{priority}</option>
+            ))}
+          </select>
+        </p>
+
+        <p class="field field--wide">
+          <label class="field__label" for="support-details">Details</label>
+          <span class="field__hint">
+            Please tell us more details so that we can troubleshoot your issue.
+            Screenshots, clip videos, and steps to reproduce the issue are
+            incredibly helpful in solving your problem.
+          </span>
+          <textarea
+            class="field__control field__control--area"
+            id="support-details"
+            name="details"
+            rows="7"
+            required></textarea>
+        </p>
+
+        {endpoint && (
+          <p class="field field--wide">
+            <label class="field__label" for="support-attachment">
+              Attachment
+            </label>
+            <span class="field__hint">
+              Please upload any screenshots or additional information. Include
+              any error messages or the issue you are seeing on screen.
+            </span>
+            <input
+              class="field__control"
+              id="support-attachment"
+              name="attachment"
+              type="file"
+              multiple
+            />
+          </p>
+        )}
+
+        <div class="field--wide">
+          <button class="form-submit" type="submit">
+            Submit
+            <span class="form-submit__icon">
+              <Icon name="arrow-right" size={20} />
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .support {
+    padding-block: var(--space-3xl) var(--space-4xl);
+  }
+
+  .support :global(.form-grid) {
+    /* Long-form fields want a reading measure, like the policy pages. */
+    max-width: 820px;
+  }
+</style>

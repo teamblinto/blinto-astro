@@ -18,7 +18,11 @@ interface Props {
   heading: string;
   /** Omitted by /seo/, whose original hero is a headline and a button. */
   subheading?: string;
-  actions: CtaAction[];
+  /**
+   * Omitted by the legal pages, whose heroes are a title and nothing else —
+   * a policy is not a place to sell.
+   */
+  actions?: CtaAction[];
   /**
    * Omit for the pages migrated from WordPress: their original hero art lives
    * on wp-content and dies with that site, and there is no on-brand
@@ -27,7 +31,8 @@ interface Props {
   banner?: CardImage;
 }
 
-const { eyebrow, heading, subheading, actions, banner }: Props = Astro.props;
+const { eyebrow, heading, subheading, actions = [], banner }: Props =
+  Astro.props;
 
 /** See ImageCard: never ask for a 2x that the export cannot actually supply. */
 const bannerDensities =
@@ -40,15 +45,17 @@ const bannerDensities =
       {heading}
     </SectionHeader>
 
-    <div class="service-hero__actions">
-      {actions.map((action) => (
-        <LargeButton
-          label={action.label}
-          href={action.href}
-          tone={action.tone ?? 'black'}
-        />
-      ))}
-    </div>
+    {actions.length > 0 && (
+      <div class="service-hero__actions">
+        {actions.map((action) => (
+          <LargeButton
+            label={action.label}
+            href={action.href}
+            tone={action.tone ?? 'black'}
+          />
+        ))}
+      </div>
+    )}
   </div>
 
   {banner && (

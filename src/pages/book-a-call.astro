@@ -1,0 +1,78 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/page/Hero.astro';
+import { contact } from '~/data/site';
+
+/**
+ * Migrated from https://blinto.co/book-a-call/, at the same path, so the link
+ * needs no redirect at launch.
+ *
+ * The original page is a bare Calendly iframe and nothing else — no heading,
+ * no copy, so no h1. The hero below is the one piece of authored content on
+ * any migrated page: a page whose entire content sits inside a third-party
+ * frame is invisible to search engines and gives a screen reader nothing to
+ * orient on.
+ *
+ * The scheduler is iframed directly rather than through Calendly's embed
+ * script, so the page still ships zero third-party JavaScript and the frame
+ * loads only when it scrolls into view.
+ */
+const meta = {
+  title: 'Book a Call — Blinto | Free 30-Minute Discovery Call',
+  description:
+    'Pick a time that works for you and talk to Blinto about your Shopify or WordPress project — a free 30-minute call, no obligation.',
+};
+---
+
+<BaseLayout title={meta.title} description={meta.description}>
+  <Hero
+    eyebrow="Book a Call"
+    heading="Book Your Free 30-Minute Discovery Call"
+    subheading="Pick a time that suits you and we’ll talk through your project — where you are now, what you need, and whether we’re the right fit. No obligation."
+  />
+
+  <section class="booking">
+    <div class="container">
+      <iframe
+        class="booking__frame"
+        src={contact.bookingUrl}
+        title="Book a 30-minute call with Blinto"
+        loading="lazy"
+      ></iframe>
+
+      <p class="booking__fallback">
+        Scheduler not loading? Email us at{' '}
+        <a href={`mailto:${contact.email}`}>{contact.email}</a> and we’ll find a
+        time.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .booking {
+    padding-block: var(--space-3xl) var(--space-4xl);
+  }
+
+  .booking__frame {
+    width: 100%;
+    /* Calendly's own embed height, with room for the mobile layout. */
+    min-height: 700px;
+    height: 78vh;
+    border: none;
+    border-radius: var(--radius-md);
+  }
+
+  .booking__fallback {
+    margin-top: var(--space-md);
+    /* Body/Answer */
+    font-size: var(--font-size-body-sm);
+    line-height: 1.55;
+  }
+
+  .booking__fallback a {
+    color: var(--color-text-brand);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+</style>

@@ -8,12 +8,27 @@ interface Props {
   href?: string;
   tone?: 'outline' | 'brand' | 'inverse';
   class?: string;
+  /** Set for the careers listings, which open on Blinto's hiring platform. */
+  target?: '_blank';
+  rel?: string;
 }
 
-const { label, href = '#contact', tone = 'outline', class: className } = Astro.props;
+const {
+  label,
+  href = '#contact',
+  tone = 'outline',
+  class: className,
+  target,
+  rel,
+} = Astro.props;
 ---
 
-<a href={href} class:list={['pill-button', `pill-button--${tone}`, className]}>
+<a
+  href={href}
+  class:list={['pill-button', `pill-button--${tone}`, className]}
+  {target}
+  {rel}
+>
   <span class="pill-button__label">{label}</span>
 </a>
 

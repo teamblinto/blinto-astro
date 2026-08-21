@@ -1,0 +1,66 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/page/Hero.astro';
+import ContactPanel from '~/components/sections/page/ContactPanel.astro';
+import ProcessGrid from '~/components/sections/page/ProcessGrid.astro';
+import Faq from '~/components/sections/Faq.astro';
+import * as page from '~/data/pages/contact-us';
+import { contact, offices } from '~/data/site';
+
+/**
+ * Migrated from https://blinto.co/contact-us/, at the same path — the sitemap
+ * keeps it, so no redirect is needed at launch. The old /contact/ path already
+ * 301s here on the current site.
+ */
+
+const contactSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Blinto LLC',
+  url: 'https://blinto.co/',
+  email: contact.email,
+  contactPoint: offices.map((office) => ({
+    '@type': 'ContactPoint',
+    contactType: 'sales',
+    telephone: office.phone,
+    areaServed: office.name === 'Wyoming' ? 'US' : 'BD',
+  })),
+  address: offices.map((office) => ({
+    '@type': 'PostalAddress',
+    name: office.name,
+    streetAddress: office.address,
+  })),
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: page.faqs.map((faq) => ({
+    '@type': 'Question',
+    name: faq.question,
+    acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+  })),
+};
+---
+
+<BaseLayout title={page.meta.title} description={page.meta.description}>
+  <script
+    slot="head"
+    type="application/ld+json"
+    is:inline
+    set:html={JSON.stringify([contactSchema, faqSchema])}
+  />
+
+  <Hero eyebrow={page.hero.eyebrow} heading={page.hero.heading} />
+
+  <ContactPanel />
+
+  <ProcessGrid copy={page.nextSection} steps={page.nextSteps} />
+
+  <Faq
+    eyebrow={page.faqSection.eyebrow}
+    heading={page.faqSection.heading}
+    items={page.faqs}
+    compact
+  />
+</BaseLayout>

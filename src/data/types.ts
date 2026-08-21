@@ -60,6 +60,8 @@ export interface StageCard {
  * way every other card in the system does.
  */
 export interface Testimonial {
+  /** Only /testimonials/ carries a headline above the quote. */
+  heading?: string;
   quote: string;
   name: string;
   role: string;
@@ -98,6 +100,19 @@ export interface ProcessStep {
 export interface WorkItem {
   name: string;
   sector: string;
+  /** A short case note, printed under the tile on /website-maintenance/. */
+  body?: string;
   href: string;
   shot: ImageMetadata;
 }
+
+/**
+ * One block of legal prose. The privacy, terms and cookie policies are
+ * migrated word for word, so they are stored as a block list rather than as
+ * markup: the copy stays in `src/data` like every other page's, and
+ * `LegalProse` decides how each block is typeset.
+ */
+export type LegalBlock =
+  | { kind: 'heading'; level: 2 | 3 | 4; text: string }
+  | { kind: 'text'; text: string }
+  | { kind: 'list'; items: string[] };

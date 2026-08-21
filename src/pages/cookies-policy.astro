@@ -1,0 +1,27 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/page/Hero.astro';
+import LegalProse from '~/components/sections/page/LegalProse.astro';
+import * as page from '~/data/legal/cookies-policy';
+
+/**
+ * Migrated from https://blinto.co/cookies-policy/, at the same path, so the
+ * link needs no redirect at launch. Copy is verbatim; see the data module.
+ */
+---
+
+<BaseLayout title={page.meta.title} description={page.meta.description}>
+  <Hero eyebrow={page.hero.eyebrow} heading={page.hero.heading} />
+
+  <section class="legal">
+    <div class="container">
+      <LegalProse blocks={page.blocks} />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .legal {
+    padding-block: var(--space-3xl) var(--space-4xl);
+  }
+</style>

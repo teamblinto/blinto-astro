@@ -58,13 +58,28 @@ export const offices = [
     map: '/images/region-us.svg',
     name: 'Wyoming',
     address: '30 N Gould St Ste R Sheridan, WY 82801, USA.',
+    phone: '+1 (818) 474-8731',
+    phoneHref: 'tel:+18184748731',
   },
   {
     map: '/images/region-bd.svg',
     name: 'Dhaka',
     address: 'House-1211, Rd-10, Ave-10, Mirpur DOHS, Dhaka, BD.',
+    phone: '+880 1841 012136',
+    phoneHref: 'tel:+8801841012136',
   },
 ];
+
+/**
+ * Where enquiries actually land. `hello@` is the address the current site's
+ * contact page publishes; `info@` is the one its policies name for legal and
+ * privacy requests, so both are kept rather than collapsed into one.
+ */
+export const contact = {
+  email: 'hello@blinto.co',
+  legalEmail: 'info@blinto.co',
+  bookingUrl: 'https://calendly.com/blinto/30min',
+};
 
 export const footerTagline =
   'A product-focused Shopify expert agency helping app founders and product teams build, grow, and maintain Shopify apps.';
@@ -84,17 +99,36 @@ export const footerColumns = [
       { label: 'About Us', href: '/about-us/' },
       { label: 'Our Apps', href: '/shopify-apps/' },
       { label: 'Case Studies', href: '/case-studies/' },
+      { label: 'Testimonials', href: '/testimonials/' },
+      { label: 'Careers', href: '/career/' },
       { label: 'Contact Us', href: '/contact-us/' },
     ],
   },
 ];
 
+/**
+ * The policies, in the footer's bottom bar. They are deliberately out of the
+ * navigation — the approved sitemap has six top-level items — but they cannot
+ * be orphaned either: a page nothing links to is a page search engines treat
+ * as abandoned.
+ */
+export const legalLinks = [
+  { label: 'Privacy Policy', href: '/privacy-policy/' },
+  { label: 'Terms & Conditions', href: '/terms-conditions/' },
+  { label: 'Cookie Policy', href: '/cookies-policy/' },
+];
+
+/** Blinto's real handles, taken from the current site's footer. */
 export const socialLinks: { label: string; href: string; icon: IconName }[] = [
-  { label: 'Facebook', href: 'https://facebook.com/blinto', icon: 'facebook' },
-  { label: 'Instagram', href: 'https://instagram.com/blinto', icon: 'instagram' },
-  { label: 'LinkedIn', href: 'https://linkedin.com/company/blinto', icon: 'linkedin' },
-  { label: 'X', href: 'https://x.com/blinto', icon: 'x' },
-  { label: 'YouTube', href: 'https://youtube.com/@blinto', icon: 'youtube' },
+  { label: 'Facebook', href: 'https://www.facebook.com/BlintoHQ/', icon: 'facebook' },
+  { label: 'Instagram', href: 'https://www.instagram.com/blintohq/', icon: 'instagram' },
+  {
+    label: 'LinkedIn',
+    href: 'https://www.linkedin.com/company/blintohq',
+    icon: 'linkedin',
+  },
+  { label: 'X', href: 'https://x.com/BlintoHQ', icon: 'x' },
+  { label: 'YouTube', href: 'https://www.youtube.com/@BlintoHQ', icon: 'youtube' },
 ];
 
 export const legal = {

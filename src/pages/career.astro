@@ -1,0 +1,75 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/page/Hero.astro';
+import BeliefGrid from '~/components/sections/page/BeliefGrid.astro';
+import JobGrid from '~/components/sections/page/JobGrid.astro';
+import ProcessGrid from '~/components/sections/page/ProcessGrid.astro';
+import Faq from '~/components/sections/Faq.astro';
+import Cta from '~/components/sections/Cta.astro';
+import * as page from '~/data/pages/career';
+
+/**
+ * Migrated from https://blinto.co/career/, at the same path, so the link needs
+ * no redirect at launch. Section order follows the original: hero, benefits,
+ * openings, hiring journey, FAQ, CTA.
+ */
+
+const jobSchema = page.jobs.map((job) => ({
+  '@context': 'https://schema.org',
+  '@type': 'JobPosting',
+  title: job.title,
+  employmentType: 'FULL_TIME',
+  hiringOrganization: {
+    '@type': 'Organization',
+    name: 'Blinto LLC',
+    sameAs: 'https://blinto.co/',
+  },
+  url: job.href,
+}));
+---
+
+<BaseLayout title={page.meta.title} description={page.meta.description}>
+  <script
+    slot="head"
+    type="application/ld+json"
+    is:inline
+    set:html={JSON.stringify(jobSchema)}
+  />
+
+  <Hero
+    eyebrow={page.hero.eyebrow}
+    heading={page.hero.heading}
+    subheading={page.hero.subheading}
+    actions={page.hero.actions}
+  />
+
+  <BeliefGrid
+    copy={page.benefitsSection}
+    cells={page.benefitCells}
+    cardMin={300}
+    cellMinHeight={200}
+  />
+
+  <JobGrid
+    copy={page.openingsSection}
+    jobs={page.jobs}
+    cardMin={380}
+    id="opening"
+  />
+
+  <ProcessGrid copy={page.journeySection} steps={page.journeySteps} />
+
+  <Faq
+    eyebrow={page.faqSection.eyebrow}
+    heading={page.faqSection.heading}
+    items={page.faqs}
+    compact
+  />
+
+  <Cta
+    kicker={page.closingCta.kicker}
+    heading={page.closingCta.heading}
+    actions={page.closingCta.actions}
+    backdrop={page.closingCta.backdrop}
+  />
+</BaseLayout>

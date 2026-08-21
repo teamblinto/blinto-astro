@@ -1,0 +1,86 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/page/Hero.astro';
+import BeliefGrid from '~/components/sections/page/BeliefGrid.astro';
+import WorkGrid from '~/components/sections/page/WorkGrid.astro';
+import QuoteGrid from '~/components/sections/page/QuoteGrid.astro';
+import Faq from '~/components/sections/Faq.astro';
+import Cta from '~/components/sections/Cta.astro';
+import * as page from '~/data/services/website-maintenance';
+
+/**
+ * Migrated from https://blinto.co/website-maintenance/, at the same path.
+ * Section order follows the original: hero, what's included, industries,
+ * recent projects, why Blinto, testimonials, FAQ, CTA.
+ */
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: page.faqs.map((faq) => ({
+    '@type': 'Question',
+    name: faq.question,
+    acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+  })),
+};
+---
+
+<BaseLayout title={page.meta.title} description={page.meta.description}>
+  <script
+    slot="head"
+    type="application/ld+json"
+    is:inline
+    set:html={JSON.stringify(faqSchema)}
+  />
+
+  <Hero
+    eyebrow={page.hero.eyebrow}
+    heading={page.hero.heading}
+    subheading={page.hero.subheading}
+    actions={page.hero.actions}
+  />
+
+  <BeliefGrid
+    copy={page.includedSection}
+    cells={page.includedCells}
+    cardMin={300}
+  />
+
+  <BeliefGrid
+    copy={page.industriesSection}
+    cells={page.industryCells}
+    cardMin={260}
+    cellMinHeight={140}
+  />
+
+  <WorkGrid
+    copy={page.projectsSection}
+    items={page.projects}
+    cardMin={400}
+    actions={[page.projectsAction]}
+  />
+
+  <BeliefGrid copy={page.whySection} cells={page.whyCells} cardMin={300} />
+
+  <QuoteGrid
+    copy={page.quotesSection}
+    quotes={page.quotes}
+    cardMin={500}
+    cardMinHeight={420}
+  />
+
+  <Faq
+    eyebrow={page.faqSection.eyebrow}
+    heading={page.faqSection.heading}
+    items={page.faqs}
+    compact
+  />
+
+  <Cta
+    kicker={page.closingCta.kicker}
+    heading={page.closingCta.heading}
+    body={page.closingCta.body}
+    actions={page.closingCta.actions}
+    backdrop={page.closingCta.backdrop}
+  />
+</BaseLayout>

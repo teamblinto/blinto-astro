@@ -35,6 +35,7 @@ const { copy, quotes, cardMin, cardMinHeight }: Props = Astro.props;
       {quotes.map((quote) => (
         <li>
           <QuoteCard
+            heading={quote.heading}
             quote={quote.quote}
             name={quote.name}
             role={quote.role}
