@@ -1,0 +1,110 @@
+---
+import { Image } from 'astro:assets';
+
+/**
+ * Card / Person (Figma 247:4815) — "Team member card: portrait, name, role.
+ * No bio by design. Photo is a FILL-width frame with a fixed height; swap the
+ * image fill per instance. Min-width is bound to layout/person-min so the grid
+ * goes 4-up, 2-up, then 1-up."
+ *
+ * The portrait carries no alt text on purpose. The name sits in the very next
+ * element, so describing the image would make a screen reader announce the
+ * person twice ("Fazle Rabbi, Fazle Rabbi, Founder & CEO"). An empty alt marks
+ * it decorative and leaves the name and role to do the work.
+ *
+ * `background` exists because the exports are not uniform: most bake their
+ * studio backdrop into the image, but a cut-out portrait arrives transparent
+ * and needs the colour painted behind it, exactly as the design does.
+ */
+interface Props {
+  name: string;
+  role: string;
+  photo: ImageMetadata;
+  background?: string;
+  /** Heading level for the name, to keep the outline sane. */
+  as?: 'h3' | 'h4';
+}
+
+const { name, role, photo, background, as: Heading = 'h3' }: Props =
+  Astro.props;
+
+/** Figma's designed slot. */
+const WIDTH = 315;
+const HEIGHT = 360;
+
+/** See ImageCard: never ask for a 2x the export cannot actually supply. */
+const densities = photo.width >= WIDTH * 2 ? [1, 2] : [1];
+---
+
+<article class="person-card">
+  <div
+    class="person-card__photo"
+    style={background ? `background-color: ${background}` : undefined}
+  >
+    <Image
+      src={photo}
+      alt=""
+      width={WIDTH}
+      height={HEIGHT}
+      {densities}
+      loading="lazy"
+      decoding="async"
+    />
+  </div>
+
+  <div class="person-card__details">
+    <Heading class="person-card__name">{name}</Heading>
+    <p class="person-card__role">{role}</p>
+  </div>
+</article>
+
+<style>
+  .person-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    width: 100%;
+    color: var(--color-text-primary);
+  }
+
+  .person-card__photo {
+    width: 100%;
+    height: 360px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    /* Holds the tile's shape while the portrait decodes, and shows through a
+       cut-out that has no backdrop of its own. */
+    background-color: var(--color-border-faint);
+  }
+
+  .person-card__photo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .person-card__details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xs);
+    width: 100%;
+  }
+
+  .person-card__name {
+    /* Heading/Row */
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-heading-2);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.25;
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  .person-card__role {
+    /* Body/Default */
+    font-size: var(--font-size-body-xs);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.3;
+  }
+</style>

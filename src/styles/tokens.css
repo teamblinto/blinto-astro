@@ -82,6 +82,10 @@
   --layout-page-margin: 60px;
   --layout-grid-gap: 20px;
   --layout-card-min: 330px;
+  /* Card / Person binds its min-width to this so the team grid goes 4-up,
+     2-up, then 1-up. Smaller than card-min because the portrait column is
+     narrower than a copy card. */
+  --layout-person-min: 260px;
   --layout-heading-min: 480px;
   --layout-aside-width: 538px;
   --layout-footer-inset: 236px;

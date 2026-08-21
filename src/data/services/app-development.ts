@@ -7,7 +7,7 @@ import type {
   ProcessStep,
   SectionCopy,
   StageCard,
-} from './types';
+} from '../types';
 
 /**
  * Photography lives in `src/assets` (not `public`) so Astro's build pipeline

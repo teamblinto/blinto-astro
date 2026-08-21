@@ -1,0 +1,57 @@
+---
+import SectionHeader from '~/components/ui/SectionHeader.astro';
+import PersonCard from '~/components/ui/PersonCard.astro';
+import type { Person, SectionCopy } from '~/data/types';
+
+/**
+ * Section / The Team (Figma 254:4930) — a wrapping grid of Card / Person.
+ *
+ * `.card-row` with `--layout-card-min` set to `--layout-person-min`: the
+ * portrait column is narrower than a copy card, and the component's own
+ * description binds its min-width to that token so the grid goes 4-up, 2-up,
+ * then 1-up. A list, because it is a list of people.
+ */
+interface Props {
+  copy: SectionCopy;
+  people: Person[];
+}
+
+const { copy, people }: Props = Astro.props;
+---
+
+<section class="team">
+  <div class="container team__inner">
+    <SectionHeader eyebrow={copy.eyebrow} subheading={copy.subheading}>
+      {copy.heading}
+    </SectionHeader>
+
+    <ul class="card-row team__grid">
+      {people.map((person) => (
+        <li>
+          <PersonCard
+            name={person.name}
+            role={person.role}
+            photo={person.photo}
+            background={person.photoBackground}
+          />
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .team {
+    padding-top: var(--space-4xl);
+  }
+
+  .team__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xl);
+  }
+
+  .team__grid {
+    --layout-card-min: var(--layout-person-min);
+  }
+</style>

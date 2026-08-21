@@ -1,20 +1,24 @@
 ---
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import Hero from '~/components/sections/page/Hero.astro';
-import ListWithImage from '~/components/sections/page/ListWithImage.astro';
+import ProcessGrid from '~/components/sections/page/ProcessGrid.astro';
 import StageGrid from '~/components/sections/page/StageGrid.astro';
 import BeliefGrid from '~/components/sections/page/BeliefGrid.astro';
-import ProcessGrid from '~/components/sections/page/ProcessGrid.astro';
+import PersonGrid from '~/components/sections/page/PersonGrid.astro';
 import Faq from '~/components/sections/Faq.astro';
 import Cta from '~/components/sections/Cta.astro';
-import * as page from '~/data/services/app-growth';
+import * as page from '~/data/about';
 
 /**
- * Service — Shopify App Growth (Figma 232:2234).
+ * About Us (Figma 251:4816).
  *
- * Section order is the design's: hero, where growth stalls, where you are,
- * what we do, the growth funnel, our process, why Blinto, keep learning, FAQ,
- * CTA. Navigation and footer come from BaseLayout.
+ * Section order is the design's: hero, our story, what we do, how we think,
+ * the team, how we work, FAQ, CTA. Navigation and footer come from BaseLayout.
+ *
+ * Five of the six shells here were built for the service pages. The two rows
+ * that go 4-up rather than 3-up pass `cardMin={260}`, which is the min-width
+ * Figma sets on those cards; How We Work is a BeliefGrid whose cells happen to
+ * all be photo tiles.
  */
 
 /** Surfaces the FAQ copy to search engines as structured data. */
@@ -45,37 +49,24 @@ const faqSchema = {
     banner={page.hero.banner}
   />
 
-  <ListWithImage
-    copy={page.growthStallsSection}
-    panel={page.growthStallsPanel}
-    image={page.growthStallsImage}
-  />
-
-  <StageGrid copy={page.stagesSection} cards={page.stageCards} />
-
-  <BeliefGrid copy={page.whatWeDoSection} cells={page.whatWeDoCells} />
-
-  <ListWithImage
-    copy={page.funnelSection}
-    panel={page.funnelPanel}
-    image={page.funnelImage}
-  />
-
   <ProcessGrid
-    id="our-process"
-    copy={page.processSection}
-    steps={page.processSteps}
-    action={page.processAction}
+    copy={page.storySection}
+    steps={page.storySteps}
+    cardMin={260}
   />
 
-  <BeliefGrid copy={page.whyBlintoSection} cells={page.whyBlintoCells} />
+  <StageGrid copy={page.whatWeDoSection} cards={page.whatWeDoCards} />
 
-  <ListWithImage
-    copy={page.keepLearningSection}
-    panel={page.keepLearningPanel}
-    image={page.keepLearningImage}
-    actions={page.keepLearningActions}
+  <BeliefGrid
+    copy={page.howWeThinkSection}
+    cells={page.howWeThinkCells}
+    cardMin={260}
+    cellMinHeight={200}
   />
+
+  <PersonGrid copy={page.teamSection} people={page.team} />
+
+  <BeliefGrid copy={page.howWeWorkSection} cells={page.howWeWorkCells} />
 
   <Faq
     eyebrow={page.faqSection.eyebrow}

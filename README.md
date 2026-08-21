@@ -10,6 +10,7 @@ Implements the **Blinto Revamp 2026** Figma design:
 | `/services/app-development` | [`213:2429` — Service · Shopify App Development · Desktop](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Revamp-2026?node-id=213-2429) |
 | `/services/app-growth` | [`232:2234` — Service · Shopify App Growth · Desktop](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Revamp-2026?node-id=232-2234) |
 | `/services/support-maintenance` | [`240:3463` — Service · App Support & Maintenance · Desktop](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Revamp-2026?node-id=240-3463) |
+| `/about` | [`251:4816` — About Us · Desktop](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Revamp-2026?node-id=251-4816) |
 
 ## Getting started
 
@@ -34,8 +35,9 @@ src/
 ├── data/                 Page content, separated from markup
 │   ├── site.ts           Nav, footer, offices, socials
 │   ├── home.ts           Homepage copy, keyed to Figma nodes
+│   ├── types.ts          Shapes shared by the pages and the section shells
+│   ├── about.ts          About Us copy
 │   └── services/         One module per service page
-│       ├── types.ts      Shapes shared by the pages and the shells
 │       ├── app-development.ts
 │       ├── app-growth.ts
 │       └── support-maintenance.ts
@@ -48,9 +50,10 @@ src/
 │   ├── ui/               Design-system primitives
 │   ├── layout/           NavBar, Footer
 │   └── sections/         One component per Figma section
-│       └── service/      Section shells shared by the service pages
+│       └── page/         Data-driven shells shared across the inner pages
 └── pages/
     ├── index.astro       Composes the homepage sections
+    ├── about.astro
     └── services/
         ├── app-development.astro
         ├── app-growth.astro
@@ -162,7 +165,15 @@ JPEG down to about 500 KB of shipped WebP.
 | `sup-why-blinto-1.jpg` | 242:3790 | 1200x1799 | Why Blinto |
 | `sup-why-blinto-2.jpg` | 242:3803 | 1200x900 | Why Blinto |
 | `sup-keep-learning.jpg` | 242:3908 | 1200x800 | Keep Learning |
+| `abt-hero-banner.jpg` | 251:4866 | 2400x1600 | About hero banner |
+| `abt-how-we-work-1..3.jpg` | 254:4992-4994 | 1200x800 | How We Work |
+| `team-01..16-*.png` | 254:4941 … 260:6009 | 564x676 (one 1024²) | The Team |
 | `cta-backdrop.png` | 213:2503 | 2400x1100 | CTA band backdrop, all pages |
+
+The team portraits stay PNG because their corners are pre-cut to the card
+radius and one is a full cut-out; JPEG would fill that transparency with
+black. Astro takes the 6.1 MB of source down to 264 KB of WebP across all
+sixteen.
 
 Alt text lives beside each import in the page's `src/data` module.
 
@@ -183,31 +194,50 @@ exported and still falls back to `Cta.astro`'s layered CSS gradients, which is
 why it looks unchanged; passing it the same asset is a one-line change if the
 real artwork is wanted there too.
 
-## Service pages
+## Inner pages
 
-The three service pages reuse the homepage's design system rather than forking
-it, and reuse each other's. Section shells live in
-`src/components/sections/service/` and are driven by data, because the design
-repeats five shapes across all thirty-one sections:
+The four inner pages reuse the homepage's design system rather than forking it,
+and reuse each other's. Section shells live in
+`src/components/sections/page/` and are driven by data, because the design
+repeats six shapes across all thirty-nine sections:
 
 | Shell | Sections it serves |
 | --- | --- |
-| `Hero.astro` | all three heroes |
+| `Hero.astro` | all four heroes |
 | `ListWithImage.astro` | Before the Code, App Types, After Launch (×2), Where Growth Stalls, The Growth Funnel, What We Investigate, Keep Learning (×2) |
-| `BeliefGrid.astro` | What We Build, What We Do (×2), Why Blinto (×3) |
+| `BeliefGrid.astro` | What We Build, What We Do (×3), Why Blinto (×3), How We Think, How We Work |
 | `StageGrid.astro` | Where You Are (×3), Support Models |
-| `ProcessGrid.astro` | Our Process (×3) |
+| `ProcessGrid.astro` | Our Process (×3), Our Story |
+| `PersonGrid.astro` | The Team |
 
 Each page is one `.astro` file that composes those shells over one content
-module in `src/data/services/`. The shapes they exchange live in
-`src/data/services/types.ts`, so a shell never imports from a particular page
-to learn its own prop types.
+module in `src/data/`. The shapes they exchange live in `src/data/types.ts`, so
+a shell never imports from a particular page to learn its own prop types.
 
-Support Models (`242:3672`) is worth calling out as reuse rather than a new
-shape: Figma builds it from the same Card / Feature in its short, button-less
-form as Where You Are, so it renders through `StageGrid` with different copy.
-`ListWithImage` takes a list of actions because Figma's Keep Learning sections
-put two buttons under the grid where After Launch puts one.
+Several sections look like new shapes but are variants of existing ones, which
+is how the shells stay this few:
+
+- **Support Models** (`242:3672`) is the same Card / Feature in its short,
+  button-less form as Where You Are. About's **What We Do** (`253:4836`) is the
+  same card with Figma's Show button=true, which is what `StageCard.cta` sets.
+- **How We Work** (`254:4981`) is a `BeliefGrid` whose cells all happen to be
+  photo tiles — `BeliefCell` already allowed that.
+- **Our Story** (`251:4869`) is `ProcessGrid` with no closing CTA and Card /
+  Step's Show body=false, giving heading-only timeline stages.
+- **How We Think** (`253:4988`) is Card / Belief's Show body=false over a
+  shorter 200 min-height. With no body to sit opposite, the heading centres.
+
+Rows that go 4-up rather than 3-up pass `cardMin={260}`, the min-width Figma
+sets on those narrower cards; `.card-row` and `.card-grid` both read
+`--layout-card-min`, so that is all it takes.
+
+**Card / Person** (`247:4815`) is the one genuinely new component. Its
+portraits carry an empty `alt` on purpose: the name sits in the very next
+element, so describing the image would make a screen reader announce the person
+twice. The exports are not uniform — fifteen bake their studio backdrop into
+the PNG, and one is a cut-out that arrives 51% transparent, so the design
+paints `#04ade5` behind it. `PersonCard` takes that as a `background` prop
+rather than assuming either case.
 
 Four design-system cards were missing and are new: `ListCard` (Card / List
 `173:1127`, including Bullet Row `170:1034`), `ImageCard` (Card / Image

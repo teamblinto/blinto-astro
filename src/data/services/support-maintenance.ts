@@ -7,7 +7,7 @@ import type {
   ProcessStep,
   SectionCopy,
   StageCard,
-} from './types';
+} from '../types';
 
 import heroBanner from '~/assets/images/sup-hero-banner.jpg';
 import afterLaunch from '~/assets/images/sup-after-launch.jpg';

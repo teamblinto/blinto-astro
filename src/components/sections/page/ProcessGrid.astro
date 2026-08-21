@@ -2,9 +2,8 @@
 import SectionHeader from '~/components/ui/SectionHeader.astro';
 import StepCard from '~/components/ui/StepCard.astro';
 import LargeButton from '~/components/ui/LargeButton.astro';
-import type { CardTone } from '~/components/ui/FeatureCard.astro';
 import type { CtaAction } from '~/components/sections/Cta.astro';
-import type { SectionCopy } from '~/data/services/types';
+import type { ProcessStep, SectionCopy } from '~/data/types';
 
 /**
  * Section / Our Process (Figma 213:2464) — five Card / Step cards on one
@@ -17,12 +16,15 @@ import type { SectionCopy } from '~/data/services/types';
  */
 interface Props {
   copy: SectionCopy;
-  steps: { number: string; tone: CardTone; heading: string; body: string }[];
-  action: CtaAction;
+  steps: ProcessStep[];
+  /** Omitted by the About page's Our Story, which closes with no CTA. */
+  action?: CtaAction;
+  /** Column floor. Default is `--layout-card-min` (330). */
+  cardMin?: number;
   id?: string;
 }
 
-const { copy, steps, action, id }: Props = Astro.props;
+const { copy, steps, action, cardMin, id }: Props = Astro.props;
 ---
 
 <section class="process" {id}>
@@ -31,7 +33,10 @@ const { copy, steps, action, id }: Props = Astro.props;
       {copy.heading}
     </SectionHeader>
 
-    <ol class="card-row">
+    <ol
+      class="card-row"
+      style={cardMin ? `--layout-card-min: ${cardMin}px` : undefined}
+    >
       {steps.map((step) => (
         <li>
           <StepCard
@@ -44,13 +49,15 @@ const { copy, steps, action, id }: Props = Astro.props;
       ))}
     </ol>
 
-    <div class="process__action">
-      <LargeButton
-        label={action.label}
-        href={action.href}
-        tone={action.tone ?? 'black'}
-      />
-    </div>
+    {action && (
+      <div class="process__action">
+        <LargeButton
+          label={action.label}
+          href={action.href}
+          tone={action.tone ?? 'black'}
+        />
+      </div>
+    )}
   </div>
 </section>
 

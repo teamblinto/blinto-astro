@@ -7,7 +7,7 @@ import type {
   ProcessStep,
   SectionCopy,
   StageCard,
-} from './types';
+} from '../types';
 
 import heroBanner from '~/assets/images/grw-hero-banner.jpg';
 import whereGrowthStalls from '~/assets/images/grw-where-growth-stalls.jpg';

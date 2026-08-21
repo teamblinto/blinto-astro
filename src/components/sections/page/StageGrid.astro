@@ -1,18 +1,17 @@
 ---
 import SectionHeader from '~/components/ui/SectionHeader.astro';
 import FeatureCard from '~/components/ui/FeatureCard.astro';
-import type { IconName } from '~/components/ui/Icon.astro';
-import type { CardTone } from '~/components/ui/FeatureCard.astro';
-import type { SectionCopy } from '~/data/services/types';
+import type { SectionCopy, StageCard } from '~/data/types';
 
 /**
- * Section / Where You Are (Figma 213:2444) — three Card / Feature instances
- * with Features=false and Show button=false, so they render as the short stage
- * card: icon, heading, body, no divider or CTA.
+ * The Card / Feature grid without its tick list — Where You Are (213:2444),
+ * Support Models (242:3672) and the About page's What We Do (253:4836).
+ * A card with no `cta` is Figma's Show button=false short stage card; About
+ * sets one, which adds the outline pill at the foot of each card.
  */
 interface Props {
   copy: SectionCopy;
-  cards: { icon: IconName; tone: CardTone; heading: string; body: string }[];
+  cards: StageCard[];
 }
 
 const { copy, cards }: Props = Astro.props;
@@ -32,6 +31,7 @@ const { copy, cards }: Props = Astro.props;
             tone={card.tone}
             heading={card.heading}
             body={card.body}
+            cta={card.cta}
           />
         </li>
       ))}
