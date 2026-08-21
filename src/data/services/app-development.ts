@@ -32,8 +32,7 @@ import ctaBackdrop from '~/assets/images/cta-backdrop.png';
  */
 
 export const meta = {
-  title:
-    'Shopify App Development Services — Blinto | From App Idea to Launch-Ready Product',
+  title: 'Shopify App Development Services — Blinto',
   description:
     'Blinto helps Shopify app founders and product teams scope an MVP, build around real merchant workflows, and launch a Shopify app that is ready for users.',
 };

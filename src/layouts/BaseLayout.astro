@@ -2,18 +2,71 @@
 import '~/styles/global.css';
 import NavBar from '~/components/layout/NavBar.astro';
 import Footer from '~/components/layout/Footer.astro';
+import type { FaqEntry } from '~/components/sections/Faq.astro';
+import {
+  ORG_NAME,
+  buildGraph,
+  faqNode,
+  serviceNode,
+  type PageType,
+  type SchemaContext,
+} from '~/data/seo';
 
 interface Props {
   title: string;
   description: string;
   /** Absolute or root-relative path to the social share image. */
   ogImage?: string;
+  /**
+   * schema.org type for this page's WebPage node. `WebPage` unless the page is
+   * genuinely one of the narrower kinds — About, Contact, a collection.
+   */
+  pageType?: PageType;
+  /**
+   * The page's FAQ band. Pass the same array the `Faq` section renders and the
+   * markup and the structured data cannot drift apart.
+   */
+  faqs?: FaqEntry[];
+  /** Set on a page that sells one service, for its Service node. */
+  service?: { name: string; description: string; serviceType?: string };
+  /**
+   * Anything else this page is about — job postings, products, reviews. These
+   * join the page's own `@graph` rather than sitting in a second script, so
+   * they can reference the shared Organization and WebPage by `@id`. Pass a
+   * function when a node needs those ids or the canonical URL.
+   */
+  schema?:
+    | Record<string, unknown>[]
+    | ((context: SchemaContext) => Record<string, unknown>[]);
 }
 
-const { title, description, ogImage = '/og-image.png' } = Astro.props;
+const {
+  title,
+  description,
+  ogImage = '/og-image.png',
+  pageType = 'WebPage',
+  faqs,
+  service,
+  schema = [],
+} = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin);
 const ogImageUrl = new URL(ogImage, canonical);
+
+const context: SchemaContext = { canonical, origin: canonical.origin };
+
+const graph = buildGraph({
+  canonical,
+  title,
+  description,
+  imageUrl: ogImageUrl.href,
+  pageType,
+  extra: [
+    ...(service ? [serviceNode(canonical, service)] : []),
+    ...(faqs?.length ? [faqNode(canonical, faqs)] : []),
+    ...(typeof schema === 'function' ? schema(context) : schema),
+  ],
+});
 ---
 
 <!doctype html>
@@ -23,16 +76,32 @@ const ogImageUrl = new URL(ogImage, canonical);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="canonical" href={canonical.href} />
+    <meta name="theme-color" content="#1945eb" />
 
     <title>{title}</title>
     <meta name="description" content={description} />
 
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={ORG_NAME} />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical.href} />
     <meta property="og:image" content={ogImageUrl.href} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${ORG_NAME} — ${title}`} />
+
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl.href} />
+
+    <script
+      type="application/ld+json"
+      is:inline
+      set:html={JSON.stringify(graph)}
+    />
 
     <slot name="head" />
   </head>

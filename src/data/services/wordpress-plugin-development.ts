@@ -21,10 +21,9 @@ import ctaBackdrop from '~/assets/images/cta-backdrop.png';
  */
 
 export const meta = {
-  title:
-    'Custom WordPress Plugin Development — Blinto | Build the Feature You Need',
+  title: 'Custom WordPress Plugin Development — Blinto',
   description:
-    'Blinto engineers secure, lightweight custom WordPress plugins — bespoke features, third-party API integrations and WooCommerce extensions that will not slow your site down.',
+    'Blinto engineers secure, lightweight custom WordPress plugins — bespoke features, third-party API integrations and WooCommerce extensions.',
 };
 
 /* ------------------------------------------------------------------- hero */

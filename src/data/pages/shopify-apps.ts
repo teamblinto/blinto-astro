@@ -28,7 +28,7 @@ import ctaBackdrop from '~/assets/images/cta-backdrop.png';
 export const meta = {
   title: 'Shopify Apps by Blinto — Built Around Real Merchant Problems',
   description:
-    'Blinto builds Shopify apps around real merchant needs — gifting with Giftify, post-purchase selling with GrowSell, and onsite offers with Smart Pop-Up Offer Builder.',
+    'Blinto builds Shopify apps around real merchant needs: gifting with Giftify, post-purchase selling with GrowSell, and onsite offers with Smart Pop-Up.',
 };
 
 /** Set these once the App Store listings are confirmed. */

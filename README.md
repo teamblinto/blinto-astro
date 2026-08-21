@@ -75,6 +75,60 @@ writes a meta-refresh HTML page at each old path, and on Netlify a file that
 exists shadows the `_redirects` rule for the same path, so the weaker
 client-side redirect would win over the 301.
 
+## SEO and answer engines
+
+Every page emits **one** `application/ld+json` block holding a single `@graph`
+with stable `@id`s, rather than several disconnected blobs. The shared
+Organization, WebSite, logo, this WebPage and its breadcrumb are declared once
+and referenced by id; whatever the page is *about* joins the same graph:
+
+| Page | Its own nodes |
+| --- | --- |
+| Every page | `Organization`, `ImageObject` (logo), `WebSite`, `WebPage`, `ImageObject` (share image), `BreadcrumbList` |
+| The nine service pages | `Service`, `FAQPage` |
+| `/services/`, `/shopify-apps/` | `CollectionPage` + `ItemList` of `Service` / `SoftwareApplication`, `FAQPage` |
+| `/about-us/` | `AboutPage`, `FAQPage` |
+| `/contact-us/` | `ContactPage`, `FAQPage` |
+| `/career/` | `JobPosting` ×10, `FAQPage` |
+| `/testimonials/` | `Review` ×2 against the Organization |
+
+`src/data/seo.ts` builds it; `BaseLayout` takes `faqs`, `service`, `pageType`
+and `schema` so a page declares what it is rather than hand-rolling JSON. The
+`faqs` prop takes the same array the `Faq` section renders, so the markup and
+the structured data cannot drift apart.
+
+Nothing is asserted that the pages do not say. There is no `aggregateRating` on
+the reviews — the clients gave words, not scores — no install counts or prices
+on the apps, and no `datePosted` on the job postings, because the current site
+never published one and inventing dates is not migration.
+
+Three files are generated at build time by `seo.mjs`, which reads titles and
+descriptions back out of the built HTML so they can never disagree with the
+pages themselves:
+
+- **`sitemap.xml`** — the 21 canonical URLs. No `lastmod`, `changefreq` or
+  `priority`: nothing tracks per-page edit dates, and a build timestamp on
+  every URL claims the whole site changed on every deploy, which is why
+  crawlers discount it.
+- **`robots.txt`** — allows everything, and names thirteen answer-engine
+  crawlers (GPTBot, ClaudeBot, PerplexityBot, Google-Extended and the rest)
+  explicitly, so being quotable in AI answers is a visible decision rather than
+  an accident. Move a name to `Disallow` to opt it out.
+- **`llms.txt`** — the emerging convention for handing a language model a clean
+  map of a site instead of making it infer one from crawled markup. Grouped
+  index, one line per page, built from each page's own title and description.
+
+Titles are kept at or under 62 characters and descriptions at or under 160, so
+neither truncates in a result. Three pages — `/services/seo/`,
+`/services/website-maintenance/` and `/testimonials/` — keep the title and
+description the WordPress site already ranks on, verbatim; the rest had the
+weak `Page name - blinto` default and are authored here.
+
+`og-image.png` and `blinto-logo.png` in `public/` are composed from existing
+brand assets — the CTA gradient artwork, the real logo paths, and Staatliches
+and DM Sans loaded from the project's own font packages — so the share card is
+on-brand without a new design asset. Replace them if a designed version lands.
+
 ## Getting started
 
 ```sh

@@ -9,9 +9,10 @@ import ctaBackdrop from '~/assets/images/cta-backdrop.png';
  */
 
 export const meta = {
-  title: 'Testimonials — Blinto | What Our Clients Say',
+  /** The current site's title and description, kept verbatim — they rank. */
+  title: 'Client Testimonials | Success Stories with Blinto LLC',
   description:
-    'Hear from the businesses Blinto has partnered with, in their own words — how we helped them design, build and grow online.',
+    'See what our clients say about working with Blinto LLC. Real testimonials showcasing results from website design, development, SEO, and growth plans.',
 };
 
 export const hero = {

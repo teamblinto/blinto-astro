@@ -26,10 +26,9 @@ import ctaBackdrop from '~/assets/images/cta-backdrop.png';
  */
 
 export const meta = {
-  title:
-    'Shopify App Support & Maintenance Services — Blinto | Keep Your App Stable',
+  title: 'Shopify App Support & Maintenance — Blinto',
   description:
-    'Blinto helps Shopify app owners fix recurring bugs, manage Shopify API updates and keep live apps stable through structured technical support and ongoing maintenance.',
+    'Blinto helps Shopify app owners fix recurring bugs, manage Shopify API updates and keep live apps stable through structured support and maintenance.',
 };
 
 /* ------------------------------------------------------------------- hero */

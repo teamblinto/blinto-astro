@@ -26,8 +26,7 @@ import ctaBackdrop from '~/assets/images/cta-backdrop.png';
  */
 
 export const meta = {
-  title:
-    'Shopify App Marketing & Growth Services — Blinto | Installs, Activation, Retention',
+  title: 'Shopify App Marketing & Growth — Blinto',
   description:
     'Blinto helps Shopify app teams turn visibility into qualified installs, stronger activation and lasting retention through marketing built around the product.',
 };

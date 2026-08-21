@@ -8,6 +8,7 @@ import ProductGrid from '~/components/sections/page/ProductGrid.astro';
 import Faq from '~/components/sections/Faq.astro';
 import Cta from '~/components/sections/Cta.astro';
 import * as page from '~/data/pages/shopify-apps';
+import { idFor, type SchemaContext } from '~/data/seo';
 
 /**
  * Our Apps — Figma "Our Apps · Desktop" (269:5897), at /shopify-apps/ per the
@@ -16,39 +17,44 @@ import * as page from '~/data/pages/shopify-apps';
  * matters, FAQ, CTA.
  */
 
-const faqSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  mainEntity: page.faqs.map((faq) => ({
-    '@type': 'Question',
-    name: faq.question,
-    acceptedAnswer: { '@type': 'Answer', text: faq.answer },
-  })),
-};
-
 /**
- * The apps themselves, as software rather than as page content. Each carries
- * only what the page actually states — no ratings or prices we cannot verify.
+ * The apps themselves, as software rather than as page content, wrapped in the
+ * ItemList this page is a collection of. Each carries only what the page states
+ * — no ratings, prices or install counts, none of which are verifiable here.
  */
-const appsSchema = page.appCards.map((card, index) => ({
-  '@context': 'https://schema.org',
-  '@type': 'SoftwareApplication',
-  name: page.products[index].name,
-  applicationCategory: 'BusinessApplication',
-  operatingSystem: 'Shopify',
-  description: card.body,
-  author: { '@type': 'Organization', name: 'Blinto LLC' },
-}));
+const appPortfolio = ({ canonical, origin }: SchemaContext) => [
+  {
+    '@type': 'ItemList',
+    '@id': `${canonical.href}#apps`,
+    name: 'Shopify apps built by Blinto',
+    itemListOrder: 'https://schema.org/ItemListUnordered',
+    numberOfItems: page.appCards.length,
+    itemListElement: page.appCards.map((card, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'SoftwareApplication',
+        name: page.products[index].name,
+        applicationCategory: 'BusinessApplication',
+        applicationSubCategory: 'Shopify app',
+        operatingSystem: 'Shopify',
+        description: card.body,
+        featureList: card.features,
+        author: { '@id': idFor.organization(origin) },
+        publisher: { '@id': idFor.organization(origin) },
+      },
+    })),
+  },
+];
 ---
 
-<BaseLayout title={page.meta.title} description={page.meta.description}>
-  <script
-    slot="head"
-    type="application/ld+json"
-    is:inline
-    set:html={JSON.stringify([faqSchema, ...appsSchema])}
-  />
-
+<BaseLayout
+  title={page.meta.title}
+  description={page.meta.description}
+  pageType="CollectionPage"
+  faqs={page.faqs}
+  schema={appPortfolio}
+>
   <Hero
     eyebrow={page.hero.eyebrow}
     heading={page.hero.heading}

@@ -22,7 +22,7 @@ import ctaBackdrop from '~/assets/images/cta-backdrop.png';
 export const meta = {
   title: 'Shopify Services — Blinto | Build, Grow and Support Your App',
   description:
-    'Blinto helps app founders and product teams plan, build, grow and support Shopify apps — development, marketing and ongoing maintenance shaped around each product stage.',
+    'Blinto helps app founders and product teams plan, build, grow and support Shopify apps — development, marketing and maintenance for every product stage.',
 };
 
 const DISCOVERY_HREF = '/contact-us/';

@@ -10,7 +10,8 @@ import type { CardTone } from './FeatureCard.astro';
  * heading, Card / Belief's pinned-bottom footer, and the outline Pill Button —
  * because the Figma library has no careers component.
  */
-export interface Job {
+/** Only what the card draws — `Job` in `src/data/types.ts` carries the rest. */
+interface Props {
   title: string;
   tone: CardTone;
   /** Employment terms, shown as a row of separated facts. */
@@ -18,8 +19,6 @@ export interface Job {
   deadline: string;
   href: string;
 }
-
-interface Props extends Job {}
 
 const { title, tone, terms, deadline, href }: Props = Astro.props;
 ---

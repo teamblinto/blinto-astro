@@ -5,7 +5,6 @@ import ContactPanel from '~/components/sections/page/ContactPanel.astro';
 import ProcessGrid from '~/components/sections/page/ProcessGrid.astro';
 import Faq from '~/components/sections/Faq.astro';
 import * as page from '~/data/pages/contact-us';
-import { contact, offices } from '~/data/site';
 
 /**
  * Migrated from https://blinto.co/contact-us/, at the same path — the sitemap
@@ -13,44 +12,19 @@ import { contact, offices } from '~/data/site';
  * 301s here on the current site.
  */
 
-const contactSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: 'Blinto LLC',
-  url: 'https://blinto.co/',
-  email: contact.email,
-  contactPoint: offices.map((office) => ({
-    '@type': 'ContactPoint',
-    contactType: 'sales',
-    telephone: office.phone,
-    areaServed: office.name === 'Wyoming' ? 'US' : 'BD',
-  })),
-  address: offices.map((office) => ({
-    '@type': 'PostalAddress',
-    name: office.name,
-    streetAddress: office.address,
-  })),
-};
-
-const faqSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  mainEntity: page.faqs.map((faq) => ({
-    '@type': 'Question',
-    name: faq.question,
-    acceptedAnswer: { '@type': 'Answer', text: faq.answer },
-  })),
-};
+/**
+ * The offices, phone numbers and email used to be re-declared here as a second
+ * Organization node. They are on the shared Organization in every page's graph
+ * now, so this page only says which kind of page it is.
+ */
 ---
 
-<BaseLayout title={page.meta.title} description={page.meta.description}>
-  <script
-    slot="head"
-    type="application/ld+json"
-    is:inline
-    set:html={JSON.stringify([contactSchema, faqSchema])}
-  />
-
+<BaseLayout
+  title={page.meta.title}
+  description={page.meta.description}
+  pageType="ContactPage"
+  faqs={page.faqs}
+>
   <Hero eyebrow={page.hero.eyebrow} heading={page.hero.heading} />
 
   <ContactPanel />

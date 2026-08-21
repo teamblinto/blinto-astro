@@ -31,10 +31,9 @@ import work8 from '~/assets/images/work/work-img8.webp';
  */
 
 export const meta = {
-  title:
-    'WordPress Design & Development — Blinto | Fast, Professional Sites You Control',
+  title: 'WordPress Design & Development — Blinto',
   description:
-    'Blinto designs and builds secure, high-performance WordPress sites — custom theme work, migrations and WooCommerce stores that launch fast and stay easy to manage.',
+    'Blinto designs and builds secure, fast WordPress sites — custom theme work, migrations and WooCommerce stores that launch quickly and stay easy to manage.',
 };
 
 /* ------------------------------------------------------------------- hero */

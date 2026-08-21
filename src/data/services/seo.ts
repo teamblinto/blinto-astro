@@ -17,7 +17,8 @@ import ctaBackdrop from '~/assets/images/cta-backdrop.png';
  */
 
 export const meta = {
-  title: 'SEO Services — Blinto | Boost Rankings, Traffic and Business Growth',
+  /** The current site's title and description, kept verbatim — they rank. */
+  title: 'SEO Services | Boost Rankings, Traffic & Business Growth',
   description:
     'At Blinto LLC, we help to dominate search results with proven SEO strategies. Improve rankings, drive targeted traffic, and turn clicks into customers. Grab it!',
 };

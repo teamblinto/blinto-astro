@@ -43,7 +43,7 @@ import teamRakibulHRocky from '~/assets/images/team-16-rakibul-h-rocky.png';
 export const meta = {
   title: 'About Blinto — A Product-Focused Shopify App Agency',
   description:
-    'Blinto helps founders and product teams build, grow and maintain Shopify apps — and builds its own Shopify products, using what it learns to serve clients better.',
+    'Blinto helps founders and product teams build, grow and maintain Shopify apps — and builds its own, using what it learns to serve clients better.',
 };
 
 /* ------------------------------------------------------------------- hero */

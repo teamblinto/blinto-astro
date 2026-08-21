@@ -4,14 +4,36 @@ import Hero from '~/components/sections/page/Hero.astro';
 import QuoteGrid from '~/components/sections/page/QuoteGrid.astro';
 import Cta from '~/components/sections/Cta.astro';
 import * as page from '~/data/pages/testimonials';
+import { idFor, type SchemaContext } from '~/data/seo';
 
 /**
  * Migrated from https://blinto.co/testimonials/, at the same path, so the link
  * needs no redirect at launch.
  */
+
+/**
+ * The two client quotes as Review nodes against the Organization. There is
+ * deliberately no `aggregateRating` and no star values: the clients gave words,
+ * not scores, and inventing a rating on our own page would be exactly the
+ * self-serving markup search engines discount.
+ */
+const reviews = ({ origin }: SchemaContext) =>
+  page.quotes.map((quote) => ({
+    '@type': 'Review',
+    itemReviewed: { '@id': idFor.organization(origin) },
+    name: quote.heading,
+    reviewBody: quote.quote,
+    author: { '@type': 'Person', name: quote.name, jobTitle: quote.role },
+    publisher: { '@id': idFor.organization(origin) },
+  }));
 ---
 
-<BaseLayout title={page.meta.title} description={page.meta.description}>
+<BaseLayout
+  title={page.meta.title}
+  description={page.meta.description}
+  pageType="CollectionPage"
+  schema={reviews}
+>
   <Hero
     eyebrow={page.hero.eyebrow}
     heading={page.hero.heading}

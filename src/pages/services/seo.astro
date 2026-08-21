@@ -17,26 +17,18 @@ import * as page from '~/data/services/seo';
  * endpoint yet, so the band closes with the audit-call CTA instead and the
  * form lands with the contact page decision.
  */
-
-const faqSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  mainEntity: page.faqs.map((faq) => ({
-    '@type': 'Question',
-    name: faq.question,
-    acceptedAnswer: { '@type': 'Answer', text: faq.answer },
-  })),
-};
 ---
 
-<BaseLayout title={page.meta.title} description={page.meta.description}>
-  <script
-    slot="head"
-    type="application/ld+json"
-    is:inline
-    set:html={JSON.stringify(faqSchema)}
-  />
-
+<BaseLayout
+  title={page.meta.title}
+  description={page.meta.description}
+  faqs={page.faqs}
+  service={{
+    name: 'SEO Services',
+    description: page.meta.description,
+    serviceType: 'Search engine optimization',
+  }}
+>
   <Hero
     eyebrow={page.hero.eyebrow}
     heading={page.hero.heading}

@@ -7,6 +7,7 @@ import ProcessGrid from '~/components/sections/page/ProcessGrid.astro';
 import Faq from '~/components/sections/Faq.astro';
 import Cta from '~/components/sections/Cta.astro';
 import * as page from '~/data/pages/services';
+import { idFor, type SchemaContext } from '~/data/seo';
 
 /**
  * Services — Figma "Shopify Services · Desktop" (272:6260), at /services/.
@@ -14,43 +15,40 @@ import * as page from '~/data/pages/services';
  * story, choose your service, how we start, our own apps, why Blinto, FAQ, CTA.
  */
 
-const faqSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  mainEntity: page.faqs.map((faq) => ({
-    '@type': 'Question',
-    name: faq.question,
-    acceptedAnswer: { '@type': 'Answer', text: faq.answer },
-  })),
-};
-
-/** The three services this hub routes to, as an itemised list. */
-const servicesSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'ItemList',
-  name: 'Shopify services by Blinto',
-  itemListElement: page.serviceCards.map((card, index) => ({
-    '@type': 'ListItem',
-    position: index + 1,
-    item: {
-      '@type': 'Service',
-      name: card.cta?.label.replace(/^Explore /, ''),
-      description: card.body,
-      url: new URL(card.cta?.href ?? '/services/', Astro.site).href,
-      provider: { '@type': 'Organization', name: 'Blinto LLC' },
-    },
-  })),
-};
+/**
+ * The hub's three services as an itemised list, each pointing at the page that
+ * describes it — which carries its own Service node under the same provider.
+ */
+const serviceList = ({ canonical, origin }: SchemaContext) => [
+  {
+    '@type': 'ItemList',
+    '@id': `${canonical.href}#services`,
+    name: 'Shopify services by Blinto',
+    itemListOrder: 'https://schema.org/ItemListUnordered',
+    numberOfItems: page.serviceCards.length,
+    itemListElement: page.serviceCards.map((card, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'Service',
+        name: card.cta?.label.replace(/^Explore /, ''),
+        description: card.body,
+        url: new URL(card.cta?.href ?? '/services/', origin).href,
+        provider: { '@id': idFor.organization(origin) },
+        areaServed: 'Worldwide',
+      },
+    })),
+  },
+];
 ---
 
-<BaseLayout title={page.meta.title} description={page.meta.description}>
-  <script
-    slot="head"
-    type="application/ld+json"
-    is:inline
-    set:html={JSON.stringify([faqSchema, servicesSchema])}
-  />
-
+<BaseLayout
+  title={page.meta.title}
+  description={page.meta.description}
+  pageType="CollectionPage"
+  faqs={page.faqs}
+  schema={serviceList}
+>
   <Hero
     eyebrow={page.hero.eyebrow}
     heading={page.hero.heading}

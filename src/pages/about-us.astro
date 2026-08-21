@@ -20,27 +20,14 @@ import * as page from '~/data/about';
  * Figma sets on those cards; How We Work is a BeliefGrid whose cells happen to
  * all be photo tiles.
  */
-
-/** Surfaces the FAQ copy to search engines as structured data. */
-const faqSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  mainEntity: page.faqs.map((faq) => ({
-    '@type': 'Question',
-    name: faq.question,
-    acceptedAnswer: { '@type': 'Answer', text: faq.answer },
-  })),
-};
 ---
 
-<BaseLayout title={page.meta.title} description={page.meta.description}>
-  <script
-    slot="head"
-    type="application/ld+json"
-    is:inline
-    set:html={JSON.stringify(faqSchema)}
-  />
-
+<BaseLayout
+  title={page.meta.title}
+  description={page.meta.description}
+  pageType="AboutPage"
+  faqs={page.faqs}
+>
   <Hero
     eyebrow={page.hero.eyebrow}
     heading={page.hero.heading}

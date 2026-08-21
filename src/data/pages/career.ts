@@ -1,7 +1,6 @@
 import type { CtaAction } from '~/components/sections/Cta.astro';
 import type { FaqEntry } from '~/components/sections/Faq.astro';
-import type { Job } from '~/components/ui/JobCard.astro';
-import type { BeliefCell, ProcessStep, SectionCopy } from '../types';
+import type { BeliefCell, Job, ProcessStep, SectionCopy } from '../types';
 import ctaBackdrop from '~/assets/images/cta-backdrop.png';
 
 /**
@@ -11,6 +10,10 @@ import ctaBackdrop from '~/assets/images/cta-backdrop.png';
  * them, including the deadline that has already passed; keeping the listings
  * current is an editorial job, not a migration one. Each role links out to the
  * live posting on Blinto's hiring platform, as it did before.
+ *
+ * `deadlineIso` and `salary` restate what each card already prints, in the
+ * shapes a JobPosting node needs — so the page and its structured data cannot
+ * disagree about when a role closes or what it pays.
  *
  * The five journey stages carry no numbers in the source. Card / Step shows
  * one, so they are numbered in order — the order the source already implies.
@@ -64,6 +67,8 @@ export const jobs: Job[] = [
     tone: 'blue',
     terms: ['Full Time', '1-2 Years Exp', 'Salary: Tk 40k-45k (Monthly)'],
     deadline: '19 February 2026',
+    deadlineIso: '2026-02-19',
+    salary: { min: 40000, max: 45000 },
     href: 'https://blinto.easy.jobs/xzqvqizpwa-business-analyst',
   },
   {
@@ -71,6 +76,8 @@ export const jobs: Job[] = [
     tone: 'yellow',
     terms: ['Full Time', '2-3 Years Exp', 'Salary: Tk 25k-35k (Monthly)'],
     deadline: '19 February 2026',
+    deadlineIso: '2026-02-19',
+    salary: { min: 25000, max: 35000 },
     href: 'https://blinto.easy.jobs/sales-growth-strategist',
   },
   {
@@ -78,6 +85,8 @@ export const jobs: Job[] = [
     tone: 'green',
     terms: ['Full Time', '2+ Years Exp', 'Salary: Tk 40k-60k (Monthly)'],
     deadline: '19 February 2026',
+    deadlineIso: '2026-02-19',
+    salary: { min: 40000, max: 60000 },
     href: 'https://jobs.blinto.co/join/backend-developer-node-js-senior/',
   },
   {
@@ -85,6 +94,8 @@ export const jobs: Job[] = [
     tone: 'yellow',
     terms: ['Full Time', '2-3 Years Exp', 'Salary: Tk 30k-40k (Monthly)'],
     deadline: '19 February 2026',
+    deadlineIso: '2026-02-19',
+    salary: { min: 30000, max: 40000 },
     href: 'https://jobs.blinto.co/join/content-writer-senior/',
   },
   {
@@ -92,6 +103,8 @@ export const jobs: Job[] = [
     tone: 'blue',
     terms: ['Full Time', '0-1 Years Exp', 'Salary: Tk 10k (Monthly)'],
     deadline: '19 February 2026',
+    deadlineIso: '2026-02-19',
+    salary: { min: 10000, max: 10000 },
     href: 'https://jobs.blinto.co/join/content-writer-intern-3-months/',
   },
   {
@@ -99,6 +112,8 @@ export const jobs: Job[] = [
     tone: 'green',
     terms: ['Full Time', '1-2 Years Exp', 'Salary: Tk 20k-30k (Monthly)'],
     deadline: '19 February 2026',
+    deadlineIso: '2026-02-19',
+    salary: { min: 20000, max: 30000 },
     href: 'https://jobs.blinto.co/join/frontend-developer-junior/',
   },
   {
@@ -106,6 +121,8 @@ export const jobs: Job[] = [
     tone: 'blue',
     terms: ['Full Time', '2-3 Years Exp', 'Salary: Tk 30k-40k (Monthly)'],
     deadline: '19 February 2026',
+    deadlineIso: '2026-02-19',
+    salary: { min: 30000, max: 40000 },
     href: 'https://jobs.blinto.co/join/graphic-designer-senior/',
   },
   {
@@ -113,6 +130,8 @@ export const jobs: Job[] = [
     tone: 'yellow',
     terms: ['Full Time', '1 Years Exp', 'Salary: Tk 10k (Monthly)'],
     deadline: '19 February 2026',
+    deadlineIso: '2026-02-19',
+    salary: { min: 10000, max: 10000 },
     href: 'https://jobs.blinto.co/join/graphic-designer-intern3-months/',
   },
   {
@@ -120,6 +139,8 @@ export const jobs: Job[] = [
     tone: 'green',
     terms: ['Full Time', '2-3 Years Exp', 'Salary: Tk 30k-40k (Monthly)'],
     deadline: '19 February 2026',
+    deadlineIso: '2026-02-19',
+    salary: { min: 30000, max: 40000 },
     href: 'https://jobs.blinto.co/join/seo-strategist-senior/',
   },
   {
@@ -127,6 +148,8 @@ export const jobs: Job[] = [
     tone: 'blue',
     terms: ['Full Time', '2-3 Years Exp', 'Salary: Tk 30k-50k (Monthly)'],
     deadline: '19 February 2026',
+    deadlineIso: '2026-02-19',
+    salary: { min: 30000, max: 50000 },
     href: 'https://jobs.blinto.co/join/ui-ux-designer-senior/',
   },
 ];

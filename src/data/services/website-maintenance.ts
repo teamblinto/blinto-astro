@@ -22,9 +22,10 @@ import work3 from '~/assets/images/work/work-img3.webp';
  */
 
 export const meta = {
-  title: 'Website Maintenance Services — Blinto | Keep Your Site Fast & Secure',
+  /** The current site's title and description, kept verbatim — they rank. */
+  title: 'Website Maintenance Services | Keep Your Site Fast & Secure',
   description:
-    'Blinto keeps your website secure and up to date: regular updates, security monitoring, daily backups, performance optimization and fast technical support.',
+    'Blinto LLC keeps your website updated, secure, and running smoothly. From fixes to speed optimization, our maintenance plans protect your online growth',
 };
 
 export const hero = {

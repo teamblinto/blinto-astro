@@ -20,10 +20,9 @@ import ctaBackdrop from '~/assets/images/cta-backdrop.png';
  */
 
 export const meta = {
-  title:
-    'Shopify Theme & Storefront Development — Blinto | Custom Stores That Convert',
+  title: 'Shopify Theme & Storefront Development — Blinto',
   description:
-    'Blinto engineers high-performance custom Shopify themes and storefronts that look unique, load fast and turn visitors into buyers — plus store setup and platform migration.',
+    'Blinto engineers custom Shopify themes and storefronts that look unique, load fast and turn visitors into buyers — plus store setup and migration.',
 };
 
 export const hero = {

@@ -139,3 +139,22 @@ export type LegalBlock =
   | { kind: 'heading'; level: 2 | 3 | 4; text: string }
   | { kind: 'text'; text: string }
   | { kind: 'list'; items: string[] };
+
+/**
+ * A job opening. `title`, `tone`, `terms`, `deadline` and `href` are what the
+ * card renders; `deadlineIso` and `salary` restate the deadline and pay in the
+ * shapes a JobPosting node needs, so the page and its structured data cannot
+ * disagree.
+ */
+export interface Job {
+  title: string;
+  tone: CardTone;
+  /** Employment terms, shown as a row of separated facts. */
+  terms: string[];
+  deadline: string;
+  /** The same deadline as an ISO date. */
+  deadlineIso: string;
+  /** The range the listing states, in BDT per month. */
+  salary?: { min: number; max: number };
+  href: string;
+}

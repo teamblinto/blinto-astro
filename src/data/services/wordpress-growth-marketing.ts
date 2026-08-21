@@ -20,8 +20,7 @@ import ctaBackdrop from '~/assets/images/cta-backdrop.png';
  */
 
 export const meta = {
-  title:
-    'WordPress Growth Marketing — Blinto | SEO, Paid Ads & Conversion Optimization',
+  title: 'WordPress Growth Marketing — Blinto | SEO & Paid Ads',
   description:
     'Blinto turns WordPress sites into growth machines: technical SEO, structured Google Ads and conversion rate optimization measured on leads, sales and ROAS.',
 };

@@ -7,6 +7,8 @@ import ProcessGrid from '~/components/sections/page/ProcessGrid.astro';
 import Faq from '~/components/sections/Faq.astro';
 import Cta from '~/components/sections/Cta.astro';
 import * as page from '~/data/pages/career';
+import { ORG_LEGAL_NAME, idFor, type SchemaContext } from '~/data/seo';
+import { offices } from '~/data/site';
 
 /**
  * Migrated from https://blinto.co/career/, at the same path, so the link needs
@@ -14,28 +16,70 @@ import * as page from '~/data/pages/career';
  * openings, hiring journey, FAQ, CTA.
  */
 
-const jobSchema = page.jobs.map((job) => ({
-  '@context': 'https://schema.org',
-  '@type': 'JobPosting',
-  title: job.title,
-  employmentType: 'FULL_TIME',
-  hiringOrganization: {
-    '@type': 'Organization',
-    name: 'Blinto LLC',
-    sameAs: 'https://blinto.co/',
-  },
-  url: job.href,
-}));
+/**
+ * One JobPosting per opening. Every field restates something the card already
+ * prints: `validThrough` is its deadline, so a role that has closed says so
+ * rather than looking open forever, and `baseSalary` is the range it states.
+ * The office comes from `site.ts` rather than being retyped here — the FAQ
+ * says the company is 100% on-site, and Dhaka is where the roles sit.
+ *
+ * `datePosted` is absent, and deliberately: Google wants one, but the old site
+ * never published a posting date and inventing one would be fabricating data.
+ * These listings need refreshing with real dates and deadlines anyway — every
+ * one closed in February 2026.
+ */
+const dhaka = offices.find((office) => office.name === 'Dhaka');
+
+const jobPostings = ({ origin }: SchemaContext) =>
+  page.jobs.map((job) => ({
+    '@type': 'JobPosting',
+    title: job.title,
+    description: `${job.title}. ${job.terms.join('. ')}.`,
+    employmentType: 'FULL_TIME',
+    hiringOrganization: {
+      '@id': idFor.organization(origin),
+      name: ORG_LEGAL_NAME,
+    },
+    jobLocationType: 'On-site',
+    ...(dhaka
+      ? {
+          jobLocation: {
+            '@type': 'Place',
+            address: {
+              '@type': 'PostalAddress',
+              streetAddress: dhaka.address,
+              addressLocality: 'Dhaka',
+              addressCountry: 'BD',
+            },
+          },
+        }
+      : {}),
+    ...(job.salary
+      ? {
+          baseSalary: {
+            '@type': 'MonetaryAmount',
+            currency: 'BDT',
+            value: {
+              '@type': 'QuantitativeValue',
+              minValue: job.salary.min,
+              maxValue: job.salary.max,
+              unitText: 'MONTH',
+            },
+          },
+        }
+      : {}),
+    validThrough: job.deadlineIso,
+    directApply: false,
+    url: job.href,
+  }));
 ---
 
-<BaseLayout title={page.meta.title} description={page.meta.description}>
-  <script
-    slot="head"
-    type="application/ld+json"
-    is:inline
-    set:html={JSON.stringify(jobSchema)}
-  />
-
+<BaseLayout
+  title={page.meta.title}
+  description={page.meta.description}
+  faqs={page.faqs}
+  schema={jobPostings}
+>
   <Hero
     eyebrow={page.hero.eyebrow}
     heading={page.hero.heading}

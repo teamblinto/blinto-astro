@@ -11,7 +11,7 @@ import type { ProcessStep, SectionCopy } from '../types';
 export const meta = {
   title: 'Contact Blinto — Let’s Connect',
   description:
-    'Talk to Blinto about your Shopify or WordPress project. Send us a message and we reply within 2-4 business hours, or reach our Wyoming and Dhaka offices directly.',
+    'Talk to Blinto about your Shopify or WordPress project. Send a message and we reply within 2-4 business hours, or reach our Wyoming and Dhaka offices.',
 };
 
 export const hero = {
