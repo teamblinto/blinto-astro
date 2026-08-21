@@ -1,5 +1,6 @@
 ---
 import SectionHeader from '~/components/ui/SectionHeader.astro';
+import Icon from '~/components/ui/Icon.astro';
 import { faqs } from '~/data/home';
 
 /**
@@ -29,7 +30,8 @@ import { faqs } from '~/data/home';
           <summary class="faq__summary">
             <span class="faq__question">{faq.question}</span>
             <span class="faq__toggle">
-              <span class="faq__glyph" aria-hidden="true"></span>
+              <Icon name="plus" size={32} class="faq__glyph faq__glyph--plus" />
+              <Icon name="minus" size={32} class="faq__glyph faq__glyph--minus" />
             </span>
           </summary>
           <div class="faq__answer">
@@ -120,29 +122,18 @@ import { faqs } from '~/data/home';
     color: var(--color-icon-primary);
   }
 
-  /* A 32px plus that loses its vertical bar when the row expands. */
-  .faq__glyph {
-    position: relative;
-    width: 32px;
-    height: 32px;
+  /**
+   * State=Collapsed shows Icon / 32 / Plus, State=Expanded swaps in
+   * Icon / 32 / Minus — both real design-system icons, stacked so the swap
+   * needs no JavaScript.
+   */
+  .faq__glyph--minus,
+  .faq__item[open] .faq__glyph--plus {
+    display: none;
   }
 
-  .faq__glyph::before,
-  .faq__glyph::after {
-    content: '';
-    position: absolute;
-    inset: 50% 16.67%;
-    border-top: 1.5px solid currentColor;
-  }
-
-  .faq__glyph::after {
-    transform: rotate(90deg);
-    transition: opacity 0.2s ease, transform 0.2s ease;
-  }
-
-  .faq__item[open] .faq__glyph::after {
-    opacity: 0;
-    transform: rotate(0deg);
+  .faq__item[open] .faq__glyph--minus {
+    display: block;
   }
 
   .faq__answer {

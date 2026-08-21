@@ -21,7 +21,7 @@ const { label, href = '#contact', tone = 'black', class: className } = Astro.pro
 <a href={href} class:list={['large-button', `large-button--${tone}`, className]}>
   <span class="large-button__label">{label}</span>
   <span class="large-button__arrow">
-    <Icon name="arrow-right" size={20} />
+    <Icon name="arrow-right" size={44} />
   </span>
 </a>
 
@@ -52,7 +52,12 @@ const { label, href = '#contact', tone = 'black', class: className } = Astro.pro
     white-space: nowrap;
   }
 
-  /* The 44px circular arrow affordance from the design. */
+  /**
+   * The 44px circular arrow affordance. Figma draws the orange disc inside
+   * the exported icon; it is painted here instead so the fill stays bound to
+   * the action token, leaving the icon to supply only the chevron — which the
+   * design strokes in ink, not white.
+   */
   .large-button__arrow {
     display: grid;
     place-items: center;
@@ -60,7 +65,7 @@ const { label, href = '#contact', tone = 'black', class: className } = Astro.pro
     height: 44px;
     border-radius: var(--radius-full);
     background-color: var(--color-bg-action);
-    color: var(--color-text-inverse);
+    color: var(--color-icon-primary);
     flex-shrink: 0;
     transition: transform 0.2s ease;
   }

@@ -22,14 +22,20 @@ export const primaryCta = {
   href: '/contact',
 };
 
+/**
+ * `map` points at the illustrated silhouette exported from Figma
+ * (nodes 105:125 and 105:149). They are shipped as standalone SVG files
+ * rather than inline icons because they are detailed illustrations, not
+ * currentColor glyphs.
+ */
 export const offices = [
   {
-    icon: 'region-us' as IconName,
+    map: '/images/region-us.svg',
     name: 'Wyoming',
     address: '30 N Gould St Ste R Sheridan, WY 82801, USA.',
   },
   {
-    icon: 'region-bd' as IconName,
+    map: '/images/region-bd.svg',
     name: 'Dhaka',
     address: 'House-1211, Rd-10, Ave-10, Mirpur DOHS, Dhaka, BD.',
   },

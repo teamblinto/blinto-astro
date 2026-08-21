@@ -78,20 +78,46 @@ clear 3:1 if that is wanted.
 
 ## Design assets
 
-`www.figma.com` was blocked by the network egress policy of the environment this
-page was built in, so **no exported asset bytes could be retrieved** — not via
-the shell, the server-side fetch, or the Figma MCP `download_assets` tool. Three
-things are therefore stand-ins, each isolated so it can be swapped in one place:
+Every **vector** asset is the real thing, exported from the Figma file itself.
+`www.figma.com` is blocked by this environment's egress policy, so the usual
+asset URLs are unreachable — instead the artwork was pulled through the Figma
+Plugin API (`exportAsync({ format: 'SVG_STRING' })`), which returns SVG as
+text rather than over HTTP. That covers:
 
-| What | Where | To replace |
+| Asset | Figma node | Lives in |
 | --- | --- | --- |
-| 7 photographs | `public/images/` | Overwrite the `.jpg` files — see `public/images/README.md` for the node IDs and sizes. No code change. |
-| Logo + icon glyphs | `src/components/ui/Logo.astro`, `src/components/ui/Icon.astro` | Authored from the design renders. Drop in the official SVGs and replace the component bodies. |
-| CTA band background | `src/components/sections/Cta.astro` | Figma backs it with a raster gradient; reproduced with layered CSS gradients, which also scales cleanly and ships no image. |
+| Logo (quatrefoil + wordmark) | 61:4323 | `src/components/ui/Logo.astro` |
+| 6 card icons (Idea, Launch, Growth, Admin, Support, Updates) | 125:142 … 125:173 | `src/components/ui/Icon.astro` |
+| Tick, Plus, Minus, Menu, caret, arrow | 125:177 … 152:399 | `src/components/ui/Icon.astro` |
+| 5 social icons | 61:4357 … 61:4374 | `src/components/ui/Icon.astro` |
+| Shopify bag (brand palette kept) | 145:40 | `src/components/ui/Icon.astro` |
+| USA / Bangladesh silhouettes | 105:125, 105:149 | `public/images/region-*.svg` |
+| Footer wordmark | 72:185 | `public/images/wordmark.svg` |
 
-The two footer map silhouettes (`region-us`, `region-bd` in `Icon.astro`) are
-explicit placeholder glyphs, not reconstructions — they need the real
-illustrations.
+Inline icons have their `#222222` / `white` strokes rewritten to
+`currentColor`; each keeps its own Figma `viewBox` so geometry is exact.
+
+### Still outstanding: the 7 photographs
+
+The hero strip's five photos and the two *Why One Team* photos are **generated
+placeholders**, not the real photography. Raster images cannot come through the
+text channel: the smallest is 81 KB as JPEG, and a `use_figma` response is
+capped at 20 KB, so even a half-resolution export exceeds one response and
+would have to be hand-reassembled from base64 fragments — not something to
+trust in a production asset.
+
+Two ways to finish them:
+
+1. **Allowlist `www.figma.com`** for this environment's egress policy, then
+   re-run the export — this is the clean fix and also restores normal
+   `download_assets` behaviour.
+2. **Drop the files in by hand.** Overwrite the seven `.jpg` files in
+   `public/images/` using the node IDs and sizes in
+   `public/images/README.md`. No code change is needed.
+
+The CTA band's background is deliberately *not* an image: Figma backs it with a
+315 KB raster gradient, and it is reproduced with layered CSS gradients in
+`src/components/sections/Cta.astro`, which scales cleanly and ships no bytes.
 
 ## Deviations from the design
 
@@ -103,3 +129,10 @@ illustrations.
   and falls back to the static centred line under `prefers-reduced-motion`.
 - **The mobile nav drawer is new.** The Figma notes record it as "still an open
   design decision"; it is built from the design's own tokens.
+- **The LinkedIn icon was normalised.** Its Figma node (61:4365) carries
+  `stroke-opacity="0.2"` and no `stroke-width`, which renders it visibly faded
+  beside its four siblings. Treated as an inconsistency rather than intent and
+  matched to the rest of the row.
+- **The close icon is the Plus rotated 45deg.** The design system ships no
+  close glyph, so the drawer reuses Icon / 32 / Plus rather than introducing a
+  foreign one.
