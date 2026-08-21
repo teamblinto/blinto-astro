@@ -13,6 +13,13 @@ import { navLinks, primaryCta } from '~/data/site';
  * The drawer below is therefore an implementation decision, built from the
  * design's own tokens: a full-height sheet with focus trapping, Escape to
  * close, scroll locking, and `inert` on the rest of the page while open.
+ *
+ * Services Menu (Figma 172:1052) is the bar's hidden dropdown state: a 288px
+ * white panel under the Services item holding the three service pages. It is
+ * built with no JavaScript at all — see the `.nav__submenu` styles for how
+ * `:hover` and `:focus-within` cover pointer and keyboard between them. The
+ * caret is decorative; the accessible structure is a plain nested list, which
+ * is what a screen reader announces as a sub-level of "Services".
  */
 ---
 
@@ -23,11 +30,25 @@ import { navLinks, primaryCta } from '~/data/site';
     <nav class="nav__menu" aria-label="Main">
       <ul class="nav__list">
         {navLinks.map((link) => (
-          <li>
+          <li class:list={['nav__item', link.submenu && 'nav__item--menu']}>
             <a class="nav__link" href={link.href}>
               {link.label}
-              {link.hasSubmenu && <Icon name="caret-down" size={12} />}
+              {link.submenu && <Icon name="caret-down" size={16} />}
             </a>
+
+            {link.submenu && (
+              <div class="nav__submenu-anchor">
+                <ul class="nav__submenu">
+                  {link.submenu.map((item) => (
+                    <li>
+                      <a class="nav__submenu-link" href={item.href}>
+                        {item.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </li>
         ))}
       </ul>
@@ -61,6 +82,20 @@ import { navLinks, primaryCta } from '~/data/site';
         {navLinks.map((link) => (
           <li>
             <a class="nav__drawer-link" href={link.href}>{link.label}</a>
+
+            {/* The sheet has room to show the sub-level outright, so it does —
+                an accordion inside a drawer is a second thing to open. */}
+            {link.submenu && (
+              <ul class="nav__drawer-sublist">
+                {link.submenu.map((item) => (
+                  <li>
+                    <a class="nav__drawer-sublink" href={item.href}>
+                      {item.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
           </li>
         ))}
       </ul>
@@ -185,6 +220,103 @@ import { navLinks, primaryCta } from '~/data/site';
     color: var(--color-text-brand);
   }
 
+  /* ------------------------------------------------------------ submenu -- */
+
+  .nav__item--menu {
+    position: relative;
+  }
+
+  /**
+   * Services Menu (Figma 172:1052) sits at y=72 in the 80px bar, 21px below
+   * the nav label. That gap is padding on this anchor rather than a margin on
+   * the panel, so the pointer stays inside the hover target on the way down
+   * and the menu cannot flicker shut mid-travel.
+   */
+  .nav__submenu-anchor {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    padding-top: 21px;
+    /**
+     * Closed, this box is invisible but still 288px wide and hanging over the
+     * page, so it must not intercept anything: without this it swallows clicks
+     * meant for the content under the bar and pops the menu open on a pointer
+     * that never went near the nav. It is re-enabled with the panel, which is
+     * what lets the pointer travel from the label down into the menu without
+     * leaving the hover target. Keyboard focus is unaffected either way.
+     */
+    pointer-events: none;
+  }
+
+  .nav__item--menu:hover .nav__submenu-anchor,
+  .nav__item--menu:focus-within .nav__submenu-anchor {
+    pointer-events: auto;
+  }
+
+  /**
+   * Closed state. Deliberately *not* `visibility: hidden` or `display: none`:
+   * the links stay in the tab order, so tabbing off "Services" lands on the
+   * first service and `:focus-within` below reveals the panel in the same
+   * instant. That is what makes the dropdown work with no JavaScript for
+   * keyboard and pointer alike. Hit-testing is handled on the anchor above,
+   * which the panel inherits.
+   */
+  .nav__submenu {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xs);
+    width: 288px;
+    max-width: calc(100vw - var(--layout-page-margin) * 2);
+    padding: var(--space-2xs);
+    background-color: var(--color-bg-page);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    /* Figma: drop shadow 0 8 12, ink at 8%. */
+    box-shadow: 0 8px 12px rgb(34 34 34 / 0.08);
+    opacity: 0;
+    transform: translateY(-4px);
+    transition:
+      opacity 0.15s ease,
+      transform 0.15s ease;
+  }
+
+  .nav__item--menu:hover .nav__submenu,
+  .nav__item--menu:focus-within .nav__submenu {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .nav__submenu-link {
+    display: flex;
+    align-items: center;
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    /* Nav/Top */
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-label);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.3;
+    color: var(--color-text-primary);
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  /* The design gives each row a 4px radius but only the resting state, so the
+     fill it implies is the lightest surface token, with the bar's own hover
+     colour on the label. */
+  .nav__submenu-link:hover {
+    background-color: var(--color-border-faint);
+    color: var(--color-text-brand);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav__submenu {
+      transition: none;
+      transform: none;
+    }
+  }
+
   .nav__toggle {
     display: none;
     padding: var(--space-2xs);
@@ -240,6 +372,33 @@ import { navLinks, primaryCta } from '~/data/site';
   }
 
   .nav__drawer-link:hover {
+    color: var(--color-text-brand);
+  }
+
+  .nav__drawer-sublist {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+    /* Indented under its parent, with the bar's own rule as the tie back to
+       it, so the sub-level reads as nested rather than as five more links. */
+    margin-top: var(--space-2xs);
+    margin-left: var(--space-xs);
+    padding-left: var(--space-xs);
+    border-left: 1px solid var(--color-border-subtle);
+  }
+
+  .nav__drawer-sublink {
+    display: block;
+    padding-block: var(--space-3xs);
+    /* Body/Default, not the display face: this is a sub-level. */
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body-sm);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.3;
+    color: var(--color-text-primary);
+  }
+
+  .nav__drawer-sublink:hover {
     color: var(--color-text-brand);
   }
 

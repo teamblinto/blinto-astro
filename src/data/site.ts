@@ -2,15 +2,36 @@ import type { IconName } from '~/components/ui/Icon.astro';
 
 /** Shared chrome content: navigation and footer. */
 
+export interface NavSubLink {
+  label: string;
+  href: string;
+}
+
 export interface NavLink {
   label: string;
   href: string;
-  /** Renders the caret and marks the item as having a submenu. */
-  hasSubmenu?: boolean;
+  /**
+   * Sub-navigation. Its presence is what renders the caret and the dropdown —
+   * Services Menu (Figma 172:1052), the hidden state of the Navigation bar
+   * (54:1406). Labels are the design's, which say "App Support & Maintenance"
+   * where the footer column says "Support & Maintenance".
+   */
+  submenu?: NavSubLink[];
 }
 
 export const navLinks: NavLink[] = [
-  { label: 'Services', href: '/services', hasSubmenu: true },
+  {
+    label: 'Services',
+    href: '/services',
+    submenu: [
+      { label: 'Shopify App Development', href: '/services/app-development' },
+      { label: 'Shopify App Growth', href: '/services/app-growth' },
+      {
+        label: 'App Support & Maintenance',
+        href: '/services/support-maintenance',
+      },
+    ],
+  },
   { label: 'Products', href: '/products' },
   { label: 'Case Studies', href: '/case-studies' },
   { label: 'Blog', href: '/blog' },
