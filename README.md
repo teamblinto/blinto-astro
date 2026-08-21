@@ -76,9 +76,24 @@ src/
 
 Skip link; one `h1` with `h2` section headings; a single visible focus
 treatment; the FAQ is a native `<details>`/`<summary>` accordion so it works
-without JavaScript; the mobile nav traps focus, locks scroll, marks the rest of
-the page `inert`, closes on Escape and returns focus to its trigger; animation
-is dropped under `prefers-reduced-motion`.
+without JavaScript; the Services dropdown works without JavaScript too (see
+below); the mobile nav traps focus, locks scroll, marks the rest of the page
+`inert`, closes on Escape and returns focus to its trigger; animation is
+dropped under `prefers-reduced-motion`.
+
+**The Services dropdown** (Services Menu, Figma `172:1052`) ships no
+JavaScript. Its panel is hidden with `opacity: 0` rather than
+`visibility: hidden` or `display: none`, so the three links stay in the tab
+order: tabbing off "Services" lands on the first service and `:focus-within`
+reveals the panel in the same instant, while `:hover` covers the pointer. The
+caret stays decorative and the markup is a plain nested `<ul>`, which is what a
+screen reader announces as a sub-level — so there is no `aria-expanded` to fall
+out of sync with a CSS-driven hover state. Hit-testing lives on the panel's
+anchor: `pointer-events` is off while closed, so the invisible box cannot
+swallow clicks meant for the page beneath the bar, and on while open, so the
+21px gap the design leaves between label and panel is inside the hover target
+instead of a dead zone. The mobile drawer shows the sub-level outright rather
+than nesting a second accordion inside a sheet.
 
 One known issue inherited from the design: the hero's tinted "Shopify"
 (`--color-text-shopify`, `#95bf46`) sits at about **2.1:1** against white, below
