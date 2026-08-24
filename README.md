@@ -38,13 +38,19 @@ navigation and the footer rather than pointing at a 404. Along with `/works/`
 and the two case-study detail pages it is still the only part of the current
 site with no home here, so those four URLs 404 at launch.
 
-**Six service pages are deliberately unlinked**: Shopify theme & storefront,
-the three WordPress pages, SEO and website maintenance. They are out of both
-the navigation and the footer but stay live, stay in `sitemap.xml` and
-`llms.txt`, and keep their 301s from the WordPress paths — indexable, just not
+**Nine pages are deliberately unlinked**: the six other service pages (Shopify
+theme & storefront, the three WordPress pages, SEO, website maintenance) and
+Testimonials, Careers and Client Support. They are out of both the navigation
+and the footer but stay live, stay in `sitemap.xml` and `llms.txt`, and keep
+their 301s from the WordPress paths where they had one — indexable, just not
 promoted. The trade-off is real: a page with no internal links earns none of
 the site's own authority, so expect them to rank below where they sit today.
-Add a link from `/services/` if that matters more than keeping them quiet.
+Link them from `/services/` or a sitemap page if that matters more than keeping
+them quiet.
+
+The navigation is Services, Our Apps and About Us, with Contact reached through
+the Book a Discovery Call button. The footer promotes three services and three
+company pages, and closes with the copyright opposite the three policies.
 
 ## Launch redirects
 

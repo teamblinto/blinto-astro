@@ -94,14 +94,17 @@ export const footerTagline =
   'A product-focused Shopify expert agency helping app founders and product teams build, grow, and maintain Shopify apps.';
 
 /**
- * The footer promotes the three Shopify services only.
+ * The footer promotes the three Shopify services and three company pages.
  *
- * The other six service pages — Shopify theme & storefront, the three
- * WordPress pages, SEO and website maintenance — are deliberately unlinked
- * from both the navigation and the footer. Their URLs stay live and they stay
- * in `sitemap.xml` and `llms.txt`, so search and answer engines still index
- * them; they are simply not promoted. Case Studies is out until those pages
- * exist, rather than pointing the footer at a 404.
+ * Nine pages are deliberately unlinked from both the navigation and the
+ * footer: the six other service pages (Shopify theme & storefront, the three
+ * WordPress pages, SEO, website maintenance) and Testimonials, Careers and
+ * Client Support. Their URLs stay live, they keep their 301s from the
+ * WordPress paths, and they stay in `sitemap.xml` and `llms.txt`, so search
+ * and answer engines still index them; they are simply not promoted.
+ *
+ * Case Studies is out until those pages exist, rather than pointing the footer
+ * at a 404.
  */
 export const footerColumns = [
   {
@@ -117,9 +120,6 @@ export const footerColumns = [
     links: [
       { label: 'About Us', href: '/about-us/' },
       { label: 'Our Apps', href: '/shopify-apps/' },
-      { label: 'Testimonials', href: '/testimonials/' },
-      { label: 'Careers', href: '/career/' },
-      { label: 'Client Support', href: '/support/' },
       { label: 'Contact Us', href: '/contact-us/' },
     ],
   },
