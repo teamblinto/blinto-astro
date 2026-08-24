@@ -33,9 +33,18 @@ content into the new design system, since no frame exists for them.
 | `/support/` | migrated content |
 | `/privacy-policy/`, `/terms-conditions/`, `/cookies-policy/` | migrated verbatim |
 
-`/case-studies/` is linked from the navigation and does not exist yet. **It must
-not ship in that state** — along with `/works/` and the two case-study detail
-pages, it is the only part of the current site with no home here.
+`/case-studies/` does not exist yet, and nothing links to it — it is out of the
+navigation and the footer rather than pointing at a 404. Along with `/works/`
+and the two case-study detail pages it is still the only part of the current
+site with no home here, so those four URLs 404 at launch.
+
+**Six service pages are deliberately unlinked**: Shopify theme & storefront,
+the three WordPress pages, SEO and website maintenance. They are out of both
+the navigation and the footer but stay live, stay in `sitemap.xml` and
+`llms.txt`, and keep their 301s from the WordPress paths — indexable, just not
+promoted. The trade-off is real: a page with no internal links earns none of
+the site's own authority, so expect them to rank below where they sit today.
+Add a link from `/services/` if that matters more than keeping them quiet.
 
 ## Launch redirects
 
@@ -124,10 +133,30 @@ neither truncates in a result. Three pages — `/services/seo/`,
 description the WordPress site already ranks on, verbatim; the rest had the
 weak `Page name - blinto` default and are authored here.
 
+Share images follow the current site, which gave each page its own: the six
+pages with a hero banner use it, cropped to 1200x630 at build time as a plain
+JPEG, since scrapers are the least capable clients on the web. The other
+fifteen fall back to `og-image.png`.
+
 `og-image.png` and `blinto-logo.png` in `public/` are composed from existing
 brand assets — the CTA gradient artwork, the real logo paths, and Staatliches
 and DM Sans loaded from the project's own font packages — so the share card is
 on-brand without a new design asset. Replace them if a designed version lands.
+
+The old site's metadata was diffed field by field against this one. Everything
+it carried is here: canonical, description, the `og:*` set, `twitter:card` and
+`twitter:site`, and a `@graph` of the same five node types Yoast emitted
+(WebPage, ImageObject, BreadcrumbList, WebSite, Organization) plus the
+per-page ones above. Four Yoast fields are deliberately dropped:
+`twitter:label1`/`data1` ("Est. reading time" on a service page is noise),
+`og:type: article` on non-articles, `WebSite.potentialAction` (there is no
+site search to point it at), and `datePublished`/`dateModified` (nothing here
+tracks per-page edit dates).
+
+One thing to confirm: the current site's Yoast config sets `twitter:site` to
+`@blintodotco` while its own footer links to `x.com/BlintoHQ`. The two
+disagree; `site.ts` uses the linked profile so the markup is internally
+consistent. One line to change if the other account is the live one.
 
 ## Getting started
 

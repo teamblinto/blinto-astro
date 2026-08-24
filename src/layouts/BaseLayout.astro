@@ -1,7 +1,9 @@
 ---
+import { getImage } from 'astro:assets';
 import '~/styles/global.css';
 import NavBar from '~/components/layout/NavBar.astro';
 import Footer from '~/components/layout/Footer.astro';
+import { contact } from '~/data/site';
 import type { FaqEntry } from '~/components/sections/Faq.astro';
 import {
   ORG_NAME,
@@ -15,8 +17,13 @@ import {
 interface Props {
   title: string;
   description: string;
-  /** Absolute or root-relative path to the social share image. */
-  ogImage?: string;
+  /**
+   * The page's share image. Pass an imported image — a page's own hero banner,
+   * as the current WordPress site does — and it is cropped to the 1200x630 card
+   * at build time. A string is used as a path verbatim. Omitted, the page falls
+   * back to the site card.
+   */
+  ogImage?: string | ImageMetadata;
   /**
    * schema.org type for this page's WebPage node. `WebPage` unless the page is
    * genuinely one of the narrower kinds — About, Contact, a collection.
@@ -51,7 +58,27 @@ const {
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin);
-const ogImageUrl = new URL(ogImage, canonical);
+
+/**
+ * Open Graph wants a real file at a fixed 1.91:1, so an imported image is run
+ * through the build pipeline at 1200x630 rather than being linked at its own
+ * dimensions. Scrapers are the least capable clients on the web, so this stays
+ * a plain JPEG — no WebP, no srcset.
+ */
+const ogAsset =
+  typeof ogImage === 'string'
+    ? ogImage
+    : (
+        await getImage({
+          src: ogImage,
+          width: 1200,
+          height: 630,
+          format: 'jpeg',
+          quality: 80,
+        })
+      ).src;
+
+const ogImageUrl = new URL(ogAsset, canonical);
 
 const context: SchemaContext = { canonical, origin: canonical.origin };
 
@@ -93,6 +120,7 @@ const graph = buildGraph({
     <meta property="og:image:alt" content={`${ORG_NAME} — ${title}`} />
 
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content={contact.twitterHandle} />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageUrl.href} />

@@ -136,7 +136,12 @@ export const projects: WorkItem[] = [
   },
 ];
 
-/** The original points this at /works; the new sitemap's path is below. */
+/**
+ * The original points this at /works, which maps to /case-studies/. That page
+ * does not exist yet, so the page does not render this button — see the note in
+ * `src/pages/services/website-maintenance.astro`. Kept here so restoring it is
+ * one line once Case Studies ships.
+ */
 export const projectsAction: CtaAction = {
   label: 'Explore More Projects',
   href: '/case-studies/',

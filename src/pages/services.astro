@@ -45,6 +45,7 @@ const serviceList = ({ canonical, origin }: SchemaContext) => [
 <BaseLayout
   title={page.meta.title}
   description={page.meta.description}
+  ogImage={page.hero.banner.src}
   pageType="CollectionPage"
   faqs={page.faqs}
   schema={serviceList}

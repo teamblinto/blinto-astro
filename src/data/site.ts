@@ -19,9 +19,12 @@ export interface NavLink {
 }
 
 /**
- * The approved sitemap's six top-level items, in order. `/about-us/`,
- * `/contact-us/` and `/case-studies/` deliberately reuse the paths the current
- * WordPress site already ranks on, so those three need no redirect at launch.
+ * The navigation. Contact is reached through the Book a Discovery Call button
+ * beside it rather than a second link to the same page, and Case Studies is out
+ * until those pages exist.
+ *
+ * `/about-us/` and `/contact-us/` deliberately reuse the paths the current
+ * WordPress site already ranks on, so neither needs a redirect at launch.
  */
 export const navLinks: NavLink[] = [
   {
@@ -37,9 +40,7 @@ export const navLinks: NavLink[] = [
     ],
   },
   { label: 'Our Apps', href: '/shopify-apps/' },
-  { label: 'Case Studies', href: '/case-studies/' },
   { label: 'About Us', href: '/about-us/' },
-  { label: 'Contact Us', href: '/contact-us/' },
 ];
 
 export const primaryCta = {
@@ -75,8 +76,16 @@ export const offices = [
  * contact page publishes; `info@` is the one its policies name for legal and
  * privacy requests, so both are kept rather than collapsed into one.
  */
+/**
+ * `twitterHandle` is the account the Twitter card is attributed to. The
+ * current site's Yoast config publishes `@blintodotco` while its footer links
+ * to `x.com/BlintoHQ` — the two disagree. The linked profile wins here so the
+ * site is internally consistent with `socialLinks`; confirm which account is
+ * live and change this one line if it is the other.
+ */
 export const contact = {
   email: 'hello@blinto.co',
+  twitterHandle: '@BlintoHQ',
   legalEmail: 'info@blinto.co',
   bookingUrl: 'https://calendly.com/blinto/30min',
 };
@@ -85,11 +94,14 @@ export const footerTagline =
   'A product-focused Shopify expert agency helping app founders and product teams build, grow, and maintain Shopify apps.';
 
 /**
- * The footer carries every service page, not just the three in the navigation.
- * The approved sitemap caps the Services dropdown at three, but all nine pages
- * are indexed today and a page nothing links to is a page search engines treat
- * as abandoned — the current WordPress footer lists its six services for the
- * same reason. Client Support is here on the same grounds.
+ * The footer promotes the three Shopify services only.
+ *
+ * The other six service pages — Shopify theme & storefront, the three
+ * WordPress pages, SEO and website maintenance — are deliberately unlinked
+ * from both the navigation and the footer. Their URLs stay live and they stay
+ * in `sitemap.xml` and `llms.txt`, so search and answer engines still index
+ * them; they are simply not promoted. Case Studies is out until those pages
+ * exist, rather than pointing the footer at a 404.
  */
 export const footerColumns = [
   {
@@ -98,24 +110,6 @@ export const footerColumns = [
       { label: 'Shopify App Development', href: '/services/shopify-app-development/' },
       { label: 'Shopify App Growth', href: '/services/shopify-app-marketing/' },
       { label: 'Support & Maintenance', href: '/services/shopify-app-support-maintenance/' },
-      {
-        label: 'Shopify Theme & Storefront',
-        href: '/services/shopify-theme-storefront-development/',
-      },
-      {
-        label: 'WordPress Design & Development',
-        href: '/services/wordpress-design-development/',
-      },
-      {
-        label: 'WordPress Plugin Development',
-        href: '/services/wordpress-plugin-development/',
-      },
-      {
-        label: 'WordPress Growth Marketing',
-        href: '/services/wordpress-growth-marketing/',
-      },
-      { label: 'SEO', href: '/services/seo/' },
-      { label: 'Website Maintenance', href: '/services/website-maintenance/' },
     ],
   },
   {
@@ -123,7 +117,6 @@ export const footerColumns = [
     links: [
       { label: 'About Us', href: '/about-us/' },
       { label: 'Our Apps', href: '/shopify-apps/' },
-      { label: 'Case Studies', href: '/case-studies/' },
       { label: 'Testimonials', href: '/testimonials/' },
       { label: 'Careers', href: '/career/' },
       { label: 'Client Support', href: '/support/' },
@@ -133,10 +126,8 @@ export const footerColumns = [
 ];
 
 /**
- * The policies, in the footer's bottom bar. They are deliberately out of the
- * navigation — the approved sitemap has six top-level items — but they cannot
- * be orphaned either: a page nothing links to is a page search engines treat
- * as abandoned.
+ * The policies. They sit opposite the copyright in the footer's bottom bar,
+ * where the "Made with Love" credit used to be.
  */
 export const legalLinks = [
   { label: 'Privacy Policy', href: '/privacy-policy/' },
@@ -159,5 +150,4 @@ export const socialLinks: { label: string; href: string; icon: IconName }[] = [
 
 export const legal = {
   copyright: '© 2026 Blinto LLC. All Rights Reserved.',
-  credit: 'Made with Love by Blinto LLC',
 };

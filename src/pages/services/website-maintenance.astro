@@ -11,6 +11,11 @@ import * as page from '~/data/services/website-maintenance';
 /**
  * Migrated from https://blinto.co/website-maintenance/, now under /services/;
  * the old path 301s here (see the redirect map in redirects.mjs).
+ *
+ * The original's "Explore More Projects" button pointed at /works/, which maps
+ * to /case-studies/ — a page that does not exist yet. It is dropped rather
+ * than shipped as a dead link; the three project tiles above it still link out
+ * to the live client sites. Restore it when Case Studies lands.
  * Section order follows the original: hero, what's included, industries,
  * recent projects, why Blinto, testimonials, FAQ, CTA.
  */
@@ -46,12 +51,7 @@ import * as page from '~/data/services/website-maintenance';
     cellMinHeight={140}
   />
 
-  <WorkGrid
-    copy={page.projectsSection}
-    items={page.projects}
-    cardMin={400}
-    actions={[page.projectsAction]}
-  />
+  <WorkGrid copy={page.projectsSection} items={page.projects} cardMin={400} />
 
   <BeliefGrid copy={page.whySection} cells={page.whyCells} cardMin={300} />
 

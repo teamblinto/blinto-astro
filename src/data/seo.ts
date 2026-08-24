@@ -191,6 +191,8 @@ export function buildGraph({
         isPartOf: { '@id': idFor.website(origin) },
         about: { '@id': idFor.organization(origin) },
         primaryImageOfPage: { '@id': idFor.primaryImage(url) },
+        /** The current site's Yoast graph carries this too. */
+        thumbnailUrl: imageUrl,
         breadcrumb: { '@id': idFor.breadcrumb(url) },
         inLanguage: 'en',
       },
