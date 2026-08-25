@@ -29,21 +29,43 @@ import { HONEYPOT_FIELD } from '~/lib/contact-form';
 const fields: {
   name: string;
   label: string;
-  type: 'text' | 'email' | 'tel' | 'url';
+  type: 'text' | 'email' | 'tel';
   placeholder: string;
   required: boolean;
   autocomplete: string;
+  inputmode?: 'url';
 }[] = [
   { name: 'name', label: 'Full Name', type: 'text', placeholder: 'Enter your name', required: true, autocomplete: 'name' },
   { name: 'email', label: 'Email', type: 'email', placeholder: 'Enter your email', required: true, autocomplete: 'email' },
   { name: 'phone', label: 'Phone', type: 'tel', placeholder: 'Enter your phone number', required: false, autocomplete: 'tel' },
   { name: 'company', label: 'Company Name', type: 'text', placeholder: 'Type here..', required: false, autocomplete: 'organization' },
-  { name: 'website', label: 'Website', type: 'url', placeholder: 'Type here..', required: false, autocomplete: 'url' },
+  /*
+    Deliberately `text` rather than `url`. The browser's own `url` validation
+    demands a scheme, so `example.com` would be rejected by `reportValidity()`
+    before the submission ever left the page. `normaliseWebsite` in
+    `src/lib/contact-form.ts` upgrades a bare domain to https and still refuses
+    anything that is not http(s), so the check that matters is unchanged;
+    `inputmode` keeps the URL-friendly keyboard on a phone.
+  */
+  { name: 'website', label: 'Website', type: 'text', placeholder: 'Type here..', required: false, autocomplete: 'url', inputmode: 'url' },
 ];
 ---
 
 <section class="contact">
-  <div class="container contact__columns">
+  {/*
+    The `form` is the two-column container rather than a child of the right
+    column, so the Turnstile widget can sit under the office cards on the left
+    and still post its `cf-turnstile-response` — the widget writes that hidden
+    input into whichever form encloses it, so moving it out of the form would
+    silently drop the token. The field grid keeps its own wrapper inside.
+  */}
+  <form
+    class="container contact__columns"
+    id="contact-form"
+    action="/api/contact/"
+    method="post"
+    data-contact-form
+  >
     <div class="contact__details">
       <h2 class="contact__details-title">Contact Information</h2>
 
@@ -62,6 +84,8 @@ const fields: {
           </li>
         ))}
       </ul>
+
+      <div class="cf-turnstile" data-sitekey={PUBLIC_TURNSTILE_SITE_KEY} data-action="contact"></div>
     </div>
 
     <div class="contact__form-column">
@@ -73,13 +97,7 @@ const fields: {
         </p>
       </noscript>
 
-      <form
-        class="contact__form form-grid"
-        id="contact-form"
-        action="/api/contact/"
-        method="post"
-        data-contact-form
-      >
+      <div class="contact__form form-grid">
         {/*
           The honeypot. Hidden from sight, from the accessibility tree and from
           the tab order, and opted out of autofill, so only a bot filling every
@@ -109,6 +127,7 @@ const fields: {
               placeholder={field.placeholder}
               required={field.required}
               autocomplete={field.autocomplete}
+              inputmode={field.inputmode}
               aria-describedby={`contact-${field.name}-error`}
             />
             <span class="field__error" id={`contact-${field.name}-error`} data-error-for={field.name}></span>
@@ -129,10 +148,6 @@ const fields: {
           <span class="field__error" id="contact-message-error" data-error-for="message"></span>
         </p>
 
-        <div class="field--wide">
-          <div class="cf-turnstile" data-sitekey={PUBLIC_TURNSTILE_SITE_KEY} data-action="contact"></div>
-        </div>
-
         <div class="field--wide contact__actions">
           <button class="form-submit" type="submit" data-submit>
             <span data-submit-label>Send Message</span>
@@ -147,9 +162,9 @@ const fields: {
           reaches a screen reader without moving focus mid-typing.
         */}
         <p class="contact__status field--wide" role="status" aria-live="polite" data-status hidden></p>
-      </form>
+      </div>
     </div>
-  </div>
+  </form>
 </section>
 
 <script
@@ -438,8 +453,14 @@ const fields: {
     color: #b3261e;
   }
 
-  .contact__form :global(.cf-turnstile) {
-    margin-block: var(--space-2xs);
+  /*
+    The widget is a fixed 300px wide, so it is left at its natural width rather
+    than stretched across the column. It sits below the last office card, which
+    keeps the form short enough for the submit button and the status message to
+    land in the viewport together.
+  */
+  .contact__details :global(.cf-turnstile) {
+    align-self: flex-start;
   }
 
   @media (width <= 900px) {
