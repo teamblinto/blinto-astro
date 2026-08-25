@@ -281,4 +281,66 @@ describe('handleContactSubmission', () => {
 
     expect(result.status).toBe('misconfigured');
   });
+
+  /**
+   * The log is the only signal an operator gets for this failure — the visitor
+   * sees a deliberately generic message — so which variable it names matters.
+   */
+  it.each([
+    ['resendApiKey', 'RESEND_API_KEY', 'TURNSTILE_SECRET_KEY'],
+    ['turnstileSecretKey', 'TURNSTILE_SECRET_KEY', 'RESEND_API_KEY'],
+  ] as const)('names %s in the log without naming the one that is set', async (
+    key,
+    expected,
+    notExpected,
+  ) => {
+    const { fetchImpl } = happyPath();
+    const logged: string[] = [];
+    const spy = vi.spyOn(console, 'error').mockImplementation((m) => logged.push(String(m)));
+
+    await handleContactSubmission({
+      fields: validFields(),
+      clientIp: null,
+      config: { ...config, [key]: '' },
+      fetch: fetchImpl as unknown as typeof fetch,
+    });
+
+    spy.mockRestore();
+    expect(logged.join('\n')).toContain(expected);
+    expect(logged.join('\n')).not.toContain(notExpected);
+  });
+
+  it('names both when neither secret is set', async () => {
+    const { fetchImpl } = happyPath();
+    const logged: string[] = [];
+    const spy = vi.spyOn(console, 'error').mockImplementation((m) => logged.push(String(m)));
+
+    await handleContactSubmission({
+      fields: validFields(),
+      clientIp: null,
+      config: { ...config, resendApiKey: '', turnstileSecretKey: '' },
+      fetch: fetchImpl as unknown as typeof fetch,
+    });
+
+    spy.mockRestore();
+    expect(logged.join('\n')).toContain('RESEND_API_KEY');
+    expect(logged.join('\n')).toContain('TURNSTILE_SECRET_KEY');
+  });
+
+  it('never puts a secret value in the log', async () => {
+    const { fetchImpl } = happyPath();
+    const logged: string[] = [];
+    const spy = vi.spyOn(console, 'error').mockImplementation((m) => logged.push(String(m)));
+
+    await handleContactSubmission({
+      fields: validFields(),
+      clientIp: null,
+      // One set, one missing: the set one must not be echoed while explaining.
+      config: { ...config, turnstileSecretKey: '' },
+      fetch: fetchImpl as unknown as typeof fetch,
+    });
+
+    spy.mockRestore();
+    expect(logged.join('\n')).not.toContain(config.resendApiKey);
+  });
 });

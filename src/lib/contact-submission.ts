@@ -99,8 +99,22 @@ export async function handleContactSubmission(
 
   // A missing secret is an operator error. Refusing loudly beats accepting a
   // submission the visitor believes was sent and then dropping it.
-  if (!config.resendApiKey || !config.turnstileSecretKey) {
-    console.error('[contact] refused: RESEND_API_KEY or TURNSTILE_SECRET_KEY is unset');
+  //
+  // The log names the offender, because the two live in different places in the
+  // Cloudflare dashboard and the usual cause is one of them being set as a
+  // *build* variable rather than a Worker secret. The visitor still sees only
+  // the generic message.
+  const missing = [
+    !config.resendApiKey && 'RESEND_API_KEY',
+    !config.turnstileSecretKey && 'TURNSTILE_SECRET_KEY',
+  ].filter(Boolean);
+
+  if (missing.length > 0) {
+    console.error(
+      `[contact] refused: ${missing.join(' and ')} unset on the Worker. ` +
+        `Set with \`wrangler secret put <NAME>\`, or in the dashboard under the ` +
+        `Worker's Variables and Secrets — not its Build variables.`,
+    );
     return { status: 'misconfigured' };
   }
 
