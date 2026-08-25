@@ -48,6 +48,12 @@ the site's own authority, so expect them to rank below where they sit today.
 Link them from `/services/` or a sitemap page if that matters more than keeping
 them quiet.
 
+Two routes sit outside that count. `/thank-you/` is where the contact form
+lands a submission that was posted natively rather than through its script; it
+is `noindex`, which also keeps it out of `sitemap.xml` and `llms.txt`.
+`/api/contact/` is the form’s endpoint and the only route on the site that is
+not prerendered — see **The contact form** below.
+
 The navigation is Services, Our Apps and About Us, with Contact reached through
 the Book a Discovery Call button. The footer promotes three services and three
 company pages, and closes with the copyright opposite the three policies.
@@ -173,12 +179,18 @@ npm run dev        # dev server on http://localhost:4321
 
 | Command | Does |
 | --- | --- |
-| `npm run dev` | Start the dev server |
-| `npm run build` | Type-check and build to `dist/` |
-| `npm run preview` | Serve the production build locally |
+| `npm run dev` | Start the dev server, on Cloudflare’s `workerd` runtime |
+| `npm run build` | Build to `dist/`, then assert the output (see below) |
+| `npm run preview` | Build, then serve it through `wrangler dev` |
 | `npm run check` | `astro check` — types and template diagnostics |
+| `npm test` | Vitest unit suite for `src/lib/` |
 
 Requires Node 20.10+ (Astro 7).
+
+The contact form needs local secrets before it will send. Copy
+`.dev.vars.example` to `.dev.vars` and fill it in — see **The contact form**
+below. Without them the form renders and validates but refuses to send, which
+is deliberate.
 
 ## Architecture
 
@@ -202,10 +214,16 @@ src/
 │   ├── layout/           NavBar, Footer
 │   └── sections/         One component per Figma section
 │       └── page/         Data-driven shells shared across the inner pages
+├── lib/                  Framework-free logic, unit tested with Vitest
+│   ├── contact-form.ts       Contact form validation and normalisation
+│   ├── contact-email.ts      The Resend payload, HTML and plain text
+│   └── contact-submission.ts The submission pipeline end to end
 └── pages/
     ├── index.astro       Composes the homepage sections
     ├── services.astro    The /services/ hub
     ├── services/         The nine service pages
+    ├── api/contact.ts    The contact endpoint — the one on-demand route
+    ├── thank-you.astro   Where a native form POST lands, noindex
     └── …                 about-us, shopify-apps, contact-us, career, …
 ```
 
@@ -263,6 +281,108 @@ the WCAG AA large-text minimum of 3:1. It is implemented as designed — changin
 a brand colour is a design decision. Darkening it to roughly `#6f8f34` would
 clear 3:1 if that is wanted.
 
+## The contact form
+
+`/contact-us/` posts to `/api/contact/`, which validates the submission and
+sends it to `hello@blinto.co` through [Resend](https://resend.com). It is the
+only route on the site that is not prerendered.
+
+### How a submission travels
+
+```
+ContactPanel.astro          the form, the honeypot, the Turnstile widget
+  ↓  fetch (or a native POST if the script failed)
+src/pages/api/contact.ts    reads the environment, shapes the response
+  ↓
+src/lib/contact-submission  rate limit → honeypot → Turnstile → validate → send
+      ├─ contact-form.ts       validation and normalisation
+      └─ contact-email.ts      the Resend payload, HTML and plain text
+```
+
+The three `src/lib/` modules take their dependencies as arguments — `fetch`,
+the secrets, the rate limiter — so the whole pipeline is unit tested under
+plain Node without Astro or `workerd`. `npm test` covers it; the route file is
+a thin adapter over them.
+
+### Configuration
+
+| Variable | Kind | Where it lives |
+| --- | --- | --- |
+| `RESEND_API_KEY` | **secret** | `.dev.vars` locally, Worker secret in production |
+| `TURNSTILE_SECRET_KEY` | **secret** | `.dev.vars` locally, Worker secret in production |
+| `PUBLIC_TURNSTILE_SITE_KEY` | public | `.env` locally, build variable in production |
+| `CONTACT_TO_EMAIL` | public | defaults to `hello@blinto.co` |
+| `CONTACT_FROM_EMAIL` | public | defaults to `Blinto <noreply@blinto.co>` |
+
+The two secrets are declared in `astro.config.mjs` with `access: 'secret'`, so
+they are readable only from `astro:env/server`. This is enforced, not a
+convention: importing one from `astro:env/client` fails the build with
+`"RESEND_API_KEY" is not exported by "astro:env/client"`, and
+`scripts/check-build-output.mjs` greps the built client assets for key-shaped
+strings as a second line of defence.
+
+Set the production secrets **before the first deploy that includes this**, or
+the form fails closed with a 503 and tells visitors to email directly:
+
+```sh
+npx wrangler secret put RESEND_API_KEY
+npx wrangler secret put TURNSTILE_SECRET_KEY
+```
+
+or Workers › `blinto-astro` › Settings › Variables and Secrets in the dashboard.
+
+`PUBLIC_TURNSTILE_SITE_KEY` defaults to Cloudflare’s always-passes **test** key
+so a fresh clone runs without setup. Production must override it. Forgetting to
+is safe rather than silent: a real `TURNSTILE_SECRET_KEY` rejects tokens minted
+by the test site key, so the form breaks loudly instead of quietly dropping its
+challenge.
+
+### What stops spam
+
+1. **Turnstile**, verified server-side against `siteverify` with the visitor’s
+   `cf-connecting-ip`. A missing or unverifiable token is refused, and the
+   endpoint fails closed if the challenge service is unreachable.
+2. **A honeypot** field (`fax`), hidden from sight, from the accessibility tree
+   and from the tab order. Filling it returns the same success message a person
+   sees, so a bot cannot tell it was dropped.
+3. **A rate limit** of five submissions a minute per IP, via the
+   `CONTACT_RATE_LIMITER` binding in `wrangler.jsonc`. Absent in local dev,
+   which the pipeline treats as "no limit configured".
+4. **Origin checking** — `security.checkOrigin` in `astro.config.mjs` rejects a
+   cross-site POST.
+
+Validation is in `src/lib/contact-form.ts`: length caps on every field, http(s)
+only for the website (a bare domain is upgraded to https rather than rejected),
+and control characters stripped from everything that reaches a mail header, so
+a `Bcc:` cannot be injected through the subject or Reply-To.
+
+### JavaScript and the fallbacks
+
+Turnstile mints its token in the browser, so a submission genuinely cannot
+succeed without JavaScript. Rather than let someone type out an enquiry that is
+certain to be rejected, a `<noscript>` block points them at the email address,
+which is on the page beside the form regardless.
+
+With JavaScript on but the enhancement script failing, the form falls back to a
+native POST; the endpoint answers with a 303 to `/thank-you/` on success, or
+back to the form with a reason in the query string.
+
+### Deployment shape
+
+Adding the adapter split the build: prerendered pages and static files go to
+`dist/client/`, the Worker to `dist/server/`. Cloudflare matches static assets
+first and only falls through to the Worker when nothing matches, so all 21
+pages are still served straight from the edge.
+
+`npm run build` runs `scripts/check-build-output.mjs`, which fails the build if
+any page references `/_image?href=…`, if `dist/client/_astro/` holds no
+optimised images, if the page count drops, if the Worker is missing, or if a
+key-shaped string appears in a client asset.
+
+The image assertions exist because adding the adapter reopened the regression
+fixed in `5e8642d`: the adapter’s default image service defers transformation
+to runtime, and on a deploy with no image binding every image 404s.
+`astro.config.mjs` pins `imageService: 'compile'` against that.
 ## Design assets
 
 Every asset on the page is the real artwork from the Figma file — no

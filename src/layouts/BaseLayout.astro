@@ -37,6 +37,13 @@ interface Props {
   /** Set on a page that sells one service, for its Service node. */
   service?: { name: string; description: string; serviceType?: string };
   /**
+   * Keeps the page out of search results and, because `seo.mjs` reads the
+   * built markup, out of `sitemap.xml` and `llms.txt` too. For pages that
+   * exist only as the far side of an action, like the thank-you page the
+   * contact form lands on.
+   */
+  noindex?: boolean;
+  /**
    * Anything else this page is about — job postings, products, reviews. These
    * join the page's own `@graph` rather than sitting in a second script, so
    * they can reference the shared Organization and WebPage by `@id`. Pass a
@@ -54,6 +61,7 @@ const {
   pageType = 'WebPage',
   faqs,
   service,
+  noindex = false,
   schema = [],
 } = Astro.props;
 
@@ -107,6 +115,7 @@ const graph = buildGraph({
 
     <title>{title}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={ORG_NAME} />
