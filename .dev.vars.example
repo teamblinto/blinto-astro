@@ -1,0 +1,16 @@
+# Local secrets for `npm run dev`, which runs the site on Cloudflare's workerd
+# runtime. Copy to `.dev.vars` and fill in. `.dev.vars` is gitignored.
+#
+# In production these are Worker secrets, NOT values in wrangler.jsonc:
+#   npx wrangler secret put RESEND_API_KEY
+#   npx wrangler secret put TURNSTILE_SECRET_KEY
+# or Workers > blinto-astro > Settings > Variables and Secrets in the dashboard.
+#
+# Both are read through `astro:env/server` with access 'secret', so importing
+# either from client code fails the build. Neither can reach the browser.
+
+# https://resend.com/api-keys — needs "Sending access" only.
+RESEND_API_KEY=""
+
+# https://dash.cloudflare.com > Turnstile > your widget > Settings.
+TURNSTILE_SECRET_KEY=""

@@ -1,0 +1,32 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/page/Hero.astro';
+import Cta from '~/components/sections/Cta.astro';
+import { contact } from '~/data/site';
+
+/**
+ * Where `/api/contact/` sends a successful submission when the visitor's
+ * browser posted the form natively — that is, when JavaScript is running but
+ * the page's enhancement script did not handle the request. The usual path
+ * never lands here: the script renders the confirmation in place.
+ *
+ * Marked `noindex`, which also keeps it out of `sitemap.xml` and `llms.txt`,
+ * since a confirmation page has nothing to offer a crawler and would only
+ * dilute the indexed set.
+ */
+---
+
+<BaseLayout
+  title="Thanks — we have your message | Blinto"
+  description="Your enquiry has reached the Blinto team. We usually reply within one working day."
+  noindex
+>
+  <Hero
+    eyebrow="Thank you"
+    heading="Your message is on its way"
+    subheading={`We usually reply within one working day. If it is urgent, email us directly at ${contact.email}.`}
+    actions={[{ label: 'Back to the site', href: '/' }]}
+  />
+
+  <Cta />
+</BaseLayout>

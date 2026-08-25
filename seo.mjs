@@ -82,6 +82,9 @@ async function collectPages(root) {
         await walk(full);
       } else if (entry.name === 'index.html') {
         const html = await readFile(full, 'utf8');
+        // A page that tells crawlers to stay away should not then be
+        // advertised in the sitemap or the llms.txt index.
+        if (/<meta name="robots" content="[^"]*noindex/.test(html)) continue;
         const rel = path.relative(root, path.dirname(full)).split(path.sep).join('/');
         const route = rel === '' ? '/' : `/${rel}/`;
         const title = html.match(/<title>([^<]*)<\/title>/);

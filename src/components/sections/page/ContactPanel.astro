@@ -1,23 +1,30 @@
 ---
 import Icon from '~/components/ui/Icon.astro';
 import { contact, offices } from '~/data/site';
+import { PUBLIC_TURNSTILE_SITE_KEY } from 'astro:env/client';
+import { HONEYPOT_FIELD } from '~/lib/contact-form';
 
 /**
  * The contact page's two-column band: how to reach Blinto directly on the
  * left, the enquiry form on the right.
  *
- * The form is plain HTML and posts on its own — no client JavaScript, so it
- * works before anything hydrates. Where it posts is a build-time setting:
- * `PUBLIC_CONTACT_FORM_ENDPOINT` takes any form backend (Formspree, Web3Forms,
- * a serverless function). With none set, the form falls back to composing a
- * mail in the visitor's own client, so a submission can never vanish into a
- * dead endpoint — and the address is on the page beside it either way.
+ * The form posts to `/api/contact/`, the site's one on-demand route, which
+ * validates the submission and sends it to the team through Resend. See
+ * `src/pages/api/contact.ts`.
+ *
+ * Three submission paths, in order of what the visitor has available:
+ *
+ * 1. JavaScript on, everything working — the script below posts with `fetch`
+ *    and swaps the result in without leaving the page.
+ * 2. JavaScript on, the script or the network failed — the browser falls back
+ *    to a native form POST and the endpoint answers with a 303, either to
+ *    `/thank-you/` or back here with a reason in the query string.
+ * 3. JavaScript off — the form cannot work at all, because Turnstile mints its
+ *    token in the browser and the endpoint refuses a submission without one.
+ *    Rather than let someone type out an enquiry that is certain to be
+ *    rejected, the `<noscript>` block below replaces the form with the email
+ *    address. That address is also on the page beside it, unconditionally.
  */
-const endpoint = import.meta.env.PUBLIC_CONTACT_FORM_ENDPOINT;
-const action = endpoint || `mailto:${contact.email}`;
-/* text/plain keeps the mail-client fallback readable; a real backend parses
-   the default urlencoded body itself. */
-const enctype = endpoint ? undefined : 'text/plain';
 
 const fields: {
   name: string;
@@ -57,47 +64,226 @@ const fields: {
       </ul>
     </div>
 
-    <form class="contact__form form-grid" {action} method="post" {enctype}>
-      {fields.map((field) => (
-        <p class="field">
-          <label class="field__label" for={`contact-${field.name}`}>
-            {field.label}
-          </label>
-          <input
-            class="field__control"
-            id={`contact-${field.name}`}
-            name={field.name}
-            type={field.type}
-            placeholder={field.placeholder}
-            required={field.required}
-            autocomplete={field.autocomplete}
-          />
+    <div class="contact__form-column">
+      <noscript>
+        <p class="contact__noscript">
+          This form needs JavaScript to verify you are human. With it switched off,
+          please email us at <a href={`mailto:${contact.email}`}>{contact.email}</a> and
+          we will pick it up the same way.
         </p>
-      ))}
+      </noscript>
 
-      <p class="field field--wide">
-        <label class="field__label" for="contact-message">Message</label>
-        <textarea
-          class="field__control field__control--area"
-          id="contact-message"
-          name="message"
-          rows="6"
-          placeholder="How can we help?"
-          required
-        ></textarea>
-      </p>
+      <form
+        class="contact__form form-grid"
+        id="contact-form"
+        action="/api/contact/"
+        method="post"
+        data-contact-form
+      >
+        {/*
+          The honeypot. Hidden from sight, from the accessibility tree and from
+          the tab order, and opted out of autofill, so only a bot filling every
+          input it finds will put anything here.
+        */}
+        <div class="contact__honeypot" aria-hidden="true">
+          <label for="contact-fax">Fax</label>
+          <input
+            id="contact-fax"
+            name={HONEYPOT_FIELD}
+            type="text"
+            tabindex="-1"
+            autocomplete="off"
+          />
+        </div>
 
-      <div class="field--wide">
-        <button class="form-submit" type="submit">
-          Send Message
-          <span class="form-submit__icon">
-            <Icon name="arrow-right" size={20} />
-          </span>
-        </button>
-      </div>
-    </form>
+        {fields.map((field) => (
+          <p class="field">
+            <label class="field__label" for={`contact-${field.name}`}>
+              {field.label}
+            </label>
+            <input
+              class="field__control"
+              id={`contact-${field.name}`}
+              name={field.name}
+              type={field.type}
+              placeholder={field.placeholder}
+              required={field.required}
+              autocomplete={field.autocomplete}
+              aria-describedby={`contact-${field.name}-error`}
+            />
+            <span class="field__error" id={`contact-${field.name}-error`} data-error-for={field.name}></span>
+          </p>
+        ))}
+
+        <p class="field field--wide">
+          <label class="field__label" for="contact-message">Message</label>
+          <textarea
+            class="field__control field__control--area"
+            id="contact-message"
+            name="message"
+            rows="6"
+            placeholder="How can we help?"
+            required
+            aria-describedby="contact-message-error"
+          ></textarea>
+          <span class="field__error" id="contact-message-error" data-error-for="message"></span>
+        </p>
+
+        <div class="field--wide">
+          <div class="cf-turnstile" data-sitekey={PUBLIC_TURNSTILE_SITE_KEY} data-action="contact"></div>
+        </div>
+
+        <div class="field--wide contact__actions">
+          <button class="form-submit" type="submit" data-submit>
+            <span data-submit-label>Send Message</span>
+            <span class="form-submit__icon">
+              <Icon name="arrow-right" size={20} />
+            </span>
+          </button>
+        </div>
+
+        {/*
+          Announced rather than merely shown, so the result of a submission
+          reaches a screen reader without moving focus mid-typing.
+        */}
+        <p class="contact__status field--wide" role="status" aria-live="polite" data-status hidden></p>
+      </form>
+    </div>
   </div>
 </section>
+
+<script
+  is:inline
+  async
+  defer
+  src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+></script>
+
+<script>
+  /**
+   * Progressive enhancement for the contact form. Without this the form still
+   * posts natively and the endpoint answers with a redirect; with it, the
+   * visitor stays on the page and sees per-field errors.
+   */
+  const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
+
+  if (form) {
+    const status = form.querySelector<HTMLElement>('[data-status]');
+    const submit = form.querySelector<HTMLButtonElement>('[data-submit]');
+    const submitLabel = form.querySelector<HTMLElement>('[data-submit-label]');
+    const idleLabel = submitLabel?.textContent ?? 'Send Message';
+
+    const errorFor = (field: string) =>
+      form.querySelector<HTMLElement>(`[data-error-for="${field}"]`);
+
+    const setStatus = (message: string, tone: 'success' | 'error') => {
+      if (!status) return;
+      status.textContent = message;
+      status.dataset.tone = tone;
+      status.hidden = false;
+    };
+
+    const clearErrors = () => {
+      form.querySelectorAll<HTMLElement>('[data-error-for]').forEach((slot) => {
+        slot.textContent = '';
+        const field = slot.dataset.errorFor;
+        if (!field) return;
+        form.querySelector(`[name="${field}"]`)?.removeAttribute('aria-invalid');
+      });
+    };
+
+    const showErrors = (errors: Record<string, string>) => {
+      let first: HTMLElement | null = null;
+      for (const [field, message] of Object.entries(errors)) {
+        const slot = errorFor(field);
+        if (slot) slot.textContent = message;
+        const control = form.querySelector<HTMLElement>(`[name="${field}"]`);
+        if (control) {
+          control.setAttribute('aria-invalid', 'true');
+          if (!first) first = control;
+        }
+      }
+      // Send focus to the first thing that needs fixing, so a keyboard user is
+      // not left hunting for it.
+      first?.focus();
+    };
+
+    /**
+     * A used Turnstile token cannot be verified twice, so the widget has to be
+     * reset before the visitor can try again after any failure.
+     */
+    const resetChallenge = () => {
+      const turnstile = (window as unknown as { turnstile?: { reset: () => void } }).turnstile;
+      try {
+        turnstile?.reset();
+      } catch {
+        /* The widget may not have loaded; the next submit will say so. */
+      }
+    };
+
+    form.addEventListener('submit', async (event) => {
+      // Let the browser run its own required/type validation first.
+      if (!form.reportValidity()) return;
+
+      event.preventDefault();
+      clearErrors();
+
+      if (submit) submit.disabled = true;
+      if (submitLabel) submitLabel.textContent = 'Sending…';
+
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { accept: 'application/json' },
+        });
+
+        const result = (await response.json()) as {
+          ok: boolean;
+          message: string;
+          errors?: Record<string, string>;
+        };
+
+        if (result.ok) {
+          form.reset();
+          resetChallenge();
+          setStatus(result.message, 'success');
+          return;
+        }
+
+        resetChallenge();
+        setStatus(result.message, 'error');
+        if (result.errors) showErrors(result.errors);
+      } catch {
+        // The request never completed. Submitting natively hands the problem to
+        // the browser, which will report it in a way the visitor can act on.
+        resetChallenge();
+        form.submit();
+      } finally {
+        if (submit) submit.disabled = false;
+        if (submitLabel) submitLabel.textContent = idleLabel;
+      }
+    });
+
+    /**
+     * The native-POST fallback bounces back here with a reason. Only reachable
+     * when JavaScript is running, which is exactly when this can render it.
+     */
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('status') === 'error') {
+      const reasons: Record<string, string> = {
+        invalid: 'Please check the highlighted fields and try again.',
+        challenge: 'We could not verify that you are human. Please try again.',
+        'rate-limited': 'That is a lot of messages in a short time. Please wait a minute.',
+        'send-failed':
+          'Something went wrong sending your message. Please try again, or email hello@blinto.co.',
+        unavailable:
+          'The contact form is temporarily unavailable. Please email hello@blinto.co.',
+      };
+      setStatus(reasons[params.get('reason') ?? ''] ?? 'Something went wrong. Please try again.', 'error');
+    }
+  }
+</script>
 
 <style>
   .contact {
@@ -184,9 +370,76 @@ const fields: {
     text-decoration: underline;
   }
 
-  .contact__form {
+  .contact__form-column {
     flex: 1 0 0;
     min-width: min(420px, 100%);
+  }
+
+  .contact__form {
+    width: 100%;
+  }
+
+  /*
+    Off-screen rather than `display: none`: some bots skip inputs that are not
+    rendered, and the point is for them to find it and fill it in.
+  */
+  .contact__honeypot {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .contact__noscript {
+    margin-bottom: var(--space-md);
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+    background-color: var(--color-bg-accent-blue);
+    font-size: var(--font-size-body-sm);
+    line-height: 1.5;
+  }
+
+  .contact__noscript a {
+    color: var(--color-text-brand);
+    text-decoration: underline;
+  }
+
+  .field__error:empty {
+    display: none;
+  }
+
+  .field__error {
+    display: block;
+    margin-top: var(--space-3xs);
+    font-size: var(--font-size-body-sm);
+    line-height: 1.4;
+    color: #b3261e;
+  }
+
+  .contact__status {
+    margin-top: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-body-sm);
+    line-height: 1.5;
+  }
+
+  .contact__status[data-tone='success'] {
+    background-color: var(--color-bg-accent-blue);
+  }
+
+  .contact__status[data-tone='error'] {
+    background-color: #fdeceb;
+    color: #b3261e;
+  }
+
+  .contact__form :global(.cf-turnstile) {
+    margin-block: var(--space-2xs);
   }
 
   @media (width <= 900px) {
