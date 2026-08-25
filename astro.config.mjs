@@ -71,19 +71,19 @@ export default defineConfig({
         optional: true,
       }),
       /**
-       * Public by nature — it renders into the widget markup. The default is
-       * Cloudflare's documented always-passes test key, so `npm run dev` and a
-       * fresh clone work without setup.
+       * Blinto's Turnstile widget. Public by nature — it renders into the
+       * widget markup and is visible in the page source, so it lives here
+       * rather than in a build variable that a new environment could forget.
+       * Its secret half is `TURNSTILE_SECRET_KEY` above.
        *
-       * Shipping that default to production is safe by interlock rather than by
-       * luck: tokens minted by the test site key are rejected by a real
-       * `TURNSTILE_SECRET_KEY`, so a forgotten override breaks the form loudly
-       * instead of quietly disabling the challenge.
+       * Override in `.env` to point local development at a different widget —
+       * Cloudflare's always-passes test key is `1x00000000000000000000AA` —
+       * which is what you need if this widget's hostname list omits localhost.
        */
       PUBLIC_TURNSTILE_SITE_KEY: envField.string({
         context: 'client',
         access: 'public',
-        default: '1x00000000000000000000AA',
+        default: '0x4AAAAAAEbQmi88eyau51tl',
       }),
       CONTACT_TO_EMAIL: envField.string({
         context: 'server',

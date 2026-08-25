@@ -74,17 +74,54 @@ if (htmlFiles.length < EXPECTED_PAGE_COUNT) {
   );
 }
 
-// 4. No secret reached anything the browser downloads. The Resend key and the
-//    Turnstile secret are read through `astro:env/server` with access 'secret',
-//    which Astro enforces at build time; this is the belt to that braces, and
-//    catches a value hardcoded or moved to a public variable by mistake.
+// 4. No secret reached anything the browser downloads.
+//
+//    `astro:env` already enforces this: both secrets are declared with
+//    access 'secret', so importing either from `astro:env/client` fails the
+//    build outright. What follows is the belt to that braces, catching a value
+//    hardcoded into a component or moved to a public variable by mistake.
+//
+//    The Turnstile checks are by *value*, not by shape. A Turnstile site key
+//    and its secret look alike — both begin `0x` — so no pattern can tell them
+//    apart, and a shape rule would either miss real secrets or fail on the
+//    public site key that is supposed to be in the markup. Comparing against
+//    the configured values avoids both failure modes. When the secrets are not
+//    present at build time, as on Cloudflare where they are Worker secrets
+//    rather than build variables, there is simply nothing to compare and the
+//    `astro:env` guarantee stands on its own.
+const SECRET_NAMES = ['RESEND_API_KEY', 'TURNSTILE_SECRET_KEY'];
+
+/** Parses the `KEY="value"` lines of a `.dev.vars` file, if there is one. */
+async function readDevVars() {
+  try {
+    const raw = await readFile('.dev.vars', 'utf8');
+    return Object.fromEntries(
+      raw
+        .split(/\r?\n/)
+        .map((line) => line.match(/^\s*([A-Z0-9_]+)\s*=\s*"?([^"]*)"?\s*$/))
+        .filter(Boolean)
+        .map((m) => [m[1], m[2]]),
+    );
+  } catch {
+    return {};
+  }
+}
+
+const devVars = await readDevVars();
+const configuredSecrets = SECRET_NAMES.map((name) => ({
+  name,
+  value: process.env[name] ?? devVars[name] ?? '',
+}))
+  // A short or placeholder value would match half the bundle by accident.
+  .filter(({ value }) => value.length >= 12);
+
+/** Prefix-unambiguous, so worth catching even when the value is unknown. */
 const SECRET_PATTERNS = [
   [/\bre_[A-Za-z0-9_-]{16,}/, 'a Resend API key (re_…)'],
   [/RESEND_API_KEY\s*[:=]\s*["'][^"']+["']/, 'an inlined RESEND_API_KEY value'],
   [/TURNSTILE_SECRET_KEY\s*[:=]\s*["'][^"']+["']/, 'an inlined TURNSTILE_SECRET_KEY value'],
-  // Turnstile secrets begin 0x…; the public site key does not.
-  [/\b0x[A-Za-z0-9]{30,}/, 'a Turnstile secret key (0x…)'],
 ];
+
 for (const file of clientAssets) {
   const content = await readFile(file, 'utf8');
   for (const [pattern, what] of SECRET_PATTERNS) {
@@ -92,6 +129,38 @@ for (const file of clientAssets) {
       fail(`${path.relative(CLIENT, file)} appears to contain ${what}.`);
     }
   }
+  for (const { name, value } of configuredSecrets) {
+    if (content.includes(value)) {
+      fail(`${path.relative(CLIENT, file)} contains the configured ${name}.`);
+    }
+  }
+}
+
+// 4b. The public site key, by contrast, must be present: without it the
+//     Turnstile widget renders nothing, no token is minted, and every
+//     submission is refused as a failed challenge.
+const contactPage = path.join(CLIENT, 'contact-us', 'index.html');
+try {
+  const html = await readFile(contactPage, 'utf8');
+  const widget = html.match(/class="cf-turnstile"[^>]*data-sitekey="([^"]+)"/);
+  if (!widget) {
+    fail('the contact page has no Turnstile widget with a data-sitekey.');
+    // Cloudflare test keys begin 1x (always passes) or 2x (always blocks).
+    // Deploying one would disable the challenge, so it fails the build. A
+    // local build against the test pair is legitimate, and says so explicitly
+    // rather than being waved through by a heuristic.
+  } else if (
+    (widget[1].startsWith('1x') || widget[1].startsWith('2x')) &&
+    !process.env.ALLOW_TURNSTILE_TEST_KEY
+  ) {
+    fail(
+      `the contact page ships the Turnstile *test* site key ${widget[1]}. ` +
+        `Set PUBLIC_TURNSTILE_SITE_KEY to the real widget before deploying, ` +
+        `or ALLOW_TURNSTILE_TEST_KEY=1 for a deliberate local build.`,
+    );
+  }
+} catch {
+  fail(`${contactPage} is missing, so the contact form did not build.`);
 }
 
 // 5. The Worker that serves /api/contact/ was emitted.

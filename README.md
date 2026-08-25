@@ -331,11 +331,32 @@ npx wrangler secret put TURNSTILE_SECRET_KEY
 
 or Workers › `blinto-astro` › Settings › Variables and Secrets in the dashboard.
 
-`PUBLIC_TURNSTILE_SITE_KEY` defaults to Cloudflare’s always-passes **test** key
-so a fresh clone runs without setup. Production must override it. Forgetting to
-is safe rather than silent: a real `TURNSTILE_SECRET_KEY` rejects tokens minted
-by the test site key, so the form breaks loudly instead of quietly dropping its
-challenge.
+`PUBLIC_TURNSTILE_SITE_KEY` defaults to Blinto’s real widget
+(`0x4AAAAAAEbQmi88eyau51tl`) in `astro.config.mjs`. It is public — it renders
+into the widget markup and is visible in the page source — so keeping it in the
+repo means production needs no build variable for it, and cannot ship a wrong
+one by omission. Only its secret half is a secret.
+
+If the widget’s hostname list does not include `localhost`, point local
+development at Cloudflare’s test pair instead, in `.env` and `.dev.vars`
+respectively:
+
+```
+PUBLIC_TURNSTILE_SITE_KEY="1x00000000000000000000AA"
+TURNSTILE_SECRET_KEY="1x0000000000000000000000000000000AA"
+```
+
+The build refuses to ship those: `scripts/check-build-output.mjs` fails if the
+built contact page carries a `1x…` or `2x…` test key, and equally if the widget
+is missing its `data-sitekey` altogether — which would render no widget, mint no
+token, and have every submission refused.
+
+For a deliberate local build against the test pair, say so:
+
+```sh
+ALLOW_TURNSTILE_TEST_KEY=1 npm run build      # bash
+$env:ALLOW_TURNSTILE_TEST_KEY=1; npm run build  # PowerShell
+```
 
 ### What stops spam
 
@@ -376,8 +397,14 @@ pages are still served straight from the edge.
 
 `npm run build` runs `scripts/check-build-output.mjs`, which fails the build if
 any page references `/_image?href=…`, if `dist/client/_astro/` holds no
-optimised images, if the page count drops, if the Worker is missing, or if a
-key-shaped string appears in a client asset.
+optimised images, if the page count drops, if the Worker is missing, if the
+contact page has lost its Turnstile site key or is carrying a test one, or if a
+secret appears in a client asset.
+
+That last check compares against the **configured values** rather than matching
+key shapes. A Turnstile site key and its secret both begin `0x` and are
+indistinguishable by pattern, so a shape rule would either miss real secrets or
+fail on the public key that belongs in the markup.
 
 The image assertions exist because adding the adapter reopened the regression
 fixed in `5e8642d`: the adapter’s default image service defers transformation
