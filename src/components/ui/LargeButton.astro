@@ -7,6 +7,11 @@ import Icon from './Icon.astro';
  * approved hero button exactly and long labels grow. Tone=Black on light
  * surfaces, Tone=White on dark or imagery, Tone=Outline as the secondary
  * action."
+ *
+ * The tone names are Figma's own variant names, not colour descriptions:
+ * `Tone=Black` paints the pill brand blue. It was near-black with an orange
+ * arrow disc until the design moved the whole component onto the brand colour,
+ * and the variant kept its name. Read `black` as "the solid one".
  */
 interface Props {
   label: string;
@@ -61,10 +66,13 @@ const { label, href = '#contact', tone = 'black', class: className } = Astro.pro
   }
 
   /**
-   * The 44px circular arrow affordance. Figma draws the orange disc inside
-   * the exported icon; it is painted here instead so the fill stays bound to
-   * the action token, leaving the icon to supply only the chevron — which the
-   * design strokes in ink, not white.
+   * The 44px circular arrow affordance. Figma draws the disc inside the
+   * exported icon; it is painted here instead so the fill stays bound to a
+   * token, leaving the icon to supply only the chevron.
+   *
+   * The disc is brand blue with a white chevron on the two light tones, and
+   * inverts to a white disc with a blue chevron on the solid brand pill — so
+   * the disc always contrasts against the pill it sits in.
    */
   .large-button__arrow {
     display: grid;
@@ -72,15 +80,20 @@ const { label, href = '#contact', tone = 'black', class: className } = Astro.pro
     width: 44px;
     height: 44px;
     border-radius: var(--radius-full);
-    background-color: var(--color-bg-action);
-    color: var(--color-icon-primary);
+    background-color: var(--color-bg-brand);
+    color: var(--color-text-inverse);
     flex-shrink: 0;
     transition: transform 0.2s ease;
   }
 
   .large-button--black {
-    background-color: var(--color-bg-inverse);
+    background-color: var(--color-bg-brand);
     color: var(--color-text-inverse);
+  }
+
+  .large-button--black .large-button__arrow {
+    background-color: var(--color-bg-page);
+    color: var(--color-icon-brand);
   }
 
   .large-button--white {

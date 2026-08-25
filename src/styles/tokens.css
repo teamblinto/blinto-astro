@@ -11,6 +11,8 @@
   --color-bg-page: #ffffff;
   --color-bg-brand: #1945eb;
   --color-bg-inverse: #222222;
+  /* Orange accent. The Large Button used it for its arrow disc until the
+     component moved onto brand blue; the inverse Eyebrow dot still does. */
   --color-bg-action: #fa8f0f;
   --color-bg-accent-blue: #dbe7fe;
   --color-bg-accent-yellow: #feeda9;

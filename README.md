@@ -412,6 +412,13 @@ the homepage exactly:
 
 - `SectionHeader` takes `compact`, Figma's "… Compact" layout half, dropping
   the heading from Display/Section (72) to Display/Feature (60).
+- `LargeButton` paints its pill brand blue on `Tone=Black`. The tone names are
+  Figma's variant names rather than colour descriptions — the component was
+  near-black with an orange arrow disc until the design moved it onto the brand
+  colour, and the variant kept its name. The disc is brand blue with a white
+  chevron on the two light tones and inverts to white-on-blue inside the solid
+  pill, so it always contrasts against the pill it sits in. `.form-submit` in
+  `global.css` is the same pill as a real `<button>` and follows it.
 - `LargeButton` takes Figma's 560px maximum and lets its label wrap, so the
   design's 513px-wide *Explore Shopify App Support and Maintenance Services*
   CTA renders as designed instead of overflowing.

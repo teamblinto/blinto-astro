@@ -283,7 +283,7 @@ ol {
   border-color: var(--color-bg-brand);
 }
 
-/* Large Button's pill, as a real <button>. */
+/* Large Button's primary pill, as a real <button>. */
 .form-submit {
   display: inline-flex;
   align-items: center;
@@ -291,7 +291,7 @@ ol {
   padding: var(--space-2xs) var(--space-2xs) var(--space-2xs) var(--space-md);
   border: none;
   border-radius: var(--radius-full);
-  background-color: var(--color-bg-inverse);
+  background-color: var(--color-bg-brand);
   cursor: pointer;
   /* Label/Button */
   font-family: var(--font-family-body);
@@ -303,7 +303,7 @@ ol {
 }
 
 .form-submit:hover {
-  background-color: var(--color-bg-brand);
+  background-color: var(--color-bg-inverse);
 }
 
 .form-submit__icon {
@@ -313,6 +313,6 @@ ol {
   width: 40px;
   height: 40px;
   border-radius: var(--radius-full);
-  background-color: var(--color-bg-action);
-  color: var(--color-text-primary);
+  background-color: var(--color-bg-page);
+  color: var(--color-icon-brand);
 }
