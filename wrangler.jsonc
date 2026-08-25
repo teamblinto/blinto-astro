@@ -1,0 +1,26 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+
+  // The site is 21 fully static pages with no server-rendered anything, so this
+  // is an assets-only Worker: no `main` script, just `dist/` uploaded and served
+  // straight from Cloudflare's edge.
+  //
+  // Committing this matters beyond convenience. Without a wrangler config in the
+  // repo, Cloudflare's Astro preset builds the project with `@astrojs/cloudflare`
+  // in on-demand mode, which makes `<Image>` emit `/_image?href=…` URLs that only
+  // resolve if a Worker is running to transform them. Nothing served those, so
+  // every image 404'd. Pinning the deploy here keeps the build static and keeps
+  // image optimisation where it belongs: at build time, into `_astro/`.
+  "name": "blinto-astro",
+
+  "compatibility_date": "2026-08-25",
+
+  "assets": {
+    "directory": "./dist",
+
+    // `astro.config.mjs` pins `trailingSlash: 'always'` and every internal link
+    // is written with the slash. Forcing it here means the host agrees, so a
+    // slashless request 301s once rather than serving a duplicate URL.
+    "html_handling": "force-trailing-slash"
+  }
+}
