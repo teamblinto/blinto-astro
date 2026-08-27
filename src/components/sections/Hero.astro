@@ -132,10 +132,19 @@ import { primaryCta } from '~/data/site';
    * Below ~1100px five 180px slots plus gaps no longer fit, so the strip
    * scrolls horizontally rather than crushing the photos. The arc offsets are
    * flattened to keep the band a predictable height on small screens.
+   *
+   * Flattening them costs the hero its only separation between the button and
+   * the photos. Figma stacks the two flush — the strip starts at the button's
+   * baseline — but at 1440 the centred 278px button sits over the middle slot,
+   * whose 160px offset does the spacing. With every slot at offset 0 the
+   * button lands straight on a photo edge, so the gap is put back explicitly.
+   * `--space-2xl` is what the service-page heroes already leave between their
+   * action row and their banner.
    */
   @media (width <= 1100px) {
     .hero__strip {
       height: auto;
+      margin-top: var(--space-2xl);
       padding-bottom: var(--space-2xs);
       overflow-x: auto;
       overscroll-behavior-x: contain;
