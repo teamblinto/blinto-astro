@@ -1,0 +1,52 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+
+  // The site is 21 prerendered pages plus exactly one on-demand route, the
+  // contact form's `/api/contact/`. Cloudflare matches static assets first and
+  // only falls through to the Worker when nothing in `dist/client/` matches, so
+  // every page is still served straight from the edge; the Worker runs for the
+  // endpoint alone.
+  //
+  // The build must stay in build-time image mode. Without it the adapter
+  // defaults to `cloudflare-binding`, `<Image>` emits `/_image?href=…`, and on
+  // a deploy with no image binding every image 404s — the regression fixed in
+  // 5e8642d. That is pinned in `astro.config.mjs` (`imageService: 'compile'`)
+  // and asserted after each build by `scripts/check-build-output.mjs`.
+  "name": "blinto-astro",
+
+  "main": "@astrojs/cloudflare/entrypoints/server",
+
+  "compatibility_date": "2026-08-25",
+
+  "assets": {
+    // Adding the adapter split the output: prerendered pages and static files
+    // go to `dist/client/`, the Worker to `dist/server/`. The adapter also
+    // writes a resolved copy of this file to `dist/server/wrangler.json` with
+    // the path rewritten relative to itself, so a deploy from either location
+    // uploads the same thing.
+    "directory": "./dist/client",
+    "binding": "ASSETS",
+
+    // `astro.config.mjs` pins `trailingSlash: 'always'` and every internal link
+    // is written with the slash. Forcing it here means the host agrees, so a
+    // slashless request 301s once rather than serving a duplicate URL.
+    "html_handling": "force-trailing-slash"
+  },
+
+  // Defence in depth behind Turnstile, keyed on the visitor's IP: five
+  // submissions a minute is far above anything a person does and far below what
+  // makes a useful spam channel. The binding is eventually consistent by
+  // design, which is fine for a coarse cap like this one.
+  //
+  // `namespace_id` is an arbitrary but stable integer identifying the counter.
+  "ratelimits": [
+    {
+      "name": "CONTACT_RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": {
+        "limit": 5,
+        "period": 60
+      }
+    }
+  ]
+}
