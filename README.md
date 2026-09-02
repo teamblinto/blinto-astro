@@ -504,6 +504,27 @@ automatically, from the heading list `render()` returns — there is nothing to
 keep in sync. `###` headings are deliberately left out of it, so the list
 stays a list rather than a maze.
 
+**Images in the body go in `src/assets/`, referenced relatively**, the same as
+`cover`:
+
+```markdown
+![What the screenshot shows](../../assets/images/blog/<post>/<file>.png)
+```
+
+A relative path is what puts the image through Astro's pipeline — WebP,
+build-time resize, and `width`/`height` on the tag so nothing shifts as it
+loads. An absolute `/images/…` path would be served raw from `public/` and skip
+all three. Alt text describes what the image shows; a screenshot that only
+decorates gets `![]()`.
+
+**Tables are wrapped for you.** A GFM table is wider than the prose column on a
+phone, so `markdown.mjs` — a Sätteri hast plugin on Astro's own Markdown
+pipeline — wraps every `<table>` in a focusable `.table-scroll` region. The
+table stays a real table, which the usual `display: block` CSS trick would cost
+it, and pans sideways inside the column instead of making the page scroll. Give
+a table a `<caption>` and it names the region; without one the region is named
+"Table".
+
 ### The index, topics and pagination
 
 - `/blog/` leads with the `featured` post, then six cards. Six is the design's
@@ -519,12 +540,14 @@ stays a list rather than a maze.
   `src/pages/blog/topic/[topic].astro` once a topic carries enough posts to be
   worth indexing in its own right.
 
-### The seven posts in this branch are samples
+### One real post, seven samples
 
-They are written to be readable rather than to be published — real prose about
-real subject matter, so the grid, the tones, the topic row and the reading-time
-estimates can all be seen working. Delete the folder and drop in real posts;
-nothing else in the code refers to them.
+`pagefly-shopify-page-builder-review.md` is a real published review, migrated
+from `teamblinto/blinto-shopify-app-reviews` with its screenshots. The other
+seven posts are samples: written to be readable rather than to be published,
+so the grid, the tones, the topic row and the reading-time estimates can all be
+seen working. Delete them and drop in real posts; nothing else in the code
+refers to them.
 
 ## Design assets
 

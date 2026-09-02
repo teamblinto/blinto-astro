@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@astrojs/cloudflare": "^14.2.4",
+    "@astrojs/markdown-satteri": "^0.3.6",
     "@fontsource-variable/dm-sans": "^5.3.0",
     "@fontsource/staatliches": "^5.3.0",
     "astro": "^7.2.3"

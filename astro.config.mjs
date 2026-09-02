@@ -1,8 +1,10 @@
 // @ts-check
 import { defineConfig, envField } from 'astro/config';
 import cloudflare from '@astrojs/cloudflare';
+import { satteri } from '@astrojs/markdown-satteri';
 import { emitHostRedirects } from './redirects.mjs';
 import { emitSeoFiles } from './seo.mjs';
+import { tableScroll } from './markdown.mjs';
 
 // https://astro.build/config
 export default defineConfig({
@@ -33,6 +35,19 @@ export default defineConfig({
      */
     imageService: 'compile',
   }),
+
+  markdown: {
+    /**
+     * Astro's own Markdown pipeline, named so a plugin can be added to it.
+     * `satteri()` with no features set is the default configuration, so the
+     * only difference from the built-in processor is the plugin below: it
+     * wraps a post's table in a focusable scroll region, which lets a wide
+     * table pan inside the prose column on a phone without the `display:
+     * block` trick that would cost the table its semantics. See
+     * `markdown.mjs`.
+     */
+    processor: satteri({ hastPlugins: [tableScroll] }),
+  },
 
   build: {
     inlineStylesheets: 'auto',

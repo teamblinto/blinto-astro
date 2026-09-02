@@ -303,6 +303,65 @@ const share = [
     background-color: var(--color-border-muted);
   }
 
+  /**
+   * Tables.
+   *
+   * `markdown.mjs` wraps each one in `.table-scroll`, so the overflow lives on
+   * the wrapper and the `<table>` keeps its own display type and therefore its
+   * semantics. `min-width` is what makes the wrapper earn its keep: the table
+   * refuses to squeeze past a legible width and pans instead, rather than
+   * collapsing into a column of single words on a phone.
+   */
+  .article-prose .table-scroll {
+    overflow-x: auto;
+    /* A focusable region needs a visible focus ring of its own. */
+    border-radius: var(--radius-sm);
+  }
+
+  .article-prose .table-scroll:focus-visible {
+    outline: 2px solid var(--color-text-brand);
+    outline-offset: 3px;
+  }
+
+  .article-prose table {
+    width: 100%;
+    min-width: 34rem;
+    border-collapse: collapse;
+    /* Body/Default — a table is reference material, not running copy. */
+    font-size: var(--font-size-body-xs);
+    line-height: 1.4;
+  }
+
+  .article-prose caption {
+    /* Body/Muted */
+    font-size: var(--font-size-body-xs);
+    line-height: 1.4;
+    text-align: left;
+    opacity: 0.7;
+    margin-bottom: var(--space-xs);
+  }
+
+  .article-prose th,
+  .article-prose td {
+    padding: var(--space-sm) var(--space-md);
+    border-bottom: 1px solid var(--color-border-muted);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .article-prose thead th {
+    /* Label/Overline */
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--color-border-default);
+  }
+
+  .article-prose tbody tr:last-child td {
+    border-bottom: none;
+  }
+
   .article-prose code {
     padding: 2px var(--space-3xs);
     background-color: var(--color-border-faint);
