@@ -111,18 +111,19 @@ const densities = cover && cover.width >= SLOT_WIDTH * 2 ? [1, 2] : [1];
     align-items: center;
     justify-content: center;
     height: 200px;
-    padding-inline: var(--space-md);
     overflow: hidden;
     background-color: var(--color-bg-page);
     border: 1px solid var(--color-border-faint);
     border-radius: var(--radius-md);
   }
 
+  /* Fills the slot corner to corner; the slot's own `overflow: hidden` is
+     what rounds it, so the image carries no radius of its own to leave a
+     pale seam inside the one the slot already draws. */
   .article-card__cover {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: var(--radius-md);
   }
 
   .article-card__note {
@@ -131,6 +132,9 @@ const densities = cover && cover.width >= SLOT_WIDTH * 2 ? [1, 2] : [1];
     line-height: 1.3;
     text-align: center;
     opacity: 0.5;
+    /* The inset belongs to the note, not the slot: a cover image is meant to
+       run to the slot's edges, and padding there would letterbox it. */
+    padding-inline: var(--space-md);
   }
 
   .article-card__details {
