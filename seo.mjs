@@ -27,6 +27,13 @@ const GROUPS = [
   },
   { title: 'Products', paths: ['/shopify-apps/'] },
   {
+    // The index first, then the posts, since `collectPages` sorts by route.
+    // Topic pages and the index's later pages are noindex, so it has already
+    // dropped them.
+    title: 'Blog',
+    match: (p) => p.startsWith('/blog/'),
+  },
+  {
     title: 'Company',
     paths: ['/about-us/', '/testimonials/', '/career/'],
   },

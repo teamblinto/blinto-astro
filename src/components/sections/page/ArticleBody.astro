@@ -1,0 +1,382 @@
+---
+/**
+ * Section / Article (Figma 336:8631) — the two-column post body.
+ *
+ * A 300px aside carrying the contents list and the share row, then the 780px
+ * prose column. Below 1000px the aside moves above the prose, as the tablet
+ * and mobile frames do.
+ *
+ * The prose itself is rendered Markdown, so its styles are `is:global` and
+ * scoped by hand under `.article-prose`. That is the one place on this site
+ * where a global rule is the right tool: the elements come from the Markdown
+ * compiler, so there is no component whose scoped styles could reach them.
+ */
+interface Props {
+  /** `headings` from `render()`, unfiltered — this picks the `h2`s out. */
+  headings: { depth: number; slug: string; text: string }[];
+  /** Absolute URL of the post, for the share links. */
+  shareUrl: string;
+  shareTitle: string;
+}
+
+const { headings, shareUrl, shareTitle }: Props = Astro.props;
+
+/** Only the top-level sections: a nested `h3` would make the list a maze. */
+const contents = headings.filter((heading) => heading.depth === 2);
+
+const share = [
+  {
+    label: 'X',
+    href: `https://x.com/intent/post?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareTitle)}`,
+  },
+  {
+    label: 'LinkedIn',
+    href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
+  },
+];
+---
+
+<section class="article-body">
+  <div class="container article-body__grid">
+    <aside class="article-body__aside">
+      {contents.length > 0 && (
+        <nav class="article-body__toc" aria-labelledby="contents-label">
+          <p class="article-body__label" id="contents-label">In this article</p>
+          <ol class="article-body__list">
+            {contents.map((heading) => (
+              <li>
+                <a class="article-body__toc-link" href={`#${heading.slug}`}>
+                  {heading.text}
+                </a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )}
+
+      <div class="article-body__share">
+        <p class="article-body__label">Share</p>
+        <ul class="article-body__share-row">
+          {share.map((link) => (
+            <li>
+              <a
+                class="article-body__share-link"
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </aside>
+
+    <div class="article-prose">
+      <slot />
+    </div>
+  </div>
+</section>
+
+<style>
+  .article-body {
+    padding-top: var(--space-4xl);
+  }
+
+  .article-body__grid {
+    display: grid;
+    /* Figma: 300 aside, layout/grid-gap, 780 prose. */
+    grid-template-columns: 300px minmax(0, 780px);
+    gap: var(--layout-grid-gap);
+  }
+
+  .article-body__aside {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+    /* Follows the reader down the article. `align-self` is what makes a
+       sticky grid item stick: a stretched item is as tall as its row and so
+       has nothing to slide within. */
+    position: sticky;
+    top: var(--space-xl);
+    align-self: start;
+  }
+
+  .article-body__label {
+    /* Label/Overline */
+    font-size: var(--font-size-body-xs);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: var(--space-xs);
+  }
+
+  .article-body__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+    counter-reset: contents;
+  }
+
+  .article-body__toc-link,
+  .article-body__share-link {
+    /* Body/Default */
+    font-size: var(--font-size-body-xs);
+    line-height: 1.4;
+  }
+
+  .article-body__toc-link:hover {
+    color: var(--color-text-brand);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .article-body__share {
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--color-border-faint);
+  }
+
+  .article-body__share-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .article-body__share-link {
+    color: var(--color-text-brand);
+  }
+
+  .article-body__share-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  @media (width <= 1000px) {
+    .article-body__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .article-body__aside {
+      position: static;
+      padding-bottom: var(--space-lg);
+      border-bottom: 1px solid var(--color-border-faint);
+    }
+  }
+</style>
+
+<style is:global>
+  /**
+   * Rendered Markdown. Every rule is prefixed with `.article-prose` so this
+   * global block cannot reach anything outside a post body.
+   *
+   * The type is the design's: the display face on headings, Body/Answer for
+   * running copy, and the same pastel and brand-rule treatments the Figma
+   * frame draws for its callout and pull quote.
+   */
+  .article-prose {
+    /* Body/Answer */
+    font-size: var(--font-size-body-sm);
+    line-height: 1.55;
+    color: var(--color-text-primary);
+  }
+
+  .article-prose > * + * {
+    margin-top: var(--space-lg);
+  }
+
+  .article-prose h2,
+  .article-prose h3 {
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.2;
+    text-transform: uppercase;
+    /* Clears the sticky-free anchor jump from a contents link. */
+    scroll-margin-top: var(--space-xl);
+  }
+
+  .article-prose h2 {
+    font-size: var(--font-size-heading-1);
+    margin-top: var(--space-2xl);
+  }
+
+  .article-prose h3 {
+    font-size: var(--font-size-heading-2);
+    margin-top: var(--space-xl);
+  }
+
+  .article-prose > :first-child {
+    margin-top: 0;
+  }
+
+  .article-prose ul,
+  .article-prose ol {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+    padding-left: var(--space-lg);
+  }
+
+  .article-prose ul {
+    list-style: disc;
+  }
+
+  .article-prose ol {
+    list-style: decimal;
+  }
+
+  .article-prose a {
+    color: var(--color-text-brand);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    overflow-wrap: anywhere;
+  }
+
+  .article-prose strong {
+    font-weight: var(--font-weight-semibold);
+  }
+
+  /* Pull quote — Figma's brand-blue left rule at 3px, 24 in from the copy. */
+  .article-prose blockquote {
+    padding-left: var(--space-lg);
+    border-left: 3px solid var(--color-bg-brand);
+    /* Body/Lead */
+    font-size: var(--font-size-body-lg);
+    line-height: 1.35;
+  }
+
+  .article-prose blockquote > * + * {
+    margin-top: var(--space-xs);
+  }
+
+  /**
+   * Callout — the pastel aside in the design. Markdown has no syntax for it,
+   * so a post writes the two lines of HTML directly:
+   *
+   *   <div class="callout">
+   *   <p class="callout__label">Worth knowing</p>
+   *   <p>…</p>
+   *   </div>
+   */
+  .article-prose .callout {
+    padding: var(--space-lg);
+    background-color: var(--color-bg-accent-yellow);
+    border-radius: var(--radius-md);
+  }
+
+  .article-prose .callout > * + * {
+    margin-top: var(--space-xs);
+  }
+
+  .article-prose .callout__label {
+    /* Label/Overline */
+    font-size: var(--font-size-body-xs);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-brand);
+  }
+
+  .article-prose figure {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .article-prose img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-md);
+  }
+
+  .article-prose figcaption {
+    /* Body/Muted */
+    font-size: var(--font-size-body-xs);
+    line-height: 1.4;
+    opacity: 0.7;
+  }
+
+  .article-prose hr {
+    height: 1px;
+    border: none;
+    background-color: var(--color-border-muted);
+  }
+
+  /**
+   * Tables.
+   *
+   * `markdown.mjs` wraps each one in `.table-scroll`, so the overflow lives on
+   * the wrapper and the `<table>` keeps its own display type and therefore its
+   * semantics. `min-width` is what makes the wrapper earn its keep: the table
+   * refuses to squeeze past a legible width and pans instead, rather than
+   * collapsing into a column of single words on a phone.
+   */
+  .article-prose .table-scroll {
+    overflow-x: auto;
+    /* A focusable region needs a visible focus ring of its own. */
+    border-radius: var(--radius-sm);
+  }
+
+  .article-prose .table-scroll:focus-visible {
+    outline: 2px solid var(--color-text-brand);
+    outline-offset: 3px;
+  }
+
+  .article-prose table {
+    width: 100%;
+    min-width: 34rem;
+    border-collapse: collapse;
+    /* Body/Default — a table is reference material, not running copy. */
+    font-size: var(--font-size-body-xs);
+    line-height: 1.4;
+  }
+
+  .article-prose caption {
+    /* Body/Muted */
+    font-size: var(--font-size-body-xs);
+    line-height: 1.4;
+    text-align: left;
+    opacity: 0.7;
+    margin-bottom: var(--space-xs);
+  }
+
+  .article-prose th,
+  .article-prose td {
+    padding: var(--space-sm) var(--space-md);
+    border-bottom: 1px solid var(--color-border-muted);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .article-prose thead th {
+    /* Label/Overline */
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--color-border-default);
+  }
+
+  .article-prose tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .article-prose code {
+    padding: 2px var(--space-3xs);
+    background-color: var(--color-border-faint);
+    border-radius: var(--radius-sm);
+    font-size: 0.9em;
+  }
+
+  .article-prose pre {
+    padding: var(--space-md);
+    overflow-x: auto;
+    border-radius: var(--radius-md);
+  }
+
+  .article-prose pre code {
+    padding: 0;
+    background: none;
+  }
+</style>

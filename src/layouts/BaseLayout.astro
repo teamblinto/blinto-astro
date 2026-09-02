@@ -37,6 +37,11 @@ interface Props {
   /** Set on a page that sells one service, for its Service node. */
   service?: { name: string; description: string; serviceType?: string };
   /**
+   * Label for this page's own breadcrumb crumb, where the route's last
+   * segment does not title-case into something readable.
+   */
+  breadcrumbName?: string;
+  /**
    * Keeps the page out of search results and, because `seo.mjs` reads the
    * built markup, out of `sitemap.xml` and `llms.txt` too. For pages that
    * exist only as the far side of an action, like the thank-you page the
@@ -61,6 +66,7 @@ const {
   pageType = 'WebPage',
   faqs,
   service,
+  breadcrumbName,
   noindex = false,
   schema = [],
 } = Astro.props;
@@ -96,6 +102,7 @@ const graph = buildGraph({
   description,
   imageUrl: ogImageUrl.href,
   pageType,
+  breadcrumbName,
   extra: [
     ...(service ? [serviceNode(canonical, service)] : []),
     ...(faqs?.length ? [faqNode(canonical, faqs)] : []),

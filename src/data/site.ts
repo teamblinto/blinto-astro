@@ -120,6 +120,7 @@ export const footerColumns = [
     links: [
       { label: 'About Us', href: '/about-us/' },
       { label: 'Our Apps', href: '/shopify-apps/' },
+      { label: 'Blog', href: '/blog/' },
       { label: 'Contact Us', href: '/contact-us/' },
     ],
   },

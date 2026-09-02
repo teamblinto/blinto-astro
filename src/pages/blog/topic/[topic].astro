@@ -1,0 +1,68 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/page/Hero.astro';
+import TopicFilter from '~/components/sections/page/TopicFilter.astro';
+import ArticleGrid from '~/components/sections/page/ArticleGrid.astro';
+import Cta from '~/components/sections/Cta.astro';
+import * as page from '~/data/pages/blog';
+import { loadArticles, topicRow } from '~/data/articles';
+import { topicHref, topicSlug } from '~/lib/blog';
+
+/**
+ * One listing page per topic the posts actually use, so a pill in the topic
+ * row can never point at an empty page.
+ *
+ * `noindex`, deliberately: with a handful of posts these pages are thin
+ * slices of `/blog/`, and every post on them already has its own indexable
+ * URL. They exist so the design's topic row is a working control rather than
+ * decoration. Drop the `noindex` once a topic carries enough posts to be
+ * worth indexing in its own right.
+ */
+export const getStaticPaths: GetStaticPaths = async () => {
+  const articles = await loadArticles();
+  const categories = [...new Set(articles.map((article) => article.category))];
+
+  return categories.map((category) => ({
+    params: { topic: topicSlug(category) },
+    props: { category },
+  }));
+};
+
+interface Props {
+  category: string;
+}
+
+const { category } = Astro.props as Props;
+const articles = await loadArticles();
+const topics = topicRow(articles);
+const inTopic = articles.filter((article) => article.category === category);
+
+const fill = (template: string) => template.replace('%s', category);
+---
+
+<BaseLayout
+  title={fill(page.topicMeta.title)}
+  description={fill(page.topicMeta.description)}
+  pageType="CollectionPage"
+  breadcrumbName={category}
+  noindex
+>
+  <Hero
+    eyebrow={page.topicSection.eyebrow}
+    heading={category}
+    subheading={page.topicSection.subheading}
+  />
+
+  <TopicFilter {topics} current={topicHref(category)} />
+
+  <ArticleGrid articles={inTopic.map((article) => article.tile)} id="latest" />
+
+  <Cta
+    kicker={page.closingCta.kicker}
+    heading={page.closingCta.heading}
+    body={page.closingCta.body}
+    actions={page.closingCta.actions}
+    backdrop={page.closingCta.backdrop}
+  />
+</BaseLayout>

@@ -1,0 +1,88 @@
+---
+/**
+ * Newer / older links under a paginated listing.
+ *
+ * The design only draws the first page, whose single centred button is
+ * `ArticleGrid`'s own action. Page two onwards needs a way back as well as
+ * forward, and this is it — the same outline pill, twice.
+ */
+interface Props {
+  prevHref?: string;
+  nextHref?: string;
+  current: number;
+  total: number;
+}
+
+const { prevHref, nextHref, current, total }: Props = Astro.props;
+---
+
+<nav class="pager" aria-label="Article pages">
+  {prevHref ? (
+    <a class="pager__link" href={prevHref} rel="prev">Newer Articles</a>
+  ) : (
+    <span class="pager__spacer"></span>
+  )}
+
+  <p class="pager__count">Page {current} of {total}</p>
+
+  {nextHref ? (
+    <a class="pager__link" href={nextHref} rel="next">Older Articles</a>
+  ) : (
+    <span class="pager__spacer"></span>
+  )}
+</nav>
+
+<style>
+  .pager {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+  }
+
+  /* Button (54:1466) State=Default. */
+  .pager__link {
+    display: inline-flex;
+    align-items: center;
+    height: 48px;
+    padding-inline: var(--space-md);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-full);
+    /* Label/Button */
+    font-size: var(--font-size-label);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.3;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .pager__link:hover {
+    background-color: var(--color-bg-brand);
+    border-color: var(--color-bg-brand);
+    color: var(--color-text-inverse);
+  }
+
+  /* Keeps the count centred when only one direction exists. */
+  .pager__spacer {
+    display: block;
+    width: 1px;
+  }
+
+  .pager__count {
+    /* Label/Overline */
+    font-size: var(--font-size-body-xs);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pager__link {
+      transition: none;
+    }
+  }
+</style>

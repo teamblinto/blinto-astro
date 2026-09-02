@@ -45,6 +45,7 @@ export const pageLabels: Record<string, string> = {
   '/services/seo/': 'SEO',
   '/services/website-maintenance/': 'Website Maintenance',
   '/shopify-apps/': 'Our Apps',
+  '/blog/': 'Blog',
   '/about-us/': 'About Us',
   '/contact-us/': 'Contact Us',
   '/career/': 'Careers',
@@ -55,6 +56,14 @@ export const pageLabels: Record<string, string> = {
   '/terms-conditions/': 'Terms & Conditions',
   '/cookies-policy/': 'Cookie Policy',
 };
+
+/**
+ * Path segments that are grouping prefixes rather than pages: `/blog/topic/`
+ * and `/blog/page/` exist only as parents of `/blog/topic/seo/` and
+ * `/blog/page/2/`. A breadcrumb must only ever point at a URL that resolves,
+ * so these are dropped from the trail rather than linked to a 404.
+ */
+const BREADCRUMB_SKIP = new Set(['/blog/topic/', '/blog/page/']);
 
 function labelFor(path: string): string {
   if (pageLabels[path]) return pageLabels[path];
@@ -87,6 +96,12 @@ export interface GraphInput {
   /** Absolute URL of the page's share image. */
   imageUrl: string;
   pageType?: PageType;
+  /**
+   * Overrides the label of the final breadcrumb. For a route whose last
+   * segment is not in `pageLabels` and does not title-case well — a blog
+   * topic page, where `/blog/topic/seo/` would otherwise read "Seo".
+   */
+  breadcrumbName?: string;
   /** Nodes describing what this page is about: Service, FAQPage, JobPosting… */
   extra?: Record<string, unknown>[];
 }
@@ -105,7 +120,7 @@ export const idFor = {
  * A crumb per path segment, each pointing at a URL that exists. The list is
  * built from the path so it can never disagree with the page it sits on.
  */
-function breadcrumbs(canonical: URL) {
+function breadcrumbs(canonical: URL, finalName?: string) {
   const segments = canonical.pathname.split('/').filter(Boolean);
   const trail = [{ path: '/', name: labelFor('/') }];
 
@@ -113,7 +128,12 @@ function breadcrumbs(canonical: URL) {
   for (const segment of segments) {
     walked.push(segment);
     const path = `/${walked.join('/')}/`;
+    if (BREADCRUMB_SKIP.has(path)) continue;
     trail.push({ path, name: labelFor(path) });
+  }
+
+  if (finalName && trail.length > 1) {
+    trail[trail.length - 1].name = finalName;
   }
 
   return trail.map((crumb, index) => ({
@@ -130,6 +150,7 @@ export function buildGraph({
   description,
   imageUrl,
   pageType = 'WebPage',
+  breadcrumbName,
   extra = [],
 }: GraphInput) {
   const origin = canonical.origin;
@@ -205,7 +226,7 @@ export function buildGraph({
       {
         '@type': 'BreadcrumbList',
         '@id': idFor.breadcrumb(url),
-        itemListElement: breadcrumbs(canonical),
+        itemListElement: breadcrumbs(canonical, breadcrumbName),
       },
       ...extra,
     ],

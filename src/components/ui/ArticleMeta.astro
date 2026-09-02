@@ -1,0 +1,78 @@
+---
+/**
+ * The category / read-time line that opens every article card, the featured
+ * panel and the post header (Figma "Meta" inside Card / Article 324:8435).
+ *
+ * One component rather than three copies because the separator, the brand-blue
+ * first item and the overline treatment are the same in all three places, and
+ * Astro's scoped styles cannot be shared between components.
+ */
+interface Props {
+  /** Printed first, in brand blue. The topic, or "Featured". */
+  lead: string;
+  /**
+   * Everything after it, printed in ink and separated by middots. Pass an
+   * object to have the item rendered as a `<time>` — the post byline's date
+   * needs the machine-readable value, the read-time estimate beside it does
+   * not.
+   */
+  rest?: (string | { text: string; dateTime: string })[];
+  /** `inverse` sits on a dark surface. */
+  tone?: 'default' | 'inverse';
+  class?: string;
+}
+
+const { lead, rest = [], tone = 'default', class: className }: Props =
+  Astro.props;
+---
+
+<p class:list={['article-meta', `article-meta--${tone}`, className]}>
+  <span class="article-meta__lead">{lead}</span>
+  {rest.map((item) => (
+    <>
+      <span class="article-meta__sep" aria-hidden="true">·</span>
+      {typeof item === 'string' ? (
+        <span>{item}</span>
+      ) : (
+        <time datetime={item.dateTime}>{item.text}</time>
+      )}
+    </>
+  ))}
+</p>
+
+<style>
+  .article-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-xs);
+    /* Label/Overline */
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body-xs);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-primary);
+  }
+
+  .article-meta__lead {
+    color: var(--color-text-brand);
+  }
+
+  .article-meta__sep {
+    /* The middots are visual punctuation between facts, not content: hidden
+       from assistive tech so a screen reader reads the line as a list of
+       facts rather than "Shopify apps dot six min read". */
+    opacity: 0.4;
+  }
+
+  .article-meta--inverse {
+    color: var(--color-text-inverse);
+  }
+
+  .article-meta--inverse .article-meta__lead {
+    color: var(--color-text-inverse);
+    opacity: 0.75;
+  }
+</style>

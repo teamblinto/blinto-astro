@@ -1,0 +1,119 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { render } from 'astro:content';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import ArticleHero from '~/components/sections/page/ArticleHero.astro';
+import ArticleBody from '~/components/sections/page/ArticleBody.astro';
+import ArticleGrid from '~/components/sections/page/ArticleGrid.astro';
+import Cta from '~/components/sections/Cta.astro';
+import * as page from '~/data/pages/blog';
+import { loadArticles, relatedTo } from '~/data/articles';
+import { idFor, ORG_NAME, type SchemaContext } from '~/data/seo';
+import { formatDate, isoDate, topicHref } from '~/lib/blog';
+
+/**
+ * One post — Figma "Blog Post · Desktop" (326:8378). Section order is the
+ * design's: article header and cover, the two-column body, Keep Reading,
+ * closing band.
+ *
+ * The post's own prose is Markdown from `src/content/blog/`; everything
+ * around it is the same section shells the rest of the site uses.
+ */
+export const getStaticPaths: GetStaticPaths = async () => {
+  const articles = await loadArticles();
+
+  return articles.map((article) => ({ params: { slug: article.entry.id } }));
+};
+
+/**
+ * The article is looked up here rather than handed over as a
+ * `getStaticPaths` prop: props are serialised between the two, and reading
+ * the list once in the page keeps the `Article` — dates, image metadata and
+ * all — as the object `loadArticles` built.
+ */
+const articles = await loadArticles();
+const article = articles.find(
+  (item) => item.entry.id === Astro.params.slug,
+);
+if (!article) {
+  throw new Error(`No blog post for slug "${Astro.params.slug}"`);
+}
+
+const { entry, tile } = article;
+const { Content, headings } = await render(entry);
+const related = relatedTo(articles, entry.id);
+
+const canonical = new URL(tile.href, Astro.site ?? Astro.url.origin);
+const published = isoDate(article.publishDate);
+const updated = entry.data.updatedDate
+  ? isoDate(entry.data.updatedDate)
+  : undefined;
+
+/**
+ * The post as a `BlogPosting`, tied back to the shared Organization and this
+ * page's own WebPage node. Only what the post actually states: no reading
+ * time, no word count, no rating.
+ */
+const postSchema = ({ canonical: url, origin }: SchemaContext) => [
+  {
+    '@type': 'BlogPosting',
+    '@id': `${url.href}#article`,
+    headline: entry.data.headline,
+    description: entry.data.description,
+    datePublished: published,
+    ...(updated ? { dateModified: updated } : {}),
+    articleSection: entry.data.category,
+    author: { '@type': 'Person', name: entry.data.author },
+    publisher: { '@id': idFor.organization(origin) },
+    mainEntityOfPage: { '@id': idFor.webpage(url.href) },
+    image: { '@id': idFor.primaryImage(url.href) },
+    isPartOf: { '@id': `${origin}/blog/#blog` },
+    inLanguage: 'en',
+  },
+];
+---
+
+<BaseLayout
+  title={entry.data.title}
+  description={entry.data.description}
+  ogImage={entry.data.cover ?? '/og-image.png'}
+  schema={postSchema}
+>
+  <ArticleHero
+    category={entry.data.category}
+    categoryHref={topicHref(entry.data.category)}
+    headline={entry.data.headline}
+    standfirst={entry.data.excerpt}
+    author={entry.data.author}
+    dateLabel={formatDate(article.publishDate)}
+    dateIso={published}
+    readTime={tile.readTime}
+    cover={entry.data.cover}
+    coverAlt={entry.data.coverAlt}
+  />
+
+  <ArticleBody
+    {headings}
+    shareUrl={canonical.href}
+    shareTitle={`${entry.data.headline} — ${ORG_NAME}`}
+  >
+    <Content />
+  </ArticleBody>
+
+  {related.length > 0 && (
+    <ArticleGrid
+      copy={page.relatedSection}
+      articles={related.map((item) => item.tile)}
+      cardHeading="h3"
+      id="keep-reading"
+    />
+  )}
+
+  <Cta
+    kicker={page.closingCta.kicker}
+    heading={page.closingCta.heading}
+    body={page.closingCta.body}
+    actions={page.closingCta.actions}
+    backdrop={page.closingCta.backdrop}
+  />
+</BaseLayout>
