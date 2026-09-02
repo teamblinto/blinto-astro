@@ -63,10 +63,12 @@ list whose canonical entry point is `/blog/`, and `/blog/topic/<topic>/`, which
 exist so the design's topic row is a working control rather than decoration.
 Every post on them has its own indexable URL. See **The blog** below.
 
-The navigation is Services, Our Apps and About Us, with Contact reached through
-the Book a Discovery Call button. The footer promotes three services and four
-company pages — About Us, Our Apps, Blog and Contact Us — and closes with the
-copyright opposite the three policies.
+The navigation is Services, Our Apps, About Us and Blog, with Contact reached
+through the Book a Discovery Call button. The Figma frame predates the blog and
+draws only the first three; Blog is added after them so the section is reachable
+from the chrome rather than from search alone. The footer promotes three
+services and four company pages — About Us, Our Apps, Blog and Contact Us — and
+closes with the copyright opposite the three policies.
 
 ## Launch redirects
 
