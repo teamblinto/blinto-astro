@@ -415,8 +415,8 @@ back to the form with a reason in the query string.
 
 Adding the adapter split the build: prerendered pages and static files go to
 `dist/client/`, the Worker to `dist/server/`. Cloudflare matches static assets
-first and only falls through to the Worker when nothing matches, so all 21
-pages are still served straight from the edge.
+first and only falls through to the Worker when nothing matches, so every
+prerendered page is still served straight from the edge.
 
 `npm run build` runs `scripts/check-build-output.mjs`, which fails the build if
 any page references `/_image?href=…`, if `dist/client/_astro/` holds no
@@ -530,7 +530,8 @@ a table a `<caption>` and it names the region; without one the region is named
 ### The index, topics and pagination
 
 - `/blog/` leads with the `featured` post, then six cards. Six is the design's
-  grid — three across, two rows.
+  grid — three across, two rows. The featured post is lifted out of those six,
+  unless it is the only post there is — see **The blog holds one post** below.
 - Beyond that, `/blog/page/2/` onwards. The design's centred **Load More
   Articles** button is the link to the next page, and does not render when
   there is no next page — an honest absence rather than a dead control.
@@ -542,14 +543,26 @@ a table a `<caption>` and it names the region; without one the region is named
   `src/pages/blog/topic/[topic].astro` once a topic carries enough posts to be
   worth indexing in its own right.
 
-### One real post, seven samples
+### The blog holds one post
 
-`pagefly-shopify-page-builder-review.md` is a real published review, migrated
-from `teamblinto/blinto-shopify-app-reviews` with its screenshots. The other
-seven posts are samples: written to be readable rather than to be published,
-so the grid, the tones, the topic row and the reading-time estimates can all be
-seen working. Delete them and drop in real posts; nothing else in the code
-refers to them.
+`pagefly-shopify-page-builder-review.md`, the hands-on review migrated from
+`teamblinto/blinto-shopify-app-reviews` with its screenshots. The seven sample
+posts this branch was built against are gone; nothing in the code referred to
+them.
+
+One post is the smallest the index can be, and two rules exist for it:
+
+- It carries `featured: true` and still appears in the Latest grid.
+  `splitFeatured` normally lifts the featured post out of the grid so the index
+  cannot print the same headline twice, but with nothing else to show that
+  would leave Latest Articles an empty row — which reads as broken rather than
+  as a blog that has published once.
+- `ArticleGrid` gives a one-card row `.card-grid--lone`, which switches the
+  grid from `auto-fit` to `auto-fill`. Without it the lone card stretches the
+  full 1320 and comes out a different shape from the card the design draws;
+  with it the card keeps its 427 and the rest of the row is simply blank.
+
+Both stop applying on their own as soon as a second post exists.
 
 ## Design assets
 

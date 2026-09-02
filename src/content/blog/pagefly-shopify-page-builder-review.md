@@ -6,6 +6,7 @@ excerpt: 'We installed PageFly on a development store and built a page end to en
 category: 'Page Builders'
 author: 'Imran'
 publishDate: 2026-09-01
+featured: true
 cover: ../../assets/images/blog/pagefly/pagefly-page-building-thumbnail-pastel-sky-v2.png
 coverAlt: 'A painterly page-building scene beneath a recognizable diamond-tile formation in the sky'
 ---

@@ -71,18 +71,22 @@ export async function loadArticles(): Promise<Article[]> {
  *
  * More than one post can carry `featured: true` — the schema cannot stop that
  * — so the most recent wins and the others simply stay in the grid.
+ *
+ * Lifting the featured post out of the grid is what stops the index printing
+ * the same headline twice. The exception is a blog with a single post: taking
+ * it out would leave Latest Articles an empty row, and an empty row reads as
+ * something broken rather than as a blog that has published once. So while
+ * there is nothing else to show, the panel and the grid are the same post.
  */
 export function splitFeatured(articles: Article[]): {
   featured?: Article;
   rest: Article[];
 } {
   const featured = articles.find((article) => article.featured);
-  return {
-    featured,
-    rest: featured
-      ? articles.filter((article) => article !== featured)
-      : articles,
-  };
+  if (!featured) return { featured, rest: articles };
+
+  const rest = articles.filter((article) => article !== featured);
+  return { featured, rest: rest.length > 0 ? rest : articles };
 }
 
 /**

@@ -27,10 +27,11 @@ const SERVER = path.join('dist', 'server');
 
 /**
  * Every page that must exist as prerendered HTML after a build: the
- * twenty-two standing routes plus the blog — its index, its later index
- * pages, one page per post and one per topic.
+ * twenty-two standing routes plus the blog — its index, one page per post,
+ * one per topic, and one per later index page once there are enough posts to
+ * need them.
  */
-const EXPECTED_PAGE_COUNT = 39;
+const EXPECTED_PAGE_COUNT = 25;
 
 async function walk(dir) {
   const found = [];
