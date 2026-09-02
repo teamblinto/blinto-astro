@@ -11,7 +11,8 @@ import type { ArticleTile, SectionCopy } from '~/data/types';
  * Card / Article, with an optional centred action beneath it.
  *
  * The grid is `.card-grid`, so it goes three across at 1440, two, then one,
- * exactly as the tablet and mobile frames do.
+ * exactly as the tablet and mobile frames do. One card is the exception —
+ * see `.card-grid--lone` below.
  */
 interface Props {
   /**
@@ -38,7 +39,7 @@ const { copy, articles, action, id, cardHeading = 'h3' }: Props = Astro.props;
       </SectionHeader>
     )}
 
-    <ul class="card-grid">
+    <ul class:list={['card-grid', articles.length === 1 && 'card-grid--lone']}>
       {articles.map((article) => (
         <li>
           <ArticleCard
@@ -78,6 +79,25 @@ const { copy, articles, action, id, cardHeading = 'h3' }: Props = Astro.props;
     display: flex;
     flex-direction: column;
     gap: var(--space-3xl);
+  }
+
+  /**
+   * A row holding a single card.
+   *
+   * `.card-grid` sizes its tracks with `auto-fit`, which collapses the tracks
+   * it cannot fill — so one card on its own stretches the full 1320 and comes
+   * out a wholly different shape from the card the design draws. `auto-fill`
+   * keeps those empty tracks, leaving the card at its own width with the rest
+   * of the row blank, which is what a blog with one post should look like.
+   *
+   * Only this section opts in: elsewhere a lone card filling its row is the
+   * intended behaviour, so `.card-grid` itself is left alone.
+   */
+  .card-grid--lone {
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(min(var(--layout-card-min), 100%), 1fr)
+    );
   }
 
   .articles__action {
