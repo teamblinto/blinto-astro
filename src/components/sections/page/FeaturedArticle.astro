@@ -1,0 +1,156 @@
+---
+import { Image } from 'astro:assets';
+import ArticleMeta from '~/components/ui/ArticleMeta.astro';
+import LargeButton from '~/components/ui/LargeButton.astro';
+import type { ArticleTile } from '~/data/types';
+
+/**
+ * Section / Featured (Figma 330:8411) — the post the index leads with.
+ *
+ * A pastel panel split cover-left / copy-right at desktop, stacking below
+ * 900px exactly as the tablet and mobile frames do. Unlike Card / Article
+ * this one keeps its Large Button as a real link: the panel is a section
+ * rather than a tile, its headline is the page's leading `h2`, and there is
+ * only one of it, so a second tab stop costs nothing and the button is the
+ * affordance the design draws.
+ */
+interface Props {
+  article: ArticleTile;
+  /** The meta row's first item. The design prints "Featured" here. */
+  lead?: string;
+  cta?: string;
+}
+
+const {
+  article,
+  lead = 'Featured',
+  cta = 'Read the Article',
+}: Props = Astro.props;
+
+/* 560x380 inside the 1320 panel at 1440. See ImageCard on density. */
+const SLOT_WIDTH = 560;
+const SLOT_HEIGHT = 380;
+const densities =
+  article.cover && article.cover.width >= SLOT_WIDTH * 2 ? [1, 2] : [1];
+---
+
+<section class="featured">
+  <div class="container">
+    <div class="featured__panel">
+      <div class="featured__slot">
+        {article.cover ? (
+          <Image
+            class="featured__cover"
+            src={article.cover}
+            alt={article.coverAlt ?? ''}
+            width={SLOT_WIDTH}
+            height={SLOT_HEIGHT}
+            {densities}
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+          />
+        ) : (
+          <p class="featured__note">Cover image</p>
+        )}
+      </div>
+
+      <div class="featured__details">
+        <ArticleMeta {lead} rest={[article.category, article.readTime]} />
+        <h2 class="featured__headline">
+          <a class="featured__link" href={article.href}>{article.headline}</a>
+        </h2>
+        <p class="featured__excerpt">{article.excerpt}</p>
+        <LargeButton label={cta} href={article.href} />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .featured {
+    padding-top: var(--space-4xl);
+  }
+
+  .featured__panel {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xl);
+    padding: var(--space-xl);
+    background-color: var(--color-bg-accent-blue);
+    border-radius: var(--radius-lg);
+  }
+
+  .featured__slot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 560px;
+    height: 380px;
+    overflow: hidden;
+    background-color: var(--color-bg-page);
+    border: 1px solid var(--color-border-faint);
+    border-radius: var(--radius-md);
+  }
+
+  .featured__cover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .featured__note {
+    /* Body/Default at 50% — Figma's pending-note treatment. */
+    font-size: var(--font-size-body-xs);
+    text-align: center;
+    opacity: 0.5;
+  }
+
+  .featured__details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-md);
+    min-width: 0;
+  }
+
+  .featured__headline {
+    /* Display/Feature */
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-display-3);
+    font-weight: var(--font-weight-regular);
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .featured__excerpt {
+    /* Body/Lead */
+    font-size: var(--font-size-body-lg);
+    line-height: 1.4;
+  }
+
+  /**
+   * The tablet and mobile frames stack the panel and let the cover fill the
+   * width. 900px is where the 560px slot stops leaving a readable measure
+   * beside it, which is earlier than the 768 frame — the frames are sample
+   * widths, not the breakpoints themselves.
+   */
+  @media (width <= 900px) {
+    .featured__panel {
+      flex-direction: column;
+      align-items: stretch;
+      padding: var(--space-lg);
+    }
+
+    .featured__slot {
+      flex: 0 0 auto;
+      height: 320px;
+    }
+  }
+
+  @media (width <= 600px) {
+    .featured__slot {
+      height: 200px;
+    }
+  }
+</style>

@@ -1,0 +1,85 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/page/Hero.astro';
+import TopicFilter from '~/components/sections/page/TopicFilter.astro';
+import ArticleGrid from '~/components/sections/page/ArticleGrid.astro';
+import Pager from '~/components/ui/Pager.astro';
+import Cta from '~/components/sections/Cta.astro';
+import * as page from '~/data/pages/blog';
+import { loadArticles, splitFeatured, topicRow } from '~/data/articles';
+import { ARTICLES_PER_PAGE, paginateArticles } from '~/lib/blog';
+
+/**
+ * The index's later pages. The first page keeps the bare `/blog/` path, so
+ * this route starts at 2 and generates nothing until there are more posts
+ * than one page holds.
+ *
+ * These pages are `noindex`: they are slices of a list whose canonical entry
+ * point is `/blog/`, and every post on them has its own indexable URL. That
+ * also keeps them out of `sitemap.xml` and `llms.txt`, which read the built
+ * markup.
+ */
+export const getStaticPaths: GetStaticPaths = async () => {
+  const articles = await loadArticles();
+  const { rest } = splitFeatured(articles);
+  const total = Math.ceil(rest.length / ARTICLES_PER_PAGE);
+
+  return Array.from({ length: Math.max(0, total - 1) }, (_, index) => ({
+    params: { page: String(index + 2) },
+  }));
+};
+
+const articles = await loadArticles();
+const { rest } = splitFeatured(articles);
+const current = paginateArticles(rest, Number(Astro.params.page));
+const topics = topicRow(articles);
+
+const heading = `${page.latestSection.heading} — Page ${current.current}`;
+---
+
+<BaseLayout
+  title={`${heading} | Blinto Blog`}
+  description={page.meta.description}
+  pageType="CollectionPage"
+  noindex
+>
+  <Hero
+    eyebrow={page.hero.eyebrow}
+    heading={page.hero.heading}
+    subheading={page.hero.subheading}
+  />
+
+  <TopicFilter {topics} current="/blog/" />
+
+  <ArticleGrid
+    copy={{ ...page.latestSection, heading }}
+    articles={current.items.map((article) => article.tile)}
+    id="latest"
+  />
+
+  <section class="pager-band">
+    <div class="container">
+      <Pager
+        prevHref={current.prevHref}
+        nextHref={current.nextHref}
+        current={current.current}
+        total={current.total}
+      />
+    </div>
+  </section>
+
+  <Cta
+    kicker={page.closingCta.kicker}
+    heading={page.closingCta.heading}
+    body={page.closingCta.body}
+    actions={page.closingCta.actions}
+    backdrop={page.closingCta.backdrop}
+  />
+</BaseLayout>
+
+<style>
+  .pager-band {
+    padding-top: var(--space-2xl);
+  }
+</style>

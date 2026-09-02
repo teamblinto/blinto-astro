@@ -1,0 +1,94 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Hero from '~/components/sections/page/Hero.astro';
+import FeaturedArticle from '~/components/sections/page/FeaturedArticle.astro';
+import TopicFilter from '~/components/sections/page/TopicFilter.astro';
+import ArticleGrid from '~/components/sections/page/ArticleGrid.astro';
+import Cta from '~/components/sections/Cta.astro';
+import * as page from '~/data/pages/blog';
+import { loadArticles, splitFeatured, topicRow } from '~/data/articles';
+import { idFor, type SchemaContext } from '~/data/seo';
+import { isoDate, paginateArticles } from '~/lib/blog';
+
+/**
+ * The blog index — Figma "Blog · Desktop" (326:8377). Section order is the
+ * design's: hero, featured, topics, latest, closing band.
+ *
+ * Pagination lives at /blog/page/2/ onwards; this page is always the first
+ * slice, and the design's centred button is the link to the next one. With
+ * six or fewer posts beyond the featured one there is no second page and no
+ * button, which is the honest state rather than a dead control.
+ */
+const articles = await loadArticles();
+const { featured, rest } = splitFeatured(articles);
+const current = paginateArticles(rest, 1);
+const topics = topicRow(articles);
+
+/**
+ * The blog as a thing in its own right, with its posts listed on it. An
+ * answer engine asking "what does Blinto write about" gets the list from
+ * here rather than having to crawl every post.
+ */
+const blogSchema = ({ canonical, origin }: SchemaContext) => [
+  {
+    '@type': 'Blog',
+    '@id': `${canonical.href}#blog`,
+    name: page.hero.heading,
+    description: page.meta.description,
+    url: canonical.href,
+    publisher: { '@id': idFor.organization(origin) },
+    isPartOf: { '@id': idFor.webpage(canonical.href) },
+    inLanguage: 'en',
+    blogPost: articles.map((article) => ({
+      '@type': 'BlogPosting',
+      '@id': new URL(article.tile.href, origin).href,
+      headline: article.entry.data.headline,
+      description: article.entry.data.description,
+      datePublished: isoDate(article.publishDate),
+      ...(article.entry.data.updatedDate
+        ? { dateModified: isoDate(article.entry.data.updatedDate) }
+        : {}),
+      articleSection: article.category,
+      author: { '@type': 'Person', name: article.entry.data.author },
+      publisher: { '@id': idFor.organization(origin) },
+      url: new URL(article.tile.href, origin).href,
+    })),
+  },
+];
+---
+
+<BaseLayout
+  title={page.meta.title}
+  description={page.meta.description}
+  pageType="CollectionPage"
+  schema={blogSchema}
+>
+  <Hero
+    eyebrow={page.hero.eyebrow}
+    heading={page.hero.heading}
+    subheading={page.hero.subheading}
+  />
+
+  {featured && <FeaturedArticle article={featured.tile} />}
+
+  <TopicFilter {topics} current="/blog/" />
+
+  <ArticleGrid
+    copy={page.latestSection}
+    articles={current.items.map((article) => article.tile)}
+    action={
+      current.nextHref
+        ? { label: page.loadMoreLabel, href: current.nextHref, tone: 'outline' }
+        : undefined
+    }
+    id="latest"
+  />
+
+  <Cta
+    kicker={page.closingCta.kicker}
+    heading={page.closingCta.heading}
+    body={page.closingCta.body}
+    actions={page.closingCta.actions}
+    backdrop={page.closingCta.backdrop}
+  />
+</BaseLayout>

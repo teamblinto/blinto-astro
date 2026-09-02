@@ -1,0 +1,211 @@
+---
+import { Image } from 'astro:assets';
+import ArticleMeta from './ArticleMeta.astro';
+import type { Tone } from '~/lib/blog';
+
+/**
+ * Card / Article (Figma 324:8435) — the blog's grid tile.
+ *
+ * Built on Card / Product's shape, which is the design's own precedent for a
+ * pastel card holding a neutral media slot: with no `cover` the slot stays an
+ * empty white surface carrying a pending note rather than a stock photo.
+ *
+ * One link per card. The heading carries it and a stretched pseudo-element
+ * makes the whole tile clickable, so the card has a single tab stop whose
+ * accessible name is the headline. The "Read Article" pill is therefore a
+ * `<span>`: a second link to the same URL would double every card's tab stops
+ * and read out twice, and making it the only link would name the card
+ * "Read Article" six times over.
+ */
+interface Props {
+  headline: string;
+  excerpt: string;
+  href: string;
+  category: string;
+  readTime: string;
+  tone: Tone;
+  cover?: ImageMetadata;
+  coverAlt?: string;
+  /** Shown in the empty slot while the post has no cover image. */
+  note?: string;
+  /** Heading level — pick per document outline, not per size. */
+  as?: 'h2' | 'h3';
+}
+
+const {
+  headline,
+  excerpt,
+  href,
+  category,
+  readTime,
+  tone,
+  cover,
+  coverAlt,
+  note = 'Cover image',
+  as: Heading = 'h3',
+}: Props = Astro.props;
+
+/* The slot is 379x200 inside the 427 card at 1440. See ImageCard on density. */
+const SLOT_WIDTH = 379;
+const SLOT_HEIGHT = 200;
+const densities = cover && cover.width >= SLOT_WIDTH * 2 ? [1, 2] : [1];
+---
+
+<article class:list={['article-card', `article-card--${tone}`]}>
+  <div class="article-card__slot">
+    {cover ? (
+      <Image
+        class="article-card__cover"
+        src={cover}
+        alt={coverAlt ?? ''}
+        width={SLOT_WIDTH}
+        height={SLOT_HEIGHT}
+        {densities}
+        loading="lazy"
+        decoding="async"
+      />
+    ) : (
+      <p class="article-card__note">{note}</p>
+    )}
+  </div>
+
+  <div class="article-card__details">
+    <ArticleMeta lead={category} rest={[readTime]} />
+    <Heading class="article-card__headline">
+      <a class="article-card__link" {href}>{headline}</a>
+    </Heading>
+    <p class="article-card__excerpt">{excerpt}</p>
+  </div>
+
+  <span class="article-card__cta" aria-hidden="true">Read Article</span>
+</article>
+
+<style>
+  .article-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    width: 100%;
+    min-width: 0;
+    padding: var(--space-lg);
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+    transition: transform 0.2s ease;
+  }
+
+  .article-card--blue {
+    background-color: var(--color-bg-accent-blue);
+  }
+
+  .article-card--yellow {
+    background-color: var(--color-bg-accent-yellow);
+  }
+
+  .article-card--green {
+    background-color: var(--color-bg-accent-green);
+  }
+
+  .article-card__slot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    padding-inline: var(--space-md);
+    overflow: hidden;
+    background-color: var(--color-bg-page);
+    border: 1px solid var(--color-border-faint);
+    border-radius: var(--radius-md);
+  }
+
+  .article-card__cover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+  }
+
+  .article-card__note {
+    /* Body/Default at 50% — Figma's pending-note treatment. */
+    font-size: var(--font-size-body-xs);
+    line-height: 1.3;
+    text-align: center;
+    opacity: 0.5;
+  }
+
+  .article-card__details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    /* Pushes the CTA to the foot of the card so a row of cards lines up
+       however long their headlines run. */
+    flex: 1 0 auto;
+  }
+
+  .article-card__headline {
+    /* Heading/Card */
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-heading-1);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.25;
+    text-transform: uppercase;
+  }
+
+  /* The card-wide click target. `position: static` on the heading keeps this
+     anchored to the card rather than to the heading box. */
+  .article-card__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-md);
+  }
+
+  .article-card__link:focus-visible {
+    outline: none;
+  }
+
+  /* Focus lands on the whole card, since that is what the link covers. */
+  .article-card__link:focus-visible::after {
+    outline: 2px solid var(--color-text-brand);
+    outline-offset: 3px;
+  }
+
+  .article-card__excerpt {
+    /* Body/Default */
+    font-size: var(--font-size-body-xs);
+    line-height: 1.4;
+  }
+
+  /* Button (54:1466) State=Default, as static text: see the note above. */
+  .article-card__cta {
+    display: inline-flex;
+    align-self: flex-start;
+    align-items: center;
+    height: 48px;
+    padding-inline: var(--space-md);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-full);
+    /* Label/Button */
+    font-size: var(--font-size-label);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.3;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  /* State=Hover, driven by the card because the pill is not the link. */
+  .article-card:hover .article-card__cta {
+    background-color: var(--color-bg-brand);
+    border-color: var(--color-bg-brand);
+    color: var(--color-text-inverse);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .article-card,
+    .article-card__cta {
+      transition: none;
+    }
+  }
+</style>

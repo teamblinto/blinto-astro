@@ -1,0 +1,85 @@
+---
+/**
+ * Section / Topics (Figma 331:8415) — the topic row.
+ *
+ * Real links to real pages rather than a scripted filter: this site ships no
+ * framework JavaScript, and a pill that only works with JS enabled is worse
+ * than one that navigates. `current` marks the active pill, which is the
+ * design's State=Hover fill.
+ */
+interface Props {
+  topics: { label: string; href: string }[];
+  /** `href` of the pill to mark as the page you are on. */
+  current: string;
+  /** Names the row for assistive tech, since it is a navigation landmark. */
+  label?: string;
+}
+
+const { topics, current, label = 'Blog topics' }: Props = Astro.props;
+---
+
+<nav class="topics" aria-label={label}>
+  <div class="container">
+    <ul class="topics__row">
+      {topics.map((topic) => {
+        const active = topic.href === current;
+        return (
+          <li>
+            <a
+              class:list={['topics__pill', active && 'topics__pill--active']}
+              href={topic.href}
+              aria-current={active ? 'page' : undefined}
+            >
+              {topic.label}
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+  </div>
+</nav>
+
+<style>
+  .topics {
+    padding-top: var(--space-4xl);
+  }
+
+  .topics__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  /* Button (54:1466) State=Default. */
+  .topics__pill {
+    display: inline-flex;
+    align-items: center;
+    height: 48px;
+    padding-inline: var(--space-md);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-full);
+    /* Label/Button */
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-label);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.3;
+    white-space: nowrap;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .topics__pill:hover,
+  .topics__pill--active {
+    background-color: var(--color-bg-brand);
+    border-color: var(--color-bg-brand);
+    color: var(--color-text-inverse);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .topics__pill {
+      transition: none;
+    }
+  }
+</style>

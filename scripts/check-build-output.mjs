@@ -25,8 +25,12 @@ import process from 'node:process';
 const CLIENT = path.join('dist', 'client');
 const SERVER = path.join('dist', 'server');
 
-/** Every page that must exist as prerendered HTML after a build. */
-const EXPECTED_PAGE_COUNT = 20;
+/**
+ * Every page that must exist as prerendered HTML after a build: the
+ * twenty-two standing routes plus the blog — its index, one page per post and
+ * one per topic.
+ */
+const EXPECTED_PAGE_COUNT = 36;
 
 async function walk(dir) {
   const found = [];

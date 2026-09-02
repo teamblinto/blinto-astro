@@ -158,3 +158,23 @@ export interface Job {
   salary?: { min: number; max: number };
   href: string;
 }
+
+/**
+ * Card / Article (Figma 324:8435) — one blog post as a grid tile.
+ *
+ * The pages build these from the `blog` content collection rather than from a
+ * data module, since a post's copy lives in its own Markdown file. `cover` is
+ * optional for the reason Card / Product's screenshot is: with none, the slot
+ * stays a neutral surface with a pending note.
+ */
+export interface ArticleTile {
+  headline: string;
+  excerpt: string;
+  href: string;
+  category: string;
+  /** Pre-rendered, e.g. "6 min read" — see `readingLabel` in `lib/blog`. */
+  readTime: string;
+  tone: CardTone;
+  cover?: ImageMetadata;
+  coverAlt?: string;
+}

@@ -8,8 +8,9 @@ a trailing slash, pinned via `trailingSlash: 'always'`.
 
 ## Routes
 
-Twenty-one pages. Six come from Figma; the rest carry the WordPress site's
-content into the new design system, since no frame exists for them.
+Twenty-two pages plus the blog. Eight come from Figma; the rest carry the
+WordPress site's content into the new design system, since no frame exists for
+them.
 
 | Route | From |
 | --- | --- |
@@ -31,6 +32,8 @@ content into the new design system, since no frame exists for them.
 | `/testimonials/` | migrated content |
 | `/book-a-call/` | migrated content |
 | `/support/` | migrated content |
+| `/blog/` | [`326:8377` — Blog · Desktop](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Website-2026?node-id=326-8377) |
+| `/blog/<slug>/` | [`326:8378` — Blog Post · Desktop](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Website-2026?node-id=326-8378) |
 | `/privacy-policy/`, `/terms-conditions/`, `/cookies-policy/` | migrated verbatim |
 
 `/case-studies/` does not exist yet, and nothing links to it — it is out of the
@@ -54,9 +57,16 @@ is `noindex`, which also keeps it out of `sitemap.xml` and `llms.txt`.
 `/api/contact/` is the form’s endpoint and the only route on the site that is
 not prerendered — see **The contact form** below.
 
+Two more blog routes exist and are `noindex`, so they also stay out of
+`sitemap.xml` and `llms.txt`: `/blog/page/2/` onwards, which are slices of a
+list whose canonical entry point is `/blog/`, and `/blog/topic/<topic>/`, which
+exist so the design's topic row is a working control rather than decoration.
+Every post on them has its own indexable URL. See **The blog** below.
+
 The navigation is Services, Our Apps and About Us, with Contact reached through
-the Book a Discovery Call button. The footer promotes three services and three
-company pages, and closes with the copyright opposite the three policies.
+the Book a Discovery Call button. The footer promotes three services and four
+company pages — About Us, Our Apps, Blog and Contact Us — and closes with the
+copyright opposite the three policies.
 
 ## Launch redirects
 
@@ -112,6 +122,8 @@ and referenced by id; whatever the page is *about* joins the same graph:
 | `/contact-us/` | `ContactPage`, `FAQPage` |
 | `/career/` | `JobPosting` ×10, `FAQPage` |
 | `/testimonials/` | `Review` ×2 against the Organization |
+| `/blog/` | `CollectionPage` + `Blog` listing every post as a `BlogPosting` |
+| `/blog/<slug>/` | `BlogPosting`, tied to the `Blog` node and the shared Organization |
 
 `src/data/seo.ts` builds it; `BaseLayout` takes `faqs`, `service`, `pageType`
 and `schema` so a page declares what it is rather than hand-rolling JSON. The
@@ -127,7 +139,7 @@ Three files are generated at build time by `seo.mjs`, which reads titles and
 descriptions back out of the built HTML so they can never disagree with the
 pages themselves:
 
-- **`sitemap.xml`** — the 21 canonical URLs. No `lastmod`, `changefreq` or
+- **`sitemap.xml`** — the 29 canonical URLs. No `lastmod`, `changefreq` or
   `priority`: nothing tracks per-page edit dates, and a build timestamp on
   every URL claims the whole site changed on every deploy, which is why
   crawlers discount it.
@@ -196,13 +208,17 @@ is deliberate.
 
 ```
 src/
+├── content.config.ts     The blog collection's frontmatter schema
+├── content/
+│   └── blog/             One Markdown file per post
 ├── data/                 Page content, separated from markup
 │   ├── site.ts           Nav, footer, offices, contact details, socials
 │   ├── home.ts           Homepage copy, keyed to Figma nodes
 │   ├── about.ts          About Us copy
 │   ├── types.ts          Shapes shared by the pages and the section shells
+│   ├── articles.ts       The blog collection, as the shapes the sections want
 │   ├── services/         One module per service page (nine)
-│   ├── pages/            services, shopify-apps, contact-us, career, …
+│   ├── pages/            services, shopify-apps, contact-us, career, blog, …
 │   └── legal/            The three policies, as block lists
 ├── styles/
 │   ├── tokens.css        Figma design variables, 1:1
@@ -215,6 +231,7 @@ src/
 │   └── sections/         One component per Figma section
 │       └── page/         Data-driven shells shared across the inner pages
 ├── lib/                  Framework-free logic, unit tested with Vitest
+│   ├── blog.ts               Reading time, dates, topic slugs, pagination
 │   ├── contact-form.ts       Contact form validation and normalisation
 │   ├── contact-email.ts      The Resend payload, HTML and plain text
 │   └── contact-submission.ts The submission pipeline end to end
@@ -222,6 +239,7 @@ src/
     ├── index.astro       Composes the homepage sections
     ├── services.astro    The /services/ hub
     ├── services/         The nine service pages
+    ├── blog/             index, [slug], page/[page], topic/[topic]
     ├── api/contact.ts    The contact endpoint — the one on-demand route
     ├── thank-you.astro   Where a native form POST lands, noindex
     └── …                 about-us, shopify-apps, contact-us, career, …
@@ -236,7 +254,10 @@ module, and passes props. Copy never lives in markup.
   the Figma variable collection. Components consume `var(--token)` so a design
   change lands in one file. Only edit tokens to reflect a change in Figma.
 - **Content lives in `src/data`.** Copy changes shouldn't require touching
-  layout. Each export notes the Figma node it came from.
+  layout. Each export notes the Figma node it came from. The blog is the one
+  exception: a post is running prose written by somebody who is not editing
+  components, so posts are Markdown in `src/content/blog/` and only the copy
+  *around* them lives in `src/data/pages/blog.ts`.
 - **Styling is scoped `<style>` blocks** in each `.astro` file, plus a small set
   of global layout primitives (`.container`, `.section`, `.card-grid`,
   `.card-row`). No CSS
@@ -410,6 +431,101 @@ The image assertions exist because adding the adapter reopened the regression
 fixed in `5e8642d`: the adapter’s default image service defers transformation
 to runtime, and on a deploy with no image binding every image 404s.
 `astro.config.mjs` pins `imageService: 'compile'` against that.
+## The blog
+
+`/blog/` and `/blog/<slug>/` implement Figma
+[`326:8377`](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Website-2026?node-id=326-8377)
+and
+[`326:8378`](https://www.figma.com/design/UTcp8QqVIYUYwK95ao0HqY/Blinto-Website-2026?node-id=326-8378),
+including the tablet and mobile frames.
+
+### Writing a post
+
+Add a Markdown file to `src/content/blog/`. Its filename is its URL:
+`shopify-app-store-pricing.md` publishes at
+`/blog/shopify-app-store-pricing/`. Nothing else needs editing — the index,
+the topic row, the topic pages, the pagination, `sitemap.xml` and `llms.txt`
+all follow from the file.
+
+```markdown
+---
+title: 'What Nine Months in the App Store Taught Us About Pricing — Blinto'
+description: 'The meta description, and what search results show.'
+headline: 'What Nine Months in the App Store Taught Us About Pricing'
+excerpt: 'The standfirst, on the card and under the headline.'
+category: 'Shopify Apps'
+author: 'Rakibul Islam'
+publishDate: 2026-09-12
+---
+
+## A heading that states the answer
+
+Running copy.
+```
+
+| Field | | Notes |
+| --- | --- | --- |
+| `title` | required | The `<title>`. Separate from `headline` so the tab and the page can differ in length. |
+| `description` | required | Meta description and Open Graph description. |
+| `headline` | required | Typeset on the page and the card. |
+| `excerpt` | required | Card and featured-panel standfirst. |
+| `category` | required | One topic per post. Becomes the card's overline and its topic page. |
+| `author` | required | Printed in the byline and used as the `BlogPosting` author. |
+| `publishDate` | required | Sorts the index and sets `datePublished`. |
+| `updatedDate` | optional | Sets `dateModified`. For a material revision, not a typo fix. |
+| `featured` | optional | The post the index leads with. One post should carry it; if several do, the most recent wins and the rest stay in the grid. |
+| `tone` | optional | Pins a card's pastel fill. Left unset the grid cycles blue → green → yellow, which is what the design does. |
+| `cover` | optional | An image in `src/assets/`. With none, the slot stays a neutral surface with a pending note — Card / Product's own convention, and better than a stock photo standing in for real artwork. |
+| `coverAlt` | optional | Required in practice whenever `cover` is set and the image carries meaning. |
+| `draft` | optional | Keeps the post out of the build entirely, including its own URL. |
+
+**Reading time is derived, not declared.** `readingTime` in `src/lib/blog.ts`
+counts words at 200 a minute, ignoring Markdown syntax, link targets and
+fenced code, and never reports less than a minute. Nobody has to keep a number
+in frontmatter honest.
+
+### Markdown the post page styles
+
+Ordinary Markdown is typeset from the design's own tokens — display face on
+headings, Body/Answer for running copy, brand blue on links. Two of the
+design's blocks have no Markdown syntax, so a post writes them directly:
+
+```markdown
+> A pull quote. Rendered with the brand-blue left rule from the design.
+
+<div class="callout">
+<p class="callout__label">Worth knowing</p>
+<p>The pastel aside from the design.</p>
+</div>
+```
+
+The `##` headings become the "In this article" list in the post's aside
+automatically, from the heading list `render()` returns — there is nothing to
+keep in sync. `###` headings are deliberately left out of it, so the list
+stays a list rather than a maze.
+
+### The index, topics and pagination
+
+- `/blog/` leads with the `featured` post, then six cards. Six is the design's
+  grid — three across, two rows.
+- Beyond that, `/blog/page/2/` onwards. The design's centred **Load More
+  Articles** button is the link to the next page, and does not render when
+  there is no next page — an honest absence rather than a dead control.
+- The topic row is built from the categories the posts actually use, so a pill
+  can never point at an empty page.
+- The later index pages and the topic pages are `noindex`. They are thin
+  slices of a list whose canonical entry point is `/blog/`, and every post on
+  them already has its own indexable URL. Drop the `noindex` on
+  `src/pages/blog/topic/[topic].astro` once a topic carries enough posts to be
+  worth indexing in its own right.
+
+### The seven posts in this branch are samples
+
+They are written to be readable rather than to be published — real prose about
+real subject matter, so the grid, the tones, the topic row and the reading-time
+estimates can all be seen working. Delete the folder and drop in real posts;
+nothing else in the code refers to them.
+
 ## Design assets
 
 Every asset on the page is the real artwork from the Figma file — no
@@ -600,6 +716,19 @@ hole beside them.
 - **The close icon is the Plus rotated 45deg.** The design system ships no
   close glyph, so the drawer reuses Icon / 32 / Plus rather than introducing a
   foreign one.
+- **The blog's closing band is not the newsletter sign-up.** The Figma frames
+  draw "Read it before anyone else does" with a Subscribe button. There is no
+  list to subscribe to and no endpoint to post to, and a Subscribe button that
+  opens the contact form is worse than not offering one, so the band ships as
+  the site's standard closing CTA. Swapping it back is `closingCta` in
+  `src/data/pages/blog.ts` plus a form.
+- **The post aside drops "Copy link".** Copying to the clipboard needs
+  JavaScript, and this site ships one script — the nav drawer. The X and
+  LinkedIn share links are real links and work without it.
+- **The topic row navigates rather than filters.** Figma draws pills with a
+  selected state, which in a client-rendered blog would be a JavaScript
+  filter. Here each pill is a real page at `/blog/topic/<topic>/`, generated
+  only for topics that have posts, so a pill can never point at an empty page.
 - **The CTA heading wraps greedily.** It carried `text-wrap: balance`, which
   re-broke it into two shorter lines. Figma fills each line to the 790px
   content width before breaking — the same greedy wrap `SectionHeader` already
