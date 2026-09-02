@@ -23,6 +23,11 @@ export interface NavLink {
  * beside it rather than a second link to the same page, and Case Studies is out
  * until those pages exist.
  *
+ * Blog sits last, after the three pages the design's bar carries. The Figma
+ * frame predates the blog and so does not draw it, but a blog nobody can reach
+ * from the chrome is a section of the site that only search finds — and the
+ * footer already lists it under Company, so the two would disagree.
+ *
  * `/about-us/` and `/contact-us/` deliberately reuse the paths the current
  * WordPress site already ranks on, so neither needs a redirect at launch.
  */
@@ -41,6 +46,7 @@ export const navLinks: NavLink[] = [
   },
   { label: 'Our Apps', href: '/shopify-apps/' },
   { label: 'About Us', href: '/about-us/' },
+  { label: 'Blog', href: '/blog/' },
 ];
 
 export const primaryCta = {
