@@ -15,11 +15,6 @@ PageFly is a drag-and-drop Shopify page builder aimed at merchants who want more
 
 Our main takeaway: **PageFly is easy to learn and capable enough for non-technical merchants to build polished campaign and landing pages quickly, but merchants planning a complete homepage redesign should understand how PageFly interacts with their existing Shopify theme before publishing.**
 
-<div class="callout">
-<p class="callout__label">How we tested</p>
-<p>Level 1 — full hands-on test. Installed on a Shopify development store and used on the Free plan on 1 September 2026. Last verified 1 September 2026.</p>
-</div>
-
 ## Our Verdict
 
 PageFly makes the most sense for Shopify merchants who want to create custom landing or promotional pages without depending on a developer for every change. In our test, the editor was straightforward, the template library gave us a useful starting point, and we were able to build a complete page in roughly 30–40 minutes with some planning done beforehand.
@@ -170,7 +165,3 @@ Yes, but merchants should understand how it interacts with their Shopify theme. 
 ### Does PageFly include A/B testing?
 
 PageFly's pricing interface listed A/B testing under its Builder plan when we checked it. However, A/B testing was accessible on our Free-plan test store. Because of that discrepancy, merchants who consider A/B testing essential should verify the current plan requirement directly before subscribing.
-
----
-
-*Reviewed hands-on by Imran for Blinto on September 1, 2026. Testing covered the Free plan, one Home-type page build and publish, responsive previews, and core CRO tools. Paid-plan workflows, long-term use, and support quality were not fully tested.*
